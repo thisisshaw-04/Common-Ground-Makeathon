@@ -105,8 +105,8 @@ This is deliberately a wireframe. To make it production-ready:
 ## Design notes
 
 Type is **Google Sans** for everything except labels and codes, which use IBM Plex Mono. Ground is
-cream `#f5f5ef`, ink `#10120e`, with acid `#e9ff57` and hot pink `#fa1f93` — matching the Form / Signal
-visuals so the two sit together.
+warm off-white `#f3f2ed` and near-black `#11120f`, with fluorescent yellow `#e8f447` as the signal color.
+The portal pairs quiet editorial spacing and restrained type with pixel-grid tracking marks drawn in CSS.
 
 Google Sans serves weights 400 / 500 / 700 (plus italic) from Google Fonts — there is no 600, so the
 CSS uses 700 wherever a heavy weight is wanted. Fonts load via `<link>` with `preconnect` in each page
