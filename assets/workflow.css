@@ -1,0 +1,45 @@
+/* Secure attendee workspace, submission form, finalist gallery and judging console. */
+.workflow-section{max-width:1100px;margin:48px auto;padding:clamp(22px,4vw,48px);border:1px solid var(--line-hard);background:var(--paper)}
+.workflow-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:24px}
+.workflow-heading h2{font-size:clamp(28px,4vw,46px);letter-spacing:-.055em;margin:8px 0}
+.workflow-auth{max-width:640px;padding:24px;border:1px solid var(--line);background:#fff}
+.workflow-auth form{display:grid;gap:14px}
+.workflow-status{min-height:1.5em;margin:12px 0;color:#385b14}
+#workflow-status.error{color:#a22222}
+.workflow-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.workflow-workspace{display:grid;gap:22px}
+.workflow-form{display:grid;gap:18px}
+.workflow-card{padding:clamp(18px,3vw,30px);border:1px solid var(--line);background:#fff}
+.workflow-card h3{font-size:22px;letter-spacing:-.035em;margin:4px 0 14px}
+.workflow-card .field-row{align-items:start}
+.track-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}
+.track-option{display:flex;align-items:center;gap:10px;padding:14px;border:1px solid var(--line-hard);background:#fff}
+.track-option input{width:auto;min-height:auto}
+.word-count{font:11px var(--mono);color:var(--muted);text-align:right;margin-top:-10px}
+.workflow-form textarea{min-height:86px}
+.workflow-help{color:var(--muted);font-size:13px;line-height:1.55}
+.workflow-check{display:flex;gap:10px;align-items:flex-start}
+.workflow-check input{width:auto;min-height:auto;margin-top:4px}
+.workflow-gallery{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.finalist-card{display:grid;align-content:start;gap:10px;padding:22px;border:1px solid var(--line-hard);background:#fff}
+.finalist-card h3{font-size:22px;letter-spacing:-.035em;margin:0}
+.finalist-card p{margin:0;line-height:1.55;overflow-wrap:anywhere}
+.vote-recorded{font:11px var(--mono);color:#385b14;text-transform:uppercase}
+.tool-claim-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px;margin-top:18px}
+.judging-panel{display:grid;gap:16px}
+.judging-toolbar{display:flex;gap:12px;align-items:end;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line)}
+.judging-cards{display:grid;gap:14px}
+.judge-card{padding:20px;border:1px solid var(--line-hard);background:#fff;display:grid;gap:14px}
+.judge-card header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.judge-card h2{font-size:22px;letter-spacing:-.04em}
+.judge-fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.judge-fields select{width:100%;padding:10px;border:1px solid var(--line-hard);background:#fff;font:14px var(--sans)}
+.judge-score{font:11px var(--mono);color:var(--muted)}
+.judge-finalist{display:flex;gap:9px;align-items:center;font:12px var(--mono)}
+.judge-finalist input{width:auto;min-height:auto}
+.judge-results{display:grid;gap:6px;padding:14px;background:#f5f5ef}
+.judge-result-row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.judge-links{display:flex;gap:14px;flex-wrap:wrap}
+.judge-links a{font:11px var(--mono);text-decoration:underline;text-underline-offset:3px}
+.judge-card details summary{cursor:pointer;font:11px var(--mono);text-transform:uppercase}
+@media(max-width:700px){.workflow-section{margin:28px 12px}.workflow-card .field-row{display:grid;grid-template-columns:1fr}.judge-card header{display:grid}}
