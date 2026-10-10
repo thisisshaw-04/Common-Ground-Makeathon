@@ -182,7 +182,14 @@
     load: function (p) { return JSON.parse(localStorage.getItem(this.key(p)) || 'null'); },
     save: function (p, record) { localStorage.setItem(this.key(p), JSON.stringify(record)); }
   };
-  var projectFields = ['name', 'description', 'demo', 'source'];
+  var projectFieldIds = {
+    name:'project-name', oneLiner:'project-one-liner', inspiration:'project-inspiration',
+    solution:'project-solution', interesting:'project-interesting', technology:'project-technology',
+    made:'project-made', experiment:'project-experiment', next:'project-next',
+    demo:'project-demo', video:'project-video', source:'project-source', prototype:'project-prototype',
+    supporting:'project-supporting', designReflection:'project-design-reflection',
+    cultureReflection:'project-culture-reflection', collaboration:'project-collaboration', attribution:'project-attribution'
+  };
   function updateProjectTeam() {
     var team = null;
     try { team = JSON.parse(localStorage.getItem(teamKey(current))); } catch (err) { /* No saved team. */ }
@@ -192,36 +199,37 @@
   function loadProject(p) {
     var saved = null;
     try { saved = projectStore.load(p); } catch (err) { /* An unreadable draft remains untouched until saved. */ }
-    projectFields.forEach(function (key) { $('project-' + key).value = saved && saved.project && saved.project[key] || ''; });
+    var project = saved && saved.project || {};
+    if (!project.solution && project.description) project.solution = project.description;
+    Object.keys(projectFieldIds).forEach(function (key) {
+      $(projectFieldIds[key]).value = project[key] || '';
+    });
+    $('project-no-code').checked = !!project.noCode;
+    document.querySelectorAll('input[name="project-track"]').forEach(function (input) {
+      input.checked = Array.isArray(project.tracks) && project.tracks.indexOf(input.value) !== -1;
+    });
     updateProjectTeam();
-    $('submission-feedback').textContent = saved ? (saved.status === 'ready' ? 'Marked ready locally. Not sent to organisers.' : 'Saved project draft loaded.') : 'No project draft saved yet.';
+    document.dispatchEvent(new Event('cg-project-draft-loaded'));
+    $('submission-feedback').textContent = saved ? (saved.status === 'ready' ? 'Saved submission loaded.' : 'Saved project draft loaded.') : 'No project draft saved yet.';
   }
-  function saveProject(ready) {
+  function saveProject() {
     if (!current || $('submission-section').hidden || !CGData.codesOpen(data.event)) return null;
     var project = {};
-    projectFields.forEach(function (key) { project[key] = $('project-' + key).value.trim(); });
-    var team = updateProjectTeam();
-    var error = '';
-    ['demo', 'source'].forEach(function (key) {
-      if (!project[key]) return;
-      try { if (!/^https?:$/.test(new URL(project[key]).protocol)) throw Error(); }
-      catch (err) { error = 'Use a complete http:// or https:// URL for your project links.'; }
-    });
-    if (ready && (!project.name || !project.description)) error = 'Add a project name and description before marking ready.';
-    if (ready && !project.demo && !project.source) error = 'Add a demo or source link before marking ready.';
-    if (ready && !team) error = 'Save your team details above first.';
-    if (error) { $('submission-feedback').textContent = error; return null; }
-    var record = {schemaVersion:1, eventId:'common-ground-2026-10-11', ownerEmail:current.email.trim().toLowerCase(), status:ready ? 'ready' : 'draft', project:project, team:team, updatedAt:new Date().toISOString()};
+    Object.keys(projectFieldIds).forEach(function (key) { project[key] = $(projectFieldIds[key]).value.trim(); });
+    project.tracks = Array.prototype.slice.call(document.querySelectorAll('input[name="project-track"]:checked')).map(function (input) { return input.value; });
+    project.noCode = $('project-no-code').checked;
+    var team = updateProjectTeam() || {};
+    var record = {schemaVersion:1, eventId:'common-ground-2026-10-11', ownerEmail:current.email.trim().toLowerCase(), status:'draft', project:project, team:team, updatedAt:new Date().toISOString()};
     try { projectStore.save(current, record); }
     catch (err) { $('submission-feedback').textContent = 'Could not save. Allow browser storage and try again.'; return null; }
-    $('submission-feedback').textContent = ready ? 'Marked ready locally. Your project has not been sent to organisers.' : 'Project draft saved on this device. You can come back to finish it.';
+    $('submission-feedback').textContent = 'Project draft saved on this device. You can come back to finish it.';
     return record;
   }
-  $('submission-form').addEventListener('submit', function (ev) { ev.preventDefault(); saveProject(false); });
+  $('submission-form').addEventListener('submit', function (ev) { ev.preventDefault(); saveProject(); });
   $('submission-form').addEventListener('input', function () { $('submission-feedback').textContent = 'Unsaved changes. Save your draft to keep these edits.'; });
-  $('project-ready').addEventListener('click', function () { saveProject(true); });
+  $('project-ready').addEventListener('click', function () { saveProject(); });
   $('project-download').addEventListener('click', function () {
-    var record = saveProject(false);
+    var record = saveProject();
     if (!record) return;
     var url = URL.createObjectURL(new Blob([JSON.stringify(record, null, 2)], {type:'application/json'}));
     var link = document.createElement('a'); link.href = url; link.download = 'common-ground-project-draft.json'; link.click();
