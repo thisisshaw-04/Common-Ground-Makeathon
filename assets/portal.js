@@ -278,7 +278,7 @@
     clearError();
     setGateStatus('');
     var value = $('email').value.trim().toLowerCase();
-    if (!value || !/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(value)) {
+    if (!value || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
       showError('Enter a valid registration email address.');
       return;
     }
