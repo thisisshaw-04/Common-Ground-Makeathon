@@ -9,6 +9,7 @@
   var finalistIds = [];
   var votingOpen = false;
   var voteCount = 0;
+  var votingStatusTimer = null;
   var $ = function (id) { return document.getElementById(id); };
   var escape = function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   function safeHref(value) { try { var url = new URL(value); return /^https?:$/.test(url.protocol) ? escape(url.href) : ''; } catch (_err) { return ''; } }
@@ -166,11 +167,7 @@
   }
   function autoSelectShortlist() {
     if (!scoringReady) {
-      peopleChoiceMessage('Apply the gallery and judging migration before using the score-based shortlist.', true);
-      return;
-    }
-    if (votingOpen || voteCount > 0) {
-      peopleChoiceMessage('The finalist list is locked after voting opens or a ballot is cast.', true);
+      $('judging-shortlist-results').textContent = 'The score-based shortlist is not available until the judging migration is applied.';
       return;
     }
     var selected = [];
@@ -186,106 +183,90 @@
           String(a.row.project.name || '').localeCompare(String(b.row.project.name || ''));
       });
       ranked.slice(0, 4).forEach(function (item) {
-        if (selected.indexOf(item.row.id) === -1) selected.push(item.row.id);
+        if (!selected.some(function (entry) { return entry.row.id === item.row.id; })) {
+          selected.push({row:item.row, score:item.score});
+        }
       });
     });
+    var target = $('judging-shortlist-results');
     if (!selected.length) {
-      peopleChoiceMessage('No ready projects have complete judge scores yet.', true);
+      target.textContent = 'No ready projects have complete judge scores yet.';
       return;
     }
-    finalistIds = selected;
-    renderFinalistOptions();
-    peopleChoiceMessage('Score-based shortlist selected ' + selected.length +
-      ' unique project(s). Review the checked names, then save the finalist list. This selection has not been saved yet.');
+    target.innerHTML = '<h3>Top scoring projects by judged track</h3><ol>' +
+      selected.map(function (item) {
+        var project = item.row.project || {}, team = item.row.team || {};
+        return '<li>' + escape(project.name || 'Untitled project') + ' · ' +
+          escape(team.name || 'No team') + ' — ' + item.score.toFixed(1) + ' / 20</li>';
+      }).join('') + '</ol><p class="helper">This judging shortlist is separate from People’s Choice voting.</p>';
   }
 
   function peopleChoiceMessage(text, isError) {
     $('people-choice-message').textContent = text || '';
     $('people-choice-message').classList.toggle('error', !!isError);
   }
-  function renderFinalistOptions() {
-    var rows = allRows.filter(function (row) { return row.status === 'ready'; });
-    $('people-choice-options').innerHTML = rows.length ? rows.map(function (row) {
-      var project = row.project || {}, team = row.team || {};
-      var trackText = Array.isArray(project.tracks) ? project.tracks.join(' · ') : '';
-      var checked = finalistIds.indexOf(row.id) !== -1;
-      return '<label class="finalist-option"><input type="checkbox" data-finalist-selection value="' + escape(row.id) + '"' +
-        (checked ? ' checked' : '') + (votingOpen || voteCount > 0 ? ' disabled' : '') + '><span>' +
-        escape(project.name || 'Untitled project') + '<small>' + escape(team.name || 'No team') +
-        (trackText ? ' · ' + escape(trackText) : '') + '</small></span></label>';
-    }).join('') : '<p class="helper">No ready submissions are available to select yet.</p>';
-    var selected = document.querySelectorAll('[data-finalist-selection]:checked').length;
-    $('people-choice-save-finalists').disabled = votingOpen || voteCount > 0 || selected < 2 || selected > 8;
-    $('people-choice-open').hidden = votingOpen;
-    $('people-choice-close').hidden = !votingOpen;
-    $('people-choice-open').disabled = finalistIds.length < 2 || finalistIds.length > 8;
-    $('people-choice-results-button').hidden = votingOpen || voteCount === 0;
-    $('judging-shortlist').disabled = !scoringReady || votingOpen || voteCount > 0;
-  }
+
   async function refreshPeopleChoice() {
     var statusResult = await client.rpc('get_people_choice_admin_status', {p_event_id:'common-ground-2026-10-11'});
     if (statusResult.error) throw statusResult.error;
-    var status = Array.isArray(statusResult.data) ? statusResult.data[0] : statusResult.data;
-    var idsResult = await client.rpc('get_people_choice_admin_finalist_ids', {p_event_id:'common-ground-2026-10-11'});
-    if (idsResult.error) throw idsResult.error;
-    finalistIds = (idsResult.data || []).map(function (row) { return row.submission_id; });
-    votingOpen = !!(status && status.voting_open);
-    voteCount = Number(status && status.vote_count || 0);
-    renderFinalistOptions();
-    peopleChoiceMessage(votingOpen
-      ? 'Voting is open · ' + finalistIds.length + ' finalists · ' + voteCount + ' ballots cast. Close the poll before viewing the tally.'
-      : finalistIds.length + ' finalists selected · ' + voteCount + ' ballots cast. ' +
-        (voteCount ? 'The finalist list is locked because voting has started.' : 'Select 2–8 ready submissions, then open voting when you are ready.'));
-  }
-  $('people-choice-options').addEventListener('change', renderFinalistOptions);
-  $('judging-shortlist').addEventListener('click', autoSelectShortlist);
-  $('people-choice-save-finalists').addEventListener('click', async function () {
-    var ids = Array.prototype.map.call(document.querySelectorAll('[data-finalist-selection]:checked'), function (input) { return input.value; });
-    if (ids.length < 2 || ids.length > 8) {
-      peopleChoiceMessage('Select between 2 and 8 finalists.', true);
-      return;
+    var status = Array.isArray(statusResult.data) ? statusResult.data[0] : statusResult.data || {};
+    votingOpen = !!status.voting_open;
+    voteCount = Number(status.vote_count || 0);
+    var readyCount = Number(status.ready_project_count || 0);
+    var paused = !!status.voting_paused;
+    var now = Date.now();
+    var cutoff = Date.parse('2026-10-11T15:15:00+08:00');
+    var ends = Date.parse('2026-10-11T17:00:00+08:00');
+    if (votingOpen) {
+      peopleChoiceMessage('Voting is open · ' + readyCount + ' projects · ' + voteCount + ' votes cast.');
+    } else if (paused) {
+      peopleChoiceMessage('Voting is paused · ' + readyCount + ' projects · ' + voteCount + ' votes cast.');
+    } else if (now < cutoff) {
+      peopleChoiceMessage('Voting opens automatically at 3:15 PM SGT after submissions close · ' + readyCount + ' ready projects.');
+    } else if (now < ends) {
+      peopleChoiceMessage('Voting is closed · ' + readyCount + ' ready projects · ' + voteCount + ' votes cast.');
+    } else {
+      peopleChoiceMessage('Voting has ended · ' + readyCount + ' projects · ' + voteCount + ' votes cast.');
     }
+    $('people-choice-pause').hidden = !votingOpen;
+    $('people-choice-resume').hidden = votingOpen || !paused || now >= ends;
+    $('people-choice-results-button').hidden = votingOpen;
+  }
+
+  $('judging-shortlist').addEventListener('click', autoSelectShortlist);
+  $('people-choice-pause').addEventListener('click', async function () {
     this.disabled = true;
     try {
-      var result = await client.rpc('set_people_choice_finalists', {
-        p_submission_ids: ids,
-        p_event_id: 'common-ground-2026-10-11'
-      });
+      var result = await client.rpc('set_people_choice_voting', {p_open:false,p_event_id:'common-ground-2026-10-11'});
       if (result.error) throw result.error;
-      $('people-choice-results').hidden = true;
       await refreshPeopleChoice();
-      peopleChoiceMessage(ids.length + ' finalists saved. Open voting when you are ready.');
     } catch (error) {
-      peopleChoiceMessage(error && error.message ? error.message : 'Could not save finalists.', true);
-    } finally { renderFinalistOptions(); }
+      peopleChoiceMessage(error && error.message ? error.message : 'Could not pause voting.', true);
+    } finally { this.disabled = false; }
   });
-  async function setVoting(open) {
+  $('people-choice-resume').addEventListener('click', async function () {
+    this.disabled = true;
     try {
-      var result = await client.rpc('set_people_choice_voting', {
-        p_open: open,
-        p_event_id: 'common-ground-2026-10-11'
-      });
+      var result = await client.rpc('set_people_choice_voting', {p_open:true,p_event_id:'common-ground-2026-10-11'});
       if (result.error) throw result.error;
-      $('people-choice-results').hidden = true;
       await refreshPeopleChoice();
     } catch (error) {
-      peopleChoiceMessage(error && error.message ? error.message : 'Could not update voting.', true);
-    }
-  }
-  $('people-choice-open').addEventListener('click', function () { setVoting(true); });
-  $('people-choice-close').addEventListener('click', function () { setVoting(false); });
+      peopleChoiceMessage(error && error.message ? error.message : 'Could not resume voting.', true);
+    } finally { this.disabled = false; }
+  });
   $('people-choice-results-button').addEventListener('click', async function () {
     try {
       var result = await client.rpc('get_people_choice_results', {p_event_id:'common-ground-2026-10-11'});
       if (result.error) throw result.error;
       var rows = result.data || [];
-      $('people-choice-results').innerHTML = '<h3>People’s Choice tally</h3>' +
+      $('people-choice-results').innerHTML = '<h3>People’s Choice results</h3>' +
         (rows.length ? '<ol>' + rows.map(function (row) {
-          return '<li>' + escape(row.project_name) + ' · ' + escape(row.team_name) + ' — <strong>' + escape(row.vote_count) + '</strong></li>';
-        }).join('') + '</ol>' : '<p>No finalists or votes to show.</p>');
+          return '<li>' + escape(row.project_name) + ' · ' + escape(row.team_name) +
+            ' — <strong>' + escape(row.vote_count) + '</strong></li>';
+        }).join('') + '</ol>' : '<p>No votes were cast.</p>');
       $('people-choice-results').hidden = false;
     } catch (error) {
-      peopleChoiceMessage(error && error.message ? error.message : 'Could not load results.', true);
+      peopleChoiceMessage(error && error.message ? error.message : 'Results are not available yet.', true);
     }
   });
 
@@ -302,7 +283,10 @@
     $('inbox-list').hidden = false;
     render();
     await refreshPeopleChoice();
-    message('Loaded the latest submissions and People’s Choice controls.');
+    if (!votingStatusTimer) votingStatusTimer = window.setInterval(function () {
+      refreshPeopleChoice().catch(function () { /* Keep the last known status visible. */ });
+    }, 15000);
+    message('Loaded the latest submissions and voting status.');
   }
   async function handleSession(session) {
     var user = session && session.user;

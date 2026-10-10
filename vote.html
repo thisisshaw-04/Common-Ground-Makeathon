@@ -3,73 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#ffc814">
+<meta name="robots" content="noindex">
+<meta http-equiv="refresh" content="0;url=./index.html#part-c">
 <title>People’s Choice — Common Ground</title>
-<link rel="icon" href="./assets/favicon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="./assets/portal.css?v=20261003-project">
-<link rel="stylesheet" href="./assets/identity.css?v=20261011-deck-style">
-<style>
-.vote-main{max-width:1040px;margin:0 auto;padding:56px 24px 100px}
-.vote-intro{max-width:720px;margin:0 auto 36px;text-align:center}
-.vote-intro h1{font-size:clamp(42px,7vw,76px);letter-spacing:-.06em;line-height:1;margin:16px 0}
-.vote-intro p{line-height:1.65;color:var(--muted)}
-.vote-auth,.vote-panel{max-width:820px;margin:28px auto;padding:28px;border:1px solid var(--ink);border-radius:16px;background:#fff}
-.vote-auth form{display:flex;align-items:end;gap:14px;flex-wrap:wrap}
-.vote-auth .field{flex:1;min-width:240px;margin:0}
-.vote-message{min-height:1.5em;margin:16px 0 0}
-.vote-message.error{color:#a22218}
-.vote-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
-.vote-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
-.vote-card{display:flex;flex-direction:column;gap:12px;padding:20px;border:1px solid var(--ink);border-radius:14px;background:#fff}
-.vote-card h2{font-size:23px;line-height:1.1;margin:0;letter-spacing:-.04em}
-.vote-card p{margin:0;line-height:1.55;overflow-wrap:anywhere}
-.vote-card .team{font:11px var(--mono);color:var(--muted)}
-.vote-card .links{display:flex;gap:12px;flex-wrap:wrap;font:11px var(--mono)}
-.vote-card .links a{text-decoration:underline;text-underline-offset:3px}
-.vote-card button{margin-top:auto;align-self:flex-start}
-.vote-card.selected{border:2px solid var(--ink);background:var(--acid)}
-.vote-lock{padding:14px;border:1px solid var(--ink);border-radius:12px;background:#f1f1f1;line-height:1.5}
-.vote-footer{text-align:center;color:var(--muted);font:11px var(--mono);margin-top:36px}
-@media(max-width:600px){.vote-main{padding:34px 16px 72px}.vote-auth,.vote-panel{padding:18px}.vote-auth form{align-items:stretch;flex-direction:column}}
-</style>
+<script>window.location.replace('./index.html#part-c');</script>
 </head>
-<body class="builder-page">
-<a class="skip-link" href="#main-content">Skip to content</a>
-<header class="topbar">
-  <a class="brand" href="./"><span class="brand-mark"></span>COMMON GROUND</a>
-  <span class="top-caption">PEOPLE’S CHOICE</span>
-  <a class="top-link" href="./index.html#gate">Builder portal ↗</a>
-</header>
-<main class="vote-main" id="main-content">
-  <section class="vote-intro">
-    <span class="eyebrow">COMMON GROUND / AUDIENCE AWARD</span>
-    <h1>People’s Choice.</h1>
-    <p>One vote per approved attendee. Sign in with the email used to register. The project descriptions and links are shown here so you can make an informed choice.</p>
-  </section>
-  <section class="vote-auth" aria-label="Voter sign in">
-    <form id="vote-login">
-      <label class="field"><span>APPROVED REGISTRATION EMAIL</span><input id="vote-email" type="email" autocomplete="email" required></label>
-      <button class="btn btn-primary" type="submit">Email me a sign-in link</button>
-    </form>
-    <button class="btn btn-sm" id="vote-signout" type="button" hidden>Sign out</button>
-    <p class="vote-message" id="vote-message" role="status">Any email provider works; you do not need a Google account.</p>
-  </section>
-  <section class="vote-panel" id="vote-panel" hidden>
-    <div class="vote-toolbar">
-      <div><span class="eyebrow">FINALISTS</span><h2>Choose one project.</h2></div>
-      <span class="eyebrow" id="vote-count"></span>
-    </div>
-    <p class="vote-lock" id="vote-lock" hidden></p>
-    <div class="vote-cards" id="vote-cards"></div>
-  </section>
-  <p class="vote-footer">A ballot is tied to your verified registration email and cannot be changed after submission.</p>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="./assets/backend-config.js?v=20261011"></script>
-<script src="./assets/submission-auth.js?v=20261011-root-redirect"></script>
-<script src="./assets/people-choice-vote.js?v=20261011"></script>
+<body>
+<p>People’s Choice voting is part of the project gallery. <a href="./index.html#part-c">Open the gallery</a>.</p>
 </body>
 </html>

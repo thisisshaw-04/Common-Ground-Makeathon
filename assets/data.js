@@ -7,12 +7,12 @@
     event: {
       name: 'Common Ground',
       edition: 'EDITION 01 / 2026',
-      tagline: 'A one-day makeathon for people who would rather build the thing than describe it.',
+      tagline: 'A one-day makeathon. One idea. Built together.',
       dates: 'SUNDAY, 11 OCTOBER 2026',
       venue: 'SQ Collective',
       hours: '9:00 AM — 5:00 PM',
       codesAvailableOn: '2026-10-10',
-      heroNote: 'Bring a problem you actually have. Leave with something that runs.',
+      heroNote: 'Build it. Show how it works.',
       intro: [
         { title: 'What this is',
           body: 'One Sunday. One thing worth making. Join us at SQ Collective on 11 October, from 9am to 5pm. Kick off together, find your team, build, and share what you made before the day is out.' },
@@ -22,21 +22,24 @@
           body: 'Build in the open. Help the team next to you when they are stuck. Ship something honest on Sunday, even if it is held together with tape.' }
       ],
       schedule: [
-        { time: '09:00', title: 'Welcome + check-in', detail: 'Arrive at SQ Collective, pick up your badge, and get set up.' },
-        { time: '09:30', title: 'Kick-off + team forming', detail: 'Meet the builders, hear the brief, and choose a problem worth solving.' },
-        { time: '10:00', title: 'Build session 01', detail: 'Sketch your idea, divide up the work, and start making.' },
-        { time: '12:00', title: 'Lunch break', detail: 'Take a breather and swap ideas with the other teams.' },
-        { time: '13:00', title: 'Build session 02', detail: 'Keep building, test your idea, and ask for feedback.' },
-        { time: '14:30', title: 'Checkpoint + final sprint', detail: 'Check your progress, focus on the essentials, and prepare your demo.' },
-        { time: '16:00', title: 'Demos + sharing', detail: 'Show what you made and share what you learned.' },
-        { time: '16:45', title: 'Wrap-up + next steps', detail: 'Celebrate the builds, exchange contacts, and plan what comes next.' },
-        { time: '17:00', title: 'Close', detail: 'That is a wrap. Keep building in the open.' }
+        { time: '09:00', title: 'Check-in', detail: 'Arrive, collect your badge, and get settled at SQ Collective.' },
+        { time: '09:30', title: 'Welcome + team forming', detail: 'Hear the brief and find your team.' },
+        { time: '10:00', title: 'Build session 01', detail: 'Choose a problem and start building.' },
+        { time: '12:00', title: 'Lunch', detail: 'Take a break and meet other teams.' },
+        { time: '13:00', title: 'Build session 02', detail: 'Test the idea, get feedback, and keep building.' },
+        { time: '14:30', title: 'Final sprint', detail: 'Finish the essentials and prepare your demo.' },
+        { time: '15:15', title: 'Submissions close · Gallery opens', detail: 'Ready submissions appear in the public gallery. People’s Choice voting opens.' },
+        { time: '16:00', title: 'Demos + judging', detail: 'Present your build and what you learned.' },
+        { time: '16:45', title: 'Wrap-up', detail: 'Share next steps and celebrate the work.' },
+        { time: '17:00', title: 'Event ends · Voting closes', detail: 'People’s Choice voting closes automatically.' }
       ],
       faq: [
-        { q: 'I signed up with a different email.', a: 'Use the address on your confirmation email. If that still fails, find us at the front desk and we will merge the records.' },
-        { q: 'Do I need a team before Sunday?', a: 'No. Come with a team or meet one during the morning kick-off.' },
-        { q: 'How do the partner offers work?', a: 'Sign in with your approved registration email. Each limited code or link is claimed first come, first served, and repeat claims return your reserved offer.' },
-        { q: 'Can I bring existing work?', a: 'Bring libraries, components and boilerplate. Do not bring a finished product.' }
+        { q: 'Which email should I use?', a: 'Use the email on your event registration.' },
+        { q: 'Can I join without a team?', a: 'Yes. Teams can form at the 9:30 kick-off.' },
+        { q: 'How do partner offers work?', a: 'Sign in and claim each offer. Claims are limited and first come, first served.' },
+        { q: 'When do submissions close?', a: '3:15 PM SGT on 11 October. Ready projects then appear in the public gallery.' },
+        { q: 'How does People’s Choice work?', a: 'Sign in and vote for up to three projects from 3:15 to 5:00 PM SGT. You cannot vote for your own team.' },
+        { q: 'Do I need source code?', a: 'Add a source link unless the project is no-code. Include a live demo or video.' }
       ]
     },
   };

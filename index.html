@@ -29,7 +29,49 @@
 .project-gallery-tracks,.project-gallery-links{display:flex;gap:8px;flex-wrap:wrap}
 .project-gallery-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--ink);border-radius:999px;background:var(--acid)}
 .project-gallery-links a{font:11px var(--mono);text-decoration:underline;text-underline-offset:3px}
-</style>
+
+.portal-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--ink);background:#fff;margin:22px 0 0;position:sticky;top:0;z-index:10}
+.portal-tab{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-height:54px;padding:10px 14px;border:1px solid var(--line-hard);background:var(--paper);color:var(--ink);font:500 14px var(--display);text-align:left}
+.portal-tab:hover,.portal-tab.active{background:var(--acid);border-color:var(--ink)}
+.tab-letter{display:grid;place-items:center;width:30px;height:30px;border:1px solid var(--ink);border-radius:50%;font:12px var(--mono)}
+.nav-note{grid-column:1/-1;padding:2px 6px;font:10px var(--mono);color:var(--muted)}
+.portal-panel[hidden]{display:none!important}
+.portal-panel{min-height:45vh}
+#panel-part-a .hero{padding-top:38px}
+#panel-part-a .gate{margin:28px 0}
+#panel-part-a .result{margin:24px 0}
+#panel-part-c .team-section{margin:28px 0}
+.submission-locked{margin:28px 0;padding:24px;border:1px solid var(--ink);background:#fff}
+.submission-locked h2{font-size:clamp(24px,3vw,36px);margin:10px 0}
+.submission-locked p{max-width:62ch;line-height:1.6;color:#55574e}
+.event-live{border:1px solid var(--ink);background:#fff;padding:clamp(18px,3vw,30px);margin:10px 0 30px}
+.event-live-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.event-live-top h3{font-size:clamp(20px,3vw,32px);margin:8px 0 0}
+.event-countdown{display:grid;gap:8px;text-align:right}
+.event-countdown span{font:10px var(--mono);letter-spacing:.08em;color:var(--muted)}
+.event-countdown strong{font:600 clamp(20px,3vw,30px) var(--mono)}
+.event-timeline{padding:24px 10px 4px}
+.timeline-track{height:5px;background:#dedfd6;position:relative;margin:10px 0 16px}
+.timeline-fill{position:absolute;inset:0 auto 0 0;width:0;background:var(--ink);transition:width .35s ease}
+.timeline-cursor{position:absolute;top:50%;left:0;width:20px;height:20px;border-radius:50%;background:var(--acid);border:2px solid var(--ink);transform:translate(-50%,-50%);transition:left .35s ease;z-index:1}
+.timeline-labels{display:flex;justify-content:space-between;gap:8px;position:relative}
+.timeline-labels span{font:9px var(--mono);color:var(--muted);max-width:10ch;text-align:center}
+.timeline-labels span:first-child{text-align:left}.timeline-labels span:last-child{text-align:right}
+.timeline-labels span.active{color:var(--ink);font-weight:600}
+.event-timezone{font:10px var(--mono);color:var(--muted);margin:12px 0 0}
+.sched-row.is-active{background:#fff6d1;padding-left:12px;padding-right:12px}
+.sched-row.is-active strong:after{content:' NOW';font:10px var(--mono);color:var(--ink);margin-left:8px}
+.sched-row.is-complete time{color:var(--muted)}
+.gallery-voting{border:1px solid var(--ink);background:#fff;padding:20px;margin:20px 0}
+.gallery-voting h3{margin:8px 0;font-size:22px}
+.gallery-voting p{margin:8px 0}
+.gallery-vote-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.gallery-vote-actions .btn[disabled]{opacity:.55;cursor:not-allowed}
+.gallery-vote-actions .vote-state{font:10px var(--mono);color:var(--muted)}
+.gallery-refresh{margin:0 0 18px}
+@media(max-width:700px){.portal-tabs{grid-template-columns:1fr;position:static}.portal-tab{min-height:46px}.event-countdown{text-align:left}.timeline-labels span{font-size:8px}.event-timeline{padding-left:0;padding-right:0}}
+@media(prefers-reduced-motion:reduce){.timeline-fill,.timeline-cursor{transition:none}}
+\n.project-gallery-card .submission-detail{margin-top:14px;padding-top:12px}\n.project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}\n.project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}\n</style>
 </head>
 <body class="builder-page">
 <a class="skip-link" href="#main-content">Skip to content</a>
@@ -37,22 +79,24 @@
 <header class="topbar">
   <a class="brand" href="./"><span class="brand-mark"></span>COMMON GROUND</a>
   <span class="top-caption" id="top-caption">BUILDER PORTAL / EDITION 01</span>
-  <a class="top-link" href="./vote.html">People’s Choice <span>↗</span></a>
+  <a class="top-link" href="#portal-tab-c" data-panel-select="part-c">Submission / gallery <span>↗</span></a>
 </header>
 
 <main id="main-content">
-  <nav class="portal-nav" aria-label="On this page">
-    <a href="#overview">Overview</a><a href="#gate">Your access <span>↗</span></a><a href="#project-gallery" data-gallery-nav hidden>Project gallery</a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a><a href="./vote.html">People’s Choice</a>
-    <span class="nav-note">One Sunday. Make something.</span>
+<nav class="portal-nav portal-tabs" role="tablist" aria-label="Portal sections">
+    <button id="portal-tab-a" class="portal-tab active" type="button" role="tab" aria-selected="true" aria-controls="panel-part-a" data-panel-select="part-a"><span class="tab-letter">A</span><span>Promo codes</span></button>
+    <button id="portal-tab-b" class="portal-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-part-b" data-panel-select="part-b" tabindex="-1"><span class="tab-letter">B</span><span>Live schedule</span></button>
+    <button id="portal-tab-c" class="portal-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-part-c" data-panel-select="part-c" tabindex="-1"><span class="tab-letter">C</span><span>Submission / gallery</span></button>
+    <span class="nav-note">Sign in once. Use the tabs to move through the day.</span>
   </nav>
+<section class="portal-panel active" id="panel-part-a" data-portal-panel="part-a" role="tabpanel" aria-labelledby="portal-tab-a">
 
-  <!-- ============ HERO ============ -->
   <section class="hero" id="overview">
     <div>
       <span class="eyebrow" id="hero-edition">EDITION 01 / 2026</span>
       <h1>Build the <em>thing</em>,<br>not the deck.</h1>
       <p id="hero-tagline">A one-day makeathon for people who would rather build the thing than describe it.</p>
-      <div class="hero-actions"><a class="primary-link" href="#gate">Sign in for codes & submissions <span aria-hidden="true">↗</span></a><a class="text-link" href="#weekend">Explore the day ↓</a></div>
+      <div class="hero-actions"><a class="primary-link" href="#gate">Sign in for promo codes <span aria-hidden="true">↗</span></a><a class="text-link" href="#portal-tab-b" data-panel-select="part-b">View the schedule ↓</a></div>
     </div>
     <div class="hero-meta">
       <span class="event-card-label">THE DAY AT A GLANCE <span aria-hidden="true">✳</span></span>
@@ -66,34 +110,27 @@
     </div>
   </section>
 
-  <!-- ============ INTRO ============ -->
-  <section class="section">
-    <div class="section-head">
-      <h2>The short version</h2>
-      <span class="eyebrow">01 / BEFORE YOU ARRIVE</span>
-    </div>
-    <div class="intro-grid" id="intro-grid"></div>
-  </section>
+  
 
-  <!-- ============ ATTENDEE ACCESS ============ -->
   <section class="gate" id="gate" aria-labelledby="gate-title">
     <div class="gate-aside" aria-hidden="true"><span class="gate-symbol">✳</span><span>ONE VERIFIED EMAIL.<br>YOUR BUILDER ACCESS.</span><div class="tool-labels"><span>Codex</span><span>Figma</span><span>Mobbin</span></div></div>
     <div class="gate-inner">
-      <span class="eyebrow">02 / YOUR ACCESS</span>
+      <span class="eyebrow">PART A / SIGN IN</span>
       <h2 id="gate-title">Sign in to your builder portal.</h2>
-      <p>Enter the approved registration email. We’ll send a one-time sign-in link to that inbox. Any email provider works; you do not need a Google account.</p>
+      <p>Use the email approved for the event. We’ll send one sign-in link to that inbox. Gmail is not required.</p>
       <form class="gate-form" id="gate-form" novalidate>
         <label for="email">Your registration email</label>
         <input type="email" id="email" name="email" placeholder="you@example.com"
                autocomplete="email" inputmode="email" spellcheck="false" aria-describedby="gate-hint gate-error" required>
         <button type="submit">Email me a sign-in link <span aria-hidden="true">→</span></button>
       </form>
-      <p class="gate-hint" id="gate-hint">After opening the link, you’ll return here to claim available promo offers and save your team’s submission.</p>
+      <p class="gate-hint" id="gate-hint">After sign-in, claim available offers here. Use Part C to submit your project.</p>
       <p class="gate-error" id="gate-error" role="alert"></p><p class="gate-hint" id="gate-status" role="status"></p><button class="btn btn-sm" id="portal-signout" type="button" hidden>Sign out</button>
     </div>
   </section>
 
-  <!-- ============ RESULT ============ -->
+  
+
   <section class="result" id="result" aria-live="polite">
     <div class="token-card">
       <div class="token-top">
@@ -117,8 +154,8 @@
     <div class="perks" id="perks"></div>
 
     <section id="tool-code-claims" class="team-section code-claim" hidden aria-labelledby="tool-claim-title">
-      <span class="eyebrow">TOOL CREDITS / LIMITED CLAIMS</span>
-      <h2 id="tool-claim-title">Claim your tool codes.</h2>
+      <span class="eyebrow">PARTNER OFFERS / FIRST COME, FIRST SERVED</span>
+      <h2 id="tool-claim-title">Claim partner offers.</h2>
       <form id="tool-claim-login" hidden>
         <label class="field"><span>APPROVED BUILDER EMAIL</span><input id="tool-claim-email" type="email" autocomplete="email" required></label>
         <button class="btn" type="submit">Email me a sign-in link</button>
@@ -130,29 +167,82 @@
       <div class="tool-claim-grid">
         <article class="perk">
           <div class="perk-head"><div><h3>OpenAI</h3><div class="perk-kind">2500 CREDITS</div></div><span class="perk-value">100 codes</span></div>
-          <p>One code per approved builder, first come, first served.</p>
+          <p>One code per approved account. Limited to the first 100 claims.</p>
           <button class="btn btn-primary" data-tool-claim="openai" type="button" hidden>Claim / retrieve code</button>
           <p id="tool-claim-status-openai" class="helper" role="status"></p>
           <div class="team-actions" id="tool-claim-output-openai" hidden><a id="tool-claim-link-openai" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open OpenAI link</a><code id="tool-claim-value-openai" hidden></code><button class="btn btn-sm" data-tool-copy="openai" type="button">Copy</button></div>
         </article>
         <article class="perk">
           <div class="perk-head"><div><h3>Figma Make</h3><div class="perk-kind">STARTER TO PRO + MAKE</div></div><span class="perk-value">Up to 100</span></div>
-          <p>Upgrade a Starter team to Pro for Make access and 3,000 AI credits. First come, first served.</p>
+          <p>Upgrade a Starter team to Pro for Make access and 3,000 AI credits. Limited to 100 claims.</p>
           <button class="btn btn-primary" data-tool-claim="figma" type="button" hidden>Claim / retrieve link</button>
           <p id="tool-claim-status-figma" class="helper" role="status"></p>
           <div class="team-actions" id="tool-claim-output-figma" hidden><a id="tool-claim-link-figma" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Figma promo</a><code id="tool-claim-value-figma" hidden></code><button class="btn btn-sm" data-tool-copy="figma" type="button">Copy</button></div>
         </article>
         <article class="perk">
           <div class="perk-head"><div><h3>Mobbin Pro</h3><div class="perk-kind">3 MONTHS FREE</div></div><span class="perk-value">Up to 100</span></div>
-          <p>Use the code by 31 October 2026. A card is required; you can cancel immediately after signing up. First come, first served.</p>
+          <p>Use the code by 31 October 2026. A card is required. Limited to 100 claims.</p>
           <button class="btn btn-primary" data-tool-claim="mobbin" type="button" hidden>Claim / retrieve code</button>
           <p id="tool-claim-status-mobbin" class="helper" role="status"></p>
           <div class="team-actions" id="tool-claim-output-mobbin" hidden><a id="tool-claim-link-mobbin" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Mobbin link</a><code id="tool-claim-value-mobbin" hidden></code><button class="btn btn-sm" data-tool-copy="mobbin" type="button">Copy</button></div>
         </article>
+        <article class="perk">
+          <div class="perk-head"><div><h3>Miro</h3><div class="perk-kind">TEAM INVITE</div></div></div>
+          <p>Your Miro team invite will arrive by email on the morning of the event.</p>
+        </article>
       </div>
     </section>
 
-    <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
+    
+
+    
+
+    <p class="wire-note">Each offer is limited. Claim it here after signing in.</p>
+  </section>
+
+  
+</section>
+<section class="portal-panel" id="panel-part-b" data-portal-panel="part-b" role="tabpanel" aria-labelledby="portal-tab-b" hidden>
+
+  <section class="section" id="weekend">
+    <div class="section-head">
+      <h2>Your Sunday, mapped out</h2>
+      <span class="eyebrow">03 / SCHEDULE</span>
+    </div>
+    <div class="event-live" id="event-live">
+      <div class="event-live-top">
+        <div><span class="eyebrow">HAPPENING NOW</span><h3 id="current-event-phase">Checking the schedule…</h3></div>
+        <div class="event-countdown"><span id="countdown-label">SUBMISSIONS CLOSE IN</span><strong id="submission-countdown">—</strong></div>
+      </div>
+      <div class="event-timeline" aria-label="Event progress from 9 AM to 5 PM">
+        <div class="timeline-track"><span class="timeline-fill" id="timeline-fill"></span><span class="timeline-cursor" id="timeline-cursor"></span></div>
+        <div class="timeline-labels" id="timeline-labels"></div>
+      </div>
+      <p class="event-timezone" id="event-timezone">Times shown in Singapore time (SGT, UTC+8).</p>
+    </div>
+    <div class="schedule" id="schedule"></div>
+  </section>
+
+  
+
+  <section class="section" id="questions">
+    <div class="section-head">
+      <h2>Questions we get</h2>
+      <span class="eyebrow">04 / FAQ</span>
+    </div>
+    <div class="faq" id="faq"></div>
+  </section>
+
+
+</section>
+<section class="portal-panel" id="panel-part-c" data-portal-panel="part-c" role="tabpanel" aria-labelledby="portal-tab-c" hidden>
+  <div class="submission-locked" id="submission-locked">
+    <span class="eyebrow">PART C / SUBMISSION</span>
+    <h2>Submit one entry per team.</h2>
+    <p>Sign in with your approved event email in Part A. Submissions close at 3:15 PM SGT.</p>
+    <a class="btn btn-primary" href="#portal-tab-a" data-panel-select="part-a">Go to sign in</a>
+  </div>
+<section id="team-section" class="team-section" hidden aria-labelledby="team-title">
       <span class="eyebrow">NEXT / YOUR TEAM</span>
       <h2 id="team-title">Good things start with a team.</h2>
       <p>Add your team details for your submission. You are included as the team contact.</p>
@@ -174,8 +264,7 @@
         <p id="team-feedback" role="status" class="helper"></p>
       </form>
     </section>
-
-    <section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
+<section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
       <span class="eyebrow">THEN / YOUR SUBMISSION</span>
       <h2 id="submission-title">Show us what you made.</h2>
       <p>Submit one entry per team. Choose up to two award tracks, then save drafts as you build. Only one teammate should submit for your team.</p>
@@ -236,37 +325,23 @@
       </form>
     </section>
 
-    <p class="wire-note">Partner offers are claimed through Supabase after attendee email verification. Each offer is limited and claimed first come, first served.</p>
-  </section>
-
-  <!-- ============ PROJECT GALLERY ============ -->
   <section class="section project-gallery" id="project-gallery" hidden aria-labelledby="project-gallery-title">
     <div class="section-head">
-      <h2 id="project-gallery-title">Projects in the room</h2>
-      <span class="eyebrow">BUILDER GALLERY</span>
+      <h2 id="project-gallery-title">Project gallery</h2>
+      <span class="eyebrow">PUBLIC AFTER 3:15 PM SGT</span>
     </div>
-    <p id="project-gallery-message" class="helper" role="status">Checking attendee access…</p>
+    <p id="project-gallery-message" class="helper" role="status">The gallery opens when submissions close at 3:15 PM SGT.</p>
+    <section class="gallery-voting" id="people-choice-area" aria-labelledby="people-choice-title" hidden>
+      <span class="eyebrow">PEOPLE’S CHOICE</span><h3 id="people-choice-title">Vote for up to three projects.</h3>
+      <p class="helper" id="people-choice-message" role="status">Sign in with your approved event email to vote.</p>
+      <a class="btn btn-sm" id="people-choice-signin" href="#portal-tab-a" data-panel-select="part-a" hidden>Sign in in Part A</a>
+    </section>
+    <button class="btn btn-sm gallery-refresh" id="gallery-refresh" type="button" hidden>Refresh projects</button>
     <div id="project-gallery-cards" class="project-gallery-grid"></div>
   </section>
 
-  <!-- ============ SCHEDULE ============ -->
-  <section class="section" id="weekend">
-    <div class="section-head">
-      <h2>Your Sunday, mapped out</h2>
-      <span class="eyebrow">03 / SCHEDULE</span>
-    </div>
-    <div class="schedule" id="schedule"></div>
-  </section>
-
-  <!-- ============ FAQ ============ -->
-  <section class="section" id="questions">
-    <div class="section-head">
-      <h2>Questions we get</h2>
-      <span class="eyebrow">04 / FAQ</span>
-    </div>
-    <div class="faq" id="faq"></div>
-  </section>
-
+  
+</section>
 </main>
 
 <footer>
@@ -281,9 +356,10 @@
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-root-redirect"></script>
 <script src="./assets/data.js?v=20261011-published-copy"></script>
-<script src="./assets/portal.js?v=20261011-gallery"></script>
-<script src="./assets/project-gallery.js?v=20261011-gallery"></script>
+<script src="./assets/portal.js?v=20261011-three-tabs"></script>
+<script src="./assets/project-gallery.js?v=20261011-public-gallery"></script>
+<script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-vote"></script>
-<script src="./assets/submission-sync.js?v=20261011-auth-vote"></script>
+<script src="./assets/submission-sync.js?v=20261011-cutoff"></script>
 </body>
 </html>
