@@ -84,7 +84,40 @@
       $('project-' + key).value = project[key] || '';
     });
     var team = record.team || {};
-    if (team.name) $('team-name').value = team.name;
+    if (team.name) {
+      $('team-name').value = team.name;
+      var email = participantEmail();
+      try { localStorage.setItem('cg-team-draft-v1:' + email, JSON.stringify(team)); } catch (_err) { /* Remote copy stays safe. */ }
+      var membersNode = $('team-members');
+      membersNode.innerHTML = '';
+      (Array.isArray(team.members) ? team.members : []).forEach(function (member, index) {
+        var fieldset = document.createElement('fieldset');
+        fieldset.className = 'team-member';
+        var legend = document.createElement('legend');
+        legend.textContent = 'Teammate';
+        var row = document.createElement('div');
+        row.className = 'field-row';
+        [['NAME', 'member-name', 'text', member.name], ['EMAIL', 'member-email', 'email', member.email]].forEach(function (field) {
+          var label = document.createElement('label');
+          label.className = 'field';
+          var caption = document.createElement('span');
+          caption.textContent = field[0];
+          var input = document.createElement('input');
+          input.className = field[1];
+          input.type = field[2];
+          input.required = true;
+          input.maxLength = 254;
+          input.value = field[3] || '';
+          label.appendChild(caption); label.appendChild(input); row.appendChild(label);
+        });
+        var remove = document.createElement('button');
+        remove.type = 'button'; remove.className = 'btn btn-sm remove-member';
+        remove.setAttribute('aria-label', 'Remove teammate ' + (index + 1));
+        remove.textContent = 'Remove teammate';
+        fieldset.appendChild(legend); fieldset.appendChild(row); fieldset.appendChild(remove);
+        membersNode.appendChild(fieldset);
+      });
+    }
     $('submission-feedback').textContent = record.status === 'ready' ? 'Your central submission is marked ready. You can still edit and save it.' : 'Your central draft is loaded.';
   }
   async function syncAuth(session) {
