@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#11120f">
+<meta name="theme-color" content="#ffc814">
 <meta name="robots" content="noindex">
 <title>Common Ground — Submission Inbox</title>
 <link rel="icon" href="./assets/favicon.svg">
@@ -11,32 +11,32 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="./assets/portal.css?v=20261002-team">
-<link rel="stylesheet" href="./assets/identity.css?v=20261011-submissions">
+<link rel="stylesheet" href="./assets/identity.css?v=20261011-deck-style">
 <style>
 .inbox-hero{padding:56px 0 38px;border-bottom:1px solid var(--line)}
 .inbox-hero h1{font-size:clamp(38px,6vw,72px);letter-spacing:-.06em;margin:12px 0}
 .inbox-panel{max-width:980px;margin:36px auto}
-.inbox-auth,.inbox-list{border:1px solid var(--line-hard);padding:clamp(20px,4vw,36px);background:#fff}
+.inbox-auth,.inbox-list{border:1px solid var(--ink);border-radius:16px;padding:clamp(20px,4vw,36px);background:#fff}
 .inbox-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:22px 0}
-.inbox-toolbar select{padding:10px 12px;border:1px solid var(--line-hard);background:var(--paper);font:12px var(--mono)}
+.inbox-toolbar select{padding:10px 12px;border:1px solid var(--ink);border-radius:10px;background:var(--paper);font:12px var(--mono)}
 .inbox-grid{display:grid;gap:14px}
-.submission-card{border:1px solid var(--line);padding:20px;display:grid;gap:8px}
+.submission-card{border:1px solid var(--ink);border-radius:14px;padding:20px;display:grid;gap:8px;background:#fff}
 .submission-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .submission-card h2{font-size:21px;letter-spacing:-.04em}
 .submission-card p{margin:0;line-height:1.6;color:#55574e;white-space:pre-wrap;overflow-wrap:anywhere}
 .submission-meta{font:11px var(--mono);color:var(--muted)}
-.submission-badge{font:10px var(--mono);border:1px solid currentColor;padding:4px 8px;text-transform:uppercase}
-.submission-badge.ready{color:#555d00;background:#f7ffd1}
+.submission-badge{font:10px var(--mono);border:1px solid currentColor;border-radius:999px;padding:4px 8px;text-transform:uppercase}
+.submission-badge.ready{color:var(--ink);background:var(--acid);border-color:var(--ink)}
 .submission-links{display:flex;gap:16px;flex-wrap:wrap;font:12px var(--mono)}
 .submission-links a{text-decoration:underline;text-underline-offset:3px}
 #inbox-message{min-height:1.5em}
 #inbox-message.error{color:#a22222}
-.people-choice-admin{border:1px solid var(--line-hard);padding:20px;margin:24px 0;background:#f8f8f3}
+.people-choice-admin{border:1px solid var(--ink);border-radius:16px;padding:20px;margin:24px 0;background:#e6e6e6}
 .people-choice-admin h2{font-size:23px;letter-spacing:-.04em}
 .people-choice-admin p{line-height:1.55}
 .finalist-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px;margin:16px 0}
-.finalist-option{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);background:#fff;line-height:1.4}
-.finalist-option input{margin-top:3px;accent-color:#7d8d00}
+.finalist-option{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--ink);border-radius:10px;background:#fff;line-height:1.4}
+.finalist-option input{margin-top:3px;accent-color:var(--acid)}
 .finalist-option small{display:block;color:var(--muted);font:10px var(--mono);margin-top:4px}
 .people-choice-actions{display:flex;gap:10px;flex-wrap:wrap}
 #people-choice-message.error{color:#a22222}
@@ -47,14 +47,14 @@
 .submission-detail p{margin-top:5px}
 .submission-tracks{display:flex;gap:8px;flex-wrap:wrap}
 .submission-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--line-hard);border-radius:999px}
-.judging-admin{border:1px solid var(--line-hard);padding:20px;margin:24px 0;background:#f8f8f3}
+.judging-admin{border:1px solid var(--ink);border-radius:16px;padding:20px;margin:24px 0;background:#e6e6e6}
 .judging-admin h2{font-size:23px;letter-spacing:-.04em}
 .judging-admin p{line-height:1.55}
 .judge-score-block{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}
 .judge-score-block h3{font-size:16px}
 .judge-score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
 .judge-score-grid .field{margin:0}
-.judge-score-grid select,.judge-score-block textarea{width:100%;padding:9px;border:1px solid var(--line-hard);background:#fff;font:12px var(--mono)}
+.judge-score-grid select,.judge-score-block textarea{width:100%;padding:9px;border:1px solid var(--ink);border-radius:10px;background:#fff;font:12px var(--mono)}
 .judge-score-block textarea{min-height:72px;margin-top:6px}
 .judge-score-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
 .judge-score-summary{font:11px var(--mono);color:var(--muted)}
