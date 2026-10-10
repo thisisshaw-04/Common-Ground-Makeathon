@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#11120f">
 <title>Common Ground — Builder Portal</title>
-<meta name="description" content="Common Ground makeathon. Find your builder token and redeem your Codex, Figma and Mobbin credits.">
+<meta name="description" content="Common Ground Makeathon builder portal. Submit projects, claim limited tool offers and vote for finalists.">
 <link rel="icon" href="./assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="./assets/portal.css?v=20261003-project">
+<link rel="stylesheet" href="./assets/workflow.css?v=20261011-complete">
 <link rel="stylesheet" href="./assets/identity.css?v=20261011-submissions">
 </head>
 <body class="builder-page">
@@ -19,12 +20,12 @@
 <header class="topbar">
   <a class="brand" href="./"><span class="brand-mark"></span>COMMON GROUND</a>
   <span class="top-caption" id="top-caption">BUILDER PORTAL / EDITION 01</span>
-  <a class="top-link" href="./admin.html">Organiser view <span>↗</span></a>
+  <a class="top-link" href="./submissions.html">Organiser inbox <span>↗</span></a>
 </header>
 
 <main id="main-content">
   <nav class="portal-nav" aria-label="On this page">
-    <a href="#overview">Overview</a><a href="#gate">Your token <span>↗</span></a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a>
+    <a href="#overview">Overview</a><a href="#builder-access">Submit a project <span>↗</span></a><a href="#project-gallery">Project gallery</a><a href="#people-choice">People’s Choice</a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a>
     <span class="nav-note">One Sunday. Make something.</span>
   </nav>
 
@@ -34,7 +35,7 @@
       <span class="eyebrow" id="hero-edition">EDITION 01 / 2026</span>
       <h1>Build the <em>thing</em>,<br>not the deck.</h1>
       <p id="hero-tagline">A one-day makeathon for people who would rather build the thing than describe it.</p>
-      <div class="hero-actions"><a class="primary-link" href="#gate">Get your builder token <span aria-hidden="true">↗</span></a><a class="text-link" href="#weekend">Explore the day ↓</a></div>
+      <div class="hero-actions"><a class="primary-link" href="#builder-access">Open builder workspace <span aria-hidden="true">↗</span></a><a class="text-link" href="#weekend">Explore the day ↓</a></div>
     </div>
     <div class="hero-meta">
       <span class="event-card-label">THE DAY AT A GLANCE <span aria-hidden="true">✳</span></span>
@@ -57,126 +58,101 @@
     <div class="intro-grid" id="intro-grid"></div>
   </section>
 
-  <!-- ============ TOKEN GATE ============ -->
-  <section class="gate" id="gate" aria-labelledby="gate-title">
-    <div class="gate-aside" aria-hidden="true"><span class="gate-symbol">✳</span><span>ONE TOKEN.<br>YOUR BUILDING BLOCKS.</span><div class="tool-labels"><span>Codex</span><span>Figma</span><span>Mobbin</span></div></div>
-    <div class="gate-inner">
-      <span class="eyebrow">02 / YOUR TOKEN</span>
-      <h2 id="gate-title">Find your builder token.</h2>
-      <p>Enter the email address you signed up with. We will show your Common Ground token and the tool credits attached to it — Codex, Figma and Mobbin.</p>
-      <form class="gate-form" id="gate-form" novalidate>
-        <label for="email">Your registration email</label>
-        <input type="email" id="email" name="email" placeholder="you@example.com"
-               autocomplete="email" inputmode="email" spellcheck="false" aria-describedby="gate-hint gate-error" required>
-        <button type="submit">Show my token <span aria-hidden="true">→</span></button>
+  <!-- ============ VERIFIED BUILDER WORKSPACE ============ -->
+  <section class="workflow-section" id="builder-access" aria-labelledby="workflow-title">
+    <div class="workflow-heading">
+      <div><span class="eyebrow">02 / VERIFIED BUILDER WORKSPACE</span><h2 id="workflow-title">Submit what your team made.</h2>
+      <p class="workflow-help">Sign in with the email on your approved attendee registration. Supabase verifies access; the attendee roster is never exposed on this page. Choose one teammate as the submitter so your team has one central entry.</p></div>
+    </div>
+    <div class="workflow-auth">
+      <form id="workflow-login">
+        <label class="field"><span>APPROVED ATTENDEE EMAIL</span><input id="workflow-email" type="email" autocomplete="email" inputmode="email" required placeholder="you@example.com"></label>
+        <button class="btn btn-primary" type="submit">Email me a secure sign-in link</button>
       </form>
-      <p class="gate-hint" id="gate-hint">Wireframe demo — try <b>ada@example.com</b>, <b>jun@example.com</b>, <b>mentor@example.com</b> or <b>waitlist@example.com</b>.</p>
-      <p class="gate-error" id="gate-error" role="alert"></p>
+      <div class="workflow-actions"><button class="btn btn-sm" id="workflow-signout" type="button" hidden>Sign out</button></div>
+      <p class="workflow-status" id="workflow-status" role="status">Your verified email unlocks submissions, tool-code claims and the finalist voting page. No Google account is required.</p>
+    </div>
+    <div id="builder-workspace" class="workflow-workspace" hidden>
+      <form id="project-form" class="workflow-form" novalidate>
+        <article class="workflow-card">
+          <span class="eyebrow">01 / TEAM DETAILS</span><h3>One submission per team</h3>
+          <label class="field"><span>PROJECT NAME *</span><input id="project-name" maxlength="150" required></label>
+          <label class="field"><span>TEAM NAME *</span><input id="team-name" maxlength="100" required></label>
+          <label class="field"><span>TEAM MEMBERS — ONE NAME PER LINE *</span><textarea id="team-members" required placeholder="Include every team member"></textarea></label>
+          <label class="field"><span>TRACKS — CHOOSE UP TO TWO *</span></label>
+          <div class="track-options">
+            <label class="track-option"><input type="checkbox" name="project-tracks" value="design_tech"> Design × Tech</label>
+            <label class="track-option"><input type="checkbox" name="project-tracks" value="culture_tech"> Culture × Tech</label>
+            <label class="track-option"><input type="checkbox" name="project-tracks" value="best_use_of_tech"> Best Use of Tech</label>
+            <label class="track-option"><input type="checkbox" name="project-tracks" value="common_ground"> Common Ground Award</label>
+          </div>
+        </article>
+        <article class="workflow-card">
+          <span class="eyebrow">02 / PROJECT OVERVIEW</span><h3>Tell us the idea in 100 words or fewer</h3>
+          <label class="field"><span>ONE-LINER *</span><input id="project-one-liner" maxlength="300" required placeholder="Describe your project in one sentence."></label>
+          <label class="field"><span>THE PROBLEM OR INSPIRATION *</span><textarea id="project-inspiration" required placeholder="What sparked this idea? What were you exploring, solving or reimagining?"></textarea></label>
+          <label class="field"><span>THE SOLUTION *</span><textarea id="project-solution" required placeholder="What did you build, and how does it work?"></textarea></label>
+          <label class="field"><span>WHAT MAKES IT INTERESTING? *</span><textarea id="project-interesting" required placeholder="What is original, unexpected or meaningful about the approach?"></textarea></label>
+          <p id="overview-count" class="word-count">0 / 100 words</p>
+        </article>
+        <article class="workflow-card">
+          <span class="eyebrow">03 / THE BUILD</span><h3>Show what you explored and made</h3>
+          <label class="field"><span>TECHNOLOGY USED *</span><textarea id="project-technology" required placeholder="Tools, technologies, hardware, software or AI models."></textarea></label>
+          <label class="field"><span>WHAT DID YOU MAKE? *</span><textarea id="project-current-build" required placeholder="What works right now? Prototype, interactive demo or functioning MVP?"></textarea></label>
+          <label class="field"><span>WHAT DID YOU EXPERIMENT WITH? *</span><textarea id="project-experiment" required placeholder="What did you try, learn or discover?"></textarea></label>
+          <label class="field"><span>WHAT WOULD YOU DO NEXT? *</span><textarea id="project-next" required placeholder="What would you improve or explore with more time?"></textarea></label>
+          <p id="build-count" class="word-count">0 / 100 words</p>
+        </article>
+        <article class="workflow-card">
+          <span class="eyebrow">04 / TRACK-SPECIFIC REFLECTION</span><h3>Connect the work to the track</h3>
+          <label class="field" data-track-reflection="design_tech" hidden><span>DESIGN × TECH *</span><textarea id="project-design-reflection" placeholder="How does your project push interaction, interfaces or the relationship between people and technology in a new direction?"></textarea></label>
+          <label class="field" data-track-reflection="culture_tech" hidden><span>CULTURE × TECH *</span><textarea id="project-culture-reflection" placeholder="How does your project meaningfully engage with, reinterpret or preserve the cultural subject it explores?"></textarea></label>
+          <p class="workflow-help">The reflection appears when you select its track. Cross-track awards do not need a separate reflection.</p>
+        </article>
+        <article class="workflow-card">
+          <span class="eyebrow">05 / PROJECT LINKS & DEMO</span><h3>Give judges a way to explore it</h3>
+          <div class="field-row">
+            <label class="field"><span>LIVE DEMO / DEPLOYED PROJECT</span><input id="project-demo" type="url" maxlength="2000" placeholder="https://…"></label>
+            <label class="field"><span>DEMO VIDEO</span><input id="project-video" type="url" maxlength="2000" placeholder="https://…"></label>
+          </div>
+          <label class="field"><span>GITHUB / SOURCE CODE LINK</span><input id="project-source" type="url" maxlength="2000" placeholder="https://github.com/…"></label>
+          <label class="workflow-check"><input id="project-no-code" type="checkbox"><span>This project is not based on code, so it has no source-code link.</span></label>
+          <div class="field-row">
+            <label class="field"><span>FIGMA / PROTOTYPE LINK</span><input id="project-prototype" type="url" maxlength="2000" placeholder="https://…"></label>
+            <label class="field"><span>SETUP INSTRUCTIONS</span><textarea id="project-setup" placeholder="Include brief steps if judges need them to try the project."></textarea></label>
+          </div>
+          <label class="field"><span>OTHER SUPPORTING LINKS — ONE PER LINE</span><textarea id="project-supporting" placeholder="Images, documentation or other relevant links"></textarea></label>
+          <p class="workflow-help">Keep links accessible to judges. Include a demo or video, and source code unless the project is not based on code.</p>
+        </article>
+        <article class="workflow-card">
+          <span class="eyebrow">06 / TEAM & ATTRIBUTION</span><h3>Credit the people and tools</h3>
+          <label class="field"><span>TEAM & COLLABORATION *</span><textarea id="team-collaboration" required placeholder="How did different skills, disciplines or perspectives come together? What did you discover by working together?"></textarea></label>
+          <label class="field"><span>AI & TOOL ATTRIBUTION *</span><textarea id="project-ai" required placeholder="List AI tools/models and what you used them for, or enter None."></textarea></label>
+          <label class="field"><span>THIRD-PARTY ASSETS, DATASETS OR REFERENCES *</span><textarea id="project-third-party" required placeholder="Credit resources you used, or enter None."></textarea></label>
+        </article>
+        <div class="workflow-actions"><button class="btn" id="project-save" type="submit">Save draft</button><button class="btn btn-primary" id="project-ready" type="button">Mark ready and submit</button></div>
+      </form>
+      <section id="tool-code-claims" class="workflow-card code-claim" hidden aria-labelledby="tool-claim-title">
+        <span class="eyebrow">OPTIONAL / LIMITED TOOL CREDITS</span><h3 id="tool-claim-title">Claim your first-come, first-served codes.</h3>
+        <form id="tool-claim-login" hidden><label class="field"><span>APPROVED BUILDER EMAIL</span><input id="tool-claim-email" type="email" autocomplete="email" required></label><button class="btn" type="submit">Email me a sign-in link</button></form>
+        <button class="btn btn-sm" id="tool-claim-signout" type="button" hidden>Sign out</button>
+        <p id="tool-claim-auth-status" class="workflow-help" role="status"></p>
+        <div class="tool-claim-grid">
+          <article class="workflow-card"><h3>OpenAI · 2,500 credits</h3><p>One promo link per approved builder, while the 100-link pool lasts.</p><button class="btn btn-primary" data-tool-claim="openai" type="button" hidden>Claim / retrieve link</button><p id="tool-claim-status-openai" class="workflow-help" role="status"></p><div class="workflow-actions" id="tool-claim-output-openai" hidden><a id="tool-claim-link-openai" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open OpenAI link</a><code id="tool-claim-value-openai" hidden></code><button class="btn btn-sm" data-tool-copy="openai" type="button">Copy</button></div></article>
+          <article class="workflow-card"><h3>Figma Make · 3,000 credits</h3><p>Upgrade an eligible Starter team to Pro, while the 100 promo links last.</p><button class="btn btn-primary" data-tool-claim="figma" type="button" hidden>Claim / retrieve link</button><p id="tool-claim-status-figma" class="workflow-help" role="status"></p><div class="workflow-actions" id="tool-claim-output-figma" hidden><a id="tool-claim-link-figma" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Figma promo</a><code id="tool-claim-value-figma" hidden></code><button class="btn btn-sm" data-tool-copy="figma" type="button">Copy</button></div></article>
+          <article class="workflow-card"><h3>Mobbin Pro · 3 months</h3><p>Redeem by 31 October 2026. A card is required; cancel any time.</p><button class="btn btn-primary" data-tool-claim="mobbin" type="button" hidden>Claim / retrieve code</button><p id="tool-claim-status-mobbin" class="workflow-help" role="status"></p><div class="workflow-actions" id="tool-claim-output-mobbin" hidden><a id="tool-claim-link-mobbin" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Mobbin link</a><code id="tool-claim-value-mobbin" hidden></code><button class="btn btn-sm" data-tool-copy="mobbin" type="button">Copy</button></div></article>
+        </div>
+      </section>
     </div>
   </section>
-
-  <!-- ============ RESULT ============ -->
-  <section class="result" id="result" aria-live="polite">
-    <div class="token-card">
-      <div class="token-top">
-        <div class="token-who">
-          <span class="eyebrow">YOU ARE IN</span>
-          <h2 id="p-name">—</h2>
-          <p id="p-detail">—</p>
-        </div>
-        <span class="badge ok" id="p-status">CONFIRMED</span>
-      </div>
-      <div class="token-block">
-        <div>
-          <span class="label">COMMON GROUND TOKEN</span>
-          <div class="token-value" id="p-token">—</div>
-        </div>
-        <button id="token-copy" class="copy-btn" data-copy-target="p-token" type="button">Copy token</button>
-      </div>
-    </div>
-
-    <p id="release-notice" class="release-notice" role="status"></p>
-    <div class="perks" id="perks"></div>
-
-    <section id="tool-code-claims" class="team-section code-claim" hidden aria-labelledby="tool-claim-title">
-      <span class="eyebrow">TOOL CREDITS / LIMITED CLAIMS</span>
-      <h2 id="tool-claim-title">Claim your tool codes.</h2>
-      <form id="tool-claim-login" hidden>
-        <label class="field"><span>APPROVED BUILDER EMAIL</span><input id="tool-claim-email" type="email" autocomplete="email" required></label>
-        <button class="btn" type="submit">Email me a sign-in link</button>
-      </form>
-      <div class="team-actions">
-        <button class="btn btn-sm" id="tool-claim-signout" type="button" hidden>Sign out</button>
-      </div>
-      <p id="tool-claim-auth-status" class="helper" role="status"></p>
-      <div class="tool-claim-grid">
-        <article class="perk">
-          <div class="perk-head"><div><h3>OpenAI</h3><div class="perk-kind">2500 CREDITS</div></div><span class="perk-value">100 codes</span></div>
-          <p>One code per approved builder, first come, first served.</p>
-          <button class="btn btn-primary" data-tool-claim="openai" type="button" hidden>Claim / retrieve code</button>
-          <p id="tool-claim-status-openai" class="helper" role="status"></p>
-          <div class="team-actions" id="tool-claim-output-openai" hidden><a id="tool-claim-link-openai" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open OpenAI link</a><code id="tool-claim-value-openai" hidden></code><button class="btn btn-sm" data-tool-copy="openai" type="button">Copy</button></div>
-        </article>
-        <article class="perk">
-          <div class="perk-head"><div><h3>Figma Make</h3><div class="perk-kind">STARTER TO PRO + MAKE</div></div><span class="perk-value">Up to 100</span></div>
-          <p>Upgrade a Starter team to Pro for Make access and 3,000 AI credits. First come, first served.</p>
-          <button class="btn btn-primary" data-tool-claim="figma" type="button" hidden>Claim / retrieve link</button>
-          <p id="tool-claim-status-figma" class="helper" role="status"></p>
-          <div class="team-actions" id="tool-claim-output-figma" hidden><a id="tool-claim-link-figma" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Figma promo</a><code id="tool-claim-value-figma" hidden></code><button class="btn btn-sm" data-tool-copy="figma" type="button">Copy</button></div>
-        </article>
-        <article class="perk">
-          <div class="perk-head"><div><h3>Mobbin Pro</h3><div class="perk-kind">3 MONTHS FREE</div></div><span class="perk-value">Up to 100</span></div>
-          <p>Use the code by 31 October 2026. A card is required; you can cancel immediately after signing up. First come, first served.</p>
-          <button class="btn btn-primary" data-tool-claim="mobbin" type="button" hidden>Claim / retrieve code</button>
-          <p id="tool-claim-status-mobbin" class="helper" role="status"></p>
-          <div class="team-actions" id="tool-claim-output-mobbin" hidden><a id="tool-claim-link-mobbin" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Mobbin link</a><code id="tool-claim-value-mobbin" hidden></code><button class="btn btn-sm" data-tool-copy="mobbin" type="button">Copy</button></div>
-        </article>
-      </div>
-    </section>
-
-    <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
-      <span class="eyebrow">NEXT / YOUR TEAM</span>
-      <h2 id="team-title">Good things start with a team.</h2>
-      <p>Add your team details for your submission. You are included as the team contact.</p>
-      <p id="team-contact" class="helper"></p>
-      <div class="submission-auth" id="submission-auth">
-        <form id="submission-auth-form">
-          <label class="field"><span>BUILDER EMAIL</span><input id="submission-auth-email" type="email" autocomplete="email" required></label>
-          <button class="btn" type="submit">Email me a sign-in link</button>
-        </form>
-        <button class="btn btn-sm" id="submission-signout" type="button" hidden>Sign out</button>
-        <p id="submission-auth-status" class="helper" role="status">Sign in with your registration email to submit centrally.</p>
-      </div>
-      <form id="team-form">
-        <label class="field"><span>TEAM NAME</span><input id="team-name" required maxlength="100" autocomplete="organization"></label>
-        <div id="team-members"></div>
-        <button class="btn" id="add-teammate" type="button">+ Add teammate</button>
-        <div class="team-actions"><button class="btn btn-primary" type="submit">Save team draft</button></div>
-        <p class="helper">Sign in above, then save your team to send it to the organiser inbox. Without sign-in it stays on this device.</p>
-        <p id="team-feedback" role="status" class="helper"></p>
-      </form>
-    </section>
-
-    <section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
-      <span class="eyebrow">THEN / YOUR SUBMISSION</span>
-      <h2 id="submission-title">Show us what you made.</h2>
-      <p>Start your project draft here. Keep refining it as you build.</p>
-      <p id="submission-team" class="helper"></p>
-      <form id="submission-form" novalidate>
-        <label class="field"><span>PROJECT NAME *</span><input id="project-name" maxlength="150" required></label>
-        <label class="field"><span>WHAT DID YOU BUILD? *</span><textarea id="project-description" maxlength="5000" required placeholder="The problem, your solution, and what you learned."></textarea></label>
-        <div class="field-row">
-          <label class="field"><span>DEMO LINK</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
-          <label class="field"><span>GITHUB / SOURCE LINK</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
-        </div>
-        <p class="helper">Add at least one project link when your draft is ready.</p>
-        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Mark ready and submit</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
-        <p class="helper">Sign in above to save drafts to the organiser inbox. Download draft saves a JSON copy to this device.</p>
-        <p id="submission-feedback" class="helper" role="status"></p>
-      </form>
-    </section>
-
-    <p class="wire-note">OpenAI codes are claimed through Supabase after email sign-in and issued once per approved builder. Other tool codes shown here are part of the local portal data.</p>
+  <section class="workflow-section" id="project-gallery" hidden aria-labelledby="project-gallery-title">
+    <span class="eyebrow">07 / PROJECT GALLERY</span><h2 id="project-gallery-title">See what teams are making.</h2>
+    <p class="workflow-help">Ready submissions are visible to approved attendees. Drafts and attendee email addresses stay private.</p>
+    <div id="project-gallery-cards" class="workflow-gallery"></div>
+  </section>
+  <section class="workflow-section" id="people-choice" hidden aria-labelledby="people-choice-title">
+    <span class="eyebrow">07 / PEOPLE’S CHOICE</span><h2 id="people-choice-title">Explore the finalists. Pick one project.</h2>
+    <p id="people-choice-message" class="workflow-help" role="status"></p><div id="people-choice-cards" class="workflow-gallery"></div>
   </section>
 
   <!-- ============ SCHEDULE ============ -->
@@ -211,8 +187,7 @@
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011"></script>
 <script src="./assets/data.js?v=20261003-project"></script>
-<script src="./assets/portal.js?v=20261011-code-claim"></script>
-<script src="./assets/tool-code-claim.js?v=20261011"></script>
-<script src="./assets/submission-sync.js?v=20261011"></script>
+<script src="./assets/hackathon-workflow.js?v=20261011-complete"></script>
+<script src="./assets/tool-code-claim.js?v=20261011-complete"></script>
 </body>
 </html>
