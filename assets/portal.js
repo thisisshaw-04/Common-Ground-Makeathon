@@ -144,11 +144,18 @@
       label.classList.toggle('active', Number(label.getAttribute('data-timeline-index')) === activeIndex);
     });
 
-    var phase = $('current-event-phase'), label = $('countdown-label'), countdown = $('submission-countdown');
+    var phase = $('current-event-phase'), phaseLabel = $('event-phase-label'), label = $('countdown-label'), countdown = $('submission-countdown');
     if (phase) {
-      if (now < EVENT_START_AT) phase.textContent = 'Check-in starts at 9:00 AM';
-      else if (now >= EVENT_END_AT) phase.textContent = 'The event has ended';
-      else phase.textContent = 'Now: ' + (rows[activeIndex] ? rows[activeIndex].title : 'Makeathon');
+      if (now < EVENT_START_AT) {
+        if (phaseLabel) phaseLabel.textContent = 'STARTS AT 9:00 AM SGT';
+        phase.textContent = 'Check-in starts at 9:00 AM';
+      } else if (now >= EVENT_END_AT) {
+        if (phaseLabel) phaseLabel.textContent = 'EVENT COMPLETE';
+        phase.textContent = 'The event has ended';
+      } else {
+        if (phaseLabel) phaseLabel.textContent = 'HAPPENING NOW';
+        phase.textContent = 'Now: ' + (rows[activeIndex] ? rows[activeIndex].title : 'Makeathon');
+      }
     }
     if (now < SUBMISSION_CUTOFF_AT) {
       if (label) label.textContent = 'SUBMISSIONS CLOSE IN';
