@@ -28,14 +28,10 @@ create table if not exists public.submissions (
       and nullif(trim(project->>'inspiration'), '') is not null
       and nullif(trim(project->>'solution'), '') is not null
       and nullif(trim(project->>'interesting'), '') is not null
-    and cardinality(regexp_split_to_array(btrim(concat_ws(' ', project->>'oneLiner', project->>'inspiration', project->>'solution', project->>'interesting')), '\s+')) <= 100
-      and cardinality(regexp_split_to_array(btrim(concat_ws(' ', project->>'oneLiner', project->>'inspiration', project->>'solution', project->>'interesting')), '\s+')) <= 100
       and nullif(trim(project->>'technology'), '') is not null
       and nullif(trim(project->>'made'), '') is not null
       and nullif(trim(project->>'experiment'), '') is not null
       and nullif(trim(project->>'next'), '') is not null
-    and cardinality(regexp_split_to_array(btrim(concat_ws(' ', project->>'technology', project->>'made', project->>'experiment', project->>'next')), '\s+')) <= 100
-      and cardinality(regexp_split_to_array(btrim(concat_ws(' ', project->>'technology', project->>'made', project->>'experiment', project->>'next')), '\s+')) <= 100
       and (coalesce(project->>'demo', '') ~* '^https?://' or coalesce(project->>'video', '') ~* '^https?://')
       and (coalesce((project->>'noCode')::boolean, false) or coalesce(project->>'source', '') ~* '^https?://')
       and (not (project->'tracks' ? 'Design × Tech') or nullif(trim(project->>'designReflection'), '') is not null)
