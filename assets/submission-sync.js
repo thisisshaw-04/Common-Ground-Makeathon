@@ -90,6 +90,10 @@
     return result.data === true;
   }
   async function syncDraft(status) {
+    if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
+      showStatus('Submissions closed at 3:15 PM SGT. The gallery is open in Part C.', true);
+      return false;
+    }
     var user = window.CGSubmission && window.CGSubmission.getUser();
     var email = participantEmail();
     if (!user || String(user.email || '').trim().toLowerCase() !== email) {
@@ -197,7 +201,11 @@
         showStatus('This email is not on the builder list enabled for submissions. Contact an organiser.', true);
         return;
       }
-      showStatus('Signed in as ' + signedInEmail + '. Your submission saves to the organiser inbox when you press Save.');
+      if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
+        showStatus('Submissions closed at 3:15 PM SGT. The gallery is open in Part C.');
+        return;
+      }
+      showStatus('Signed in as ' + signedInEmail + '. Save your draft or submit before 3:15 PM SGT.');
       if (lastUserId !== user.id) {
         lastUserId = user.id;
         var result = await client.from('submissions').select('project,team,status').eq('event_id', EVENT_ID).eq('user_id', user.id).maybeSingle();
