@@ -133,6 +133,11 @@ with check (
 create index if not exists submissions_event_status_updated_idx
 on public.submissions (event_id, status, updated_at desc);
 
+-- A normalized team name identifies a single team submission for the event.
+create unique index if not exists submissions_one_entry_per_team_idx
+on public.submissions (event_id, lower(trim(team->>'name')))
+where nullif(trim(team->>'name'), '') is not null;
+
 -- Private first-come-first-served inventory for tool codes.
 -- Code URLs stay out of GitHub and are claimed through an authenticated RPC.
 create schema if not exists private;
