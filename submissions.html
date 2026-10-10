@@ -47,6 +47,18 @@
 .submission-detail p{margin-top:5px}
 .submission-tracks{display:flex;gap:8px;flex-wrap:wrap}
 .submission-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--line-hard);border-radius:999px}
+.judging-admin{border:1px solid var(--line-hard);padding:20px;margin:24px 0;background:#f8f8f3}
+.judging-admin h2{font-size:23px;letter-spacing:-.04em}
+.judging-admin p{line-height:1.55}
+.judge-score-block{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}
+.judge-score-block h3{font-size:16px}
+.judge-score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.judge-score-grid .field{margin:0}
+.judge-score-grid select,.judge-score-block textarea{width:100%;padding:9px;border:1px solid var(--line-hard);background:#fff;font:12px var(--mono)}
+.judge-score-block textarea{min-height:72px;margin-top:6px}
+.judge-score-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.judge-score-summary{font:11px var(--mono);color:var(--muted)}
+#judging-message.error{color:#a22222}
 </style>
 </head>
 <body class="admin-page">
@@ -54,7 +66,7 @@
 <header class="topbar">
   <a class="brand" href="./"><span class="brand-mark"></span>COMMON GROUND</a>
   <span class="top-caption">ORGANISER / SUBMISSIONS</span>
-  <a class="top-link" href="./admin.html">Organiser console ↗</a>
+  <a class="top-link" href="./">Builder portal ↗</a>
 </header>
 <main id="main-content">
   <section class="inbox-hero">
@@ -81,6 +93,16 @@
         <button class="btn" id="inbox-refresh" type="button">Refresh</button>
         <button class="btn" id="inbox-export" type="button">Download JSON</button>
       </div>
+      <section class="judging-admin" aria-labelledby="judging-title">
+        <span class="eyebrow">JUDGING / RUBRIC</span>
+        <h2 id="judging-title">Judge submissions.</h2>
+        <p class="helper">Organisers score each ready project from 1–5 for Concept, Track Fit, Execution, and Presentation. Each is worth 25% (20 points total). Scores and notes are visible only to organisers.</p>
+        <p id="judging-message" class="helper" role="status">Loading judge scores…</p>
+        <div class="people-choice-actions">
+          <button class="btn" id="judging-shortlist" type="button">Select top 4 from each judged track</button>
+        </div>
+        <p class="helper">This selects the highest average scores for Design × Tech and Culture × Tech, removes duplicate teams, and checks them below. Review the list, then save it as the People’s Choice finalists.</p>
+      </section>
       <section class="people-choice-admin" aria-labelledby="people-choice-admin-title">
         <span class="eyebrow">AUDIENCE AWARD</span>
         <h2 id="people-choice-admin-title">People’s Choice voting</h2>
@@ -103,6 +125,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011"></script>
-<script src="./assets/submissions-admin.js?v=20261011-vote-admin"></script>
+<script src="./assets/submissions-admin.js?v=20261011-judging"></script>
 </body>
 </html>
