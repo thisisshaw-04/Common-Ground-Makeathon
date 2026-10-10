@@ -21,15 +21,38 @@
     $('inbox-cards').innerHTML = rows.map(function (row) {
       var project = row.project || {}, team = row.team || {};
       var members = Array.isArray(team.members) ? team.members : [];
-      var links = [
-        project.demo ? '<a href="' + safeHref(project.demo) + '" target="_blank" rel="noopener noreferrer">Demo ↗</a>' : '',
-        project.source ? '<a href="' + safeHref(project.source) + '" target="_blank" rel="noopener noreferrer">Source ↗</a>' : ''
-      ].filter(Boolean).join('');
+      var linkItems = [
+        ['Live demo', project.demo], ['Demo video', project.video], ['Source code', project.source],
+        ['Figma / prototype', project.prototype]
+      ];
+      var links = linkItems.map(function (item) {
+        var href = item[1] && safeHref(item[1]);
+        return href ? '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + escape(item[0]) + ' ↗</a>' : '';
+      }).join('');
+      if (project.supporting) {
+        links += (links ? ' ' : '') + '<span>' + escape(project.supporting) + '</span>';
+      }
+      var labels = {
+        oneLiner:'One-liner', inspiration:'Problem / inspiration', solution:'Solution', interesting:'What makes it interesting?',
+        technology:'Technology used', made:'What works now', experiment:'Experiment / learning', next:'What they would do next',
+        designReflection:'Design × Tech reflection', cultureReflection:'Culture × Tech reflection',
+        collaboration:'Team & collaboration', attribution:'AI & tool attribution'
+      };
+      var fieldOrder = ['oneLiner','inspiration','solution','interesting','technology','made','experiment','next','designReflection','cultureReflection','collaboration','attribution'];
+      var fields = fieldOrder.filter(function (key) { return project[key]; }).map(function (key) {
+        return '<section class="submission-detail"><strong>' + escape(labels[key]) + '</strong><p>' + escape(project[key]) + '</p></section>';
+      }).join('');
+      var tracks = Array.isArray(project.tracks) ? project.tracks : [];
+      var memberNames = members.map(function (member) {
+        return escape(member.name || '') + (member.email ? ' · ' + escape(member.email) : '');
+      }).filter(Boolean).join('<br>');
       return '<article class="submission-card"><header><div><h2>' + escape(project.name || 'Untitled project') + '</h2>' +
         '<span class="submission-meta">' + escape(row.owner_email) + ' · ' + escape(team.name || 'No team') + '</span></div>' +
         '<span class="submission-badge ' + (row.status === 'ready' ? 'ready' : '') + '">' + escape(row.status) + '</span></header>' +
-        '<p>' + escape(project.description || 'No description yet.') + '</p>' +
+        (tracks.length ? '<div class="submission-tracks">' + tracks.map(function (track) { return '<span>' + escape(track) + '</span>'; }).join('') + '</div>' : '') +
+        (memberNames ? '<div class="submission-meta"><strong>Team members</strong><br>' + memberNames + '</div>' : '') +
         '<div class="submission-meta">' + escape(members.length + 1) + ' team member(s) · Updated ' + escape(new Date(row.updated_at).toLocaleString()) + '</div>' +
+        (fields ? '<div class="submission-fields">' + fields + '</div>' : '<p>No project details yet.</p>') +
         (links ? '<div class="submission-links">' + links + '</div>' : '') + '</article>';
     }).join('');
   }
