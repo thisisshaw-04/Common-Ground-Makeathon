@@ -82,6 +82,9 @@ security definer
 set search_path = ''
 as $$
 begin
+  if p_event_id is distinct from 'common-ground-2026-10-11' then
+    raise exception 'This gallery is not available.' using errcode = '22023';
+  end if;
   if (select auth.uid()) is null or not public.is_current_user_eligible() then
     raise exception 'Eligible attendee access is required.'
       using errcode = '42501';

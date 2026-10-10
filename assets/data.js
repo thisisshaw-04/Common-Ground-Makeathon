@@ -2,8 +2,6 @@
    Published event copy lives here; eligibility, offers, submissions, and voting live in Supabase.
 */
 (function (global) {
-  const STORE_KEY = 'cg-portal-v1';
-
   const SEED = {
     eventRevision: '2026-10-11-v2',
     event: {
@@ -46,7 +44,6 @@
   function clone(v) { return JSON.parse(JSON.stringify(v)); }
 
   const CGData = {
-    STORE_KEY,
     codesOpen: function (event, now) {
       const date = event.codesAvailableOn;
       if (!date) return true;
@@ -60,47 +57,9 @@
         new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' }).format(date) + ' · 00:00 WIB';
     },
     seed: function () { return clone(SEED); },
-
-    load: function () {
-      try {
-        const raw = localStorage.getItem(STORE_KEY);
-        if (!raw) return clone(SEED);
-        const parsed = JSON.parse(raw);
-        // Refresh published event details once, retaining participant and credit records.
-        if (parsed.eventRevision !== SEED.eventRevision) {
-          parsed.event = Object.assign({}, parsed.event || {}, clone(SEED.event));
-          delete parsed.event.capacity;
-          parsed.eventRevision = SEED.eventRevision;
-          if (Array.isArray(parsed.perks)) parsed.perks.forEach(function (perk) {
-            if (perk.window === 'REDEEM BEFORE 12 MAR') perk.window = 'REDEEM BEFORE THE EVENT';
-          });
-          localStorage.setItem(STORE_KEY, JSON.stringify(parsed));
-        }
-        // Shallow repair so a half-written record never blanks the portal.
-        return {
-          eventRevision: SEED.eventRevision,
-          event: Object.assign(clone(SEED.event), parsed.event || {})
-        };
-      } catch (err) {
-        console.warn('Common Ground: falling back to seed data.', err);
-        return clone(SEED);
-      }
-    },
-
-    save: function (data) {
-      try {
-        localStorage.setItem(STORE_KEY, JSON.stringify(data));
-        return true;
-      } catch (err) {
-        console.warn('Common Ground: could not save.', err);
-        return false;
-      }
-    },
-
-    reset: function () {
-      try { localStorage.removeItem(STORE_KEY); } catch (err) { /* private mode */ }
-      return clone(SEED);
-    }
+    load: function () { return clone(SEED); },
+    save: function () { return false; },
+    reset: function () { return clone(SEED); }
   };
 
   global.CGData = CGData;
