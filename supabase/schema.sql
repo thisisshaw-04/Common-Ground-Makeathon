@@ -77,6 +77,7 @@ create policy submissions_insert_eligible_owner
 on public.submissions for insert to authenticated
 with check (
   user_id = (select auth.uid())
+  and event_id = 'common-ground-2026-10-11'
   and owner_email = lower(coalesce((select auth.jwt() ->> 'email'), ''))
   and (select public.is_current_user_eligible())
 );
@@ -87,6 +88,7 @@ on public.submissions for update to authenticated
 using (user_id = (select auth.uid()) or (select public.is_current_user_organizer()))
 with check (
   (user_id = (select auth.uid())
+   and event_id = 'common-ground-2026-10-11'
    and owner_email = lower(coalesce((select auth.jwt() ->> 'email'), ''))
    and (select public.is_current_user_eligible()))
   or (select public.is_current_user_organizer())
