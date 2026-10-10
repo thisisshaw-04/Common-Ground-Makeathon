@@ -53,8 +53,13 @@
       showStatus('This email is not on the builder list enabled for submissions. Contact an organiser.', true);
       return false;
     }
-    var team = readTeam(email) || { name: $('team-name').value.trim(), members: [] };
+    var savedTeam = readTeam(email);
+    var team = savedTeam || { name: $('team-name').value.trim(), members: [] };
     var project = formProject();
+    if (status === 'ready' && !savedTeam) {
+      showStatus('Save your team draft before marking the project ready.', true);
+      return false;
+    }
     if (status === 'ready' && !isReady(project, team)) {
       showStatus('To mark ready, save your team, project name, description, and at least one https:// link first.', true);
       return false;
@@ -150,6 +155,10 @@
   });
 
   document.addEventListener('cg-submission-auth', function (event) { syncAuth(event.detail && event.detail.session); });
+  var detailObserver = new MutationObserver(function () {
+    if (window.CGSubmission) syncAuth(window.CGSubmission.getSession());
+  });
+  detailObserver.observe($('p-detail'), { childList: true, characterData: true, subtree: true });
   if (!client) {
     syncAuth(null);
     return;
