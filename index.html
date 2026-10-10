@@ -28,12 +28,12 @@
 <header class="topbar">
   <a class="brand" href="./"><span class="brand-mark"></span>COMMON GROUND</a>
   <span class="top-caption" id="top-caption">BUILDER PORTAL / EDITION 01</span>
-  <a class="top-link" href="./admin.html">Organiser view <span>↗</span></a>
+  <a class="top-link" href="./vote.html">People’s Choice <span>↗</span></a>
 </header>
 
 <main id="main-content">
   <nav class="portal-nav" aria-label="On this page">
-    <a href="#overview">Overview</a><a href="#gate">Your token <span>↗</span></a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a>
+    <a href="#overview">Overview</a><a href="#gate">Your token <span>↗</span></a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a><a href="./vote.html">People’s Choice</a>
     <span class="nav-note">One Sunday. Make something.</span>
   </nav>
 
@@ -43,7 +43,7 @@
       <span class="eyebrow" id="hero-edition">EDITION 01 / 2026</span>
       <h1>Build the <em>thing</em>,<br>not the deck.</h1>
       <p id="hero-tagline">A one-day makeathon for people who would rather build the thing than describe it.</p>
-      <div class="hero-actions"><a class="primary-link" href="#gate">Get your builder token <span aria-hidden="true">↗</span></a><a class="text-link" href="#weekend">Explore the day ↓</a></div>
+      <div class="hero-actions"><a class="primary-link" href="#gate">Sign in for codes & submissions <span aria-hidden="true">↗</span></a><a class="text-link" href="#weekend">Explore the day ↓</a></div>
     </div>
     <div class="hero-meta">
       <span class="event-card-label">THE DAY AT A GLANCE <span aria-hidden="true">✳</span></span>
@@ -72,15 +72,15 @@
     <div class="gate-inner">
       <span class="eyebrow">02 / YOUR TOKEN</span>
       <h2 id="gate-title">Find your builder token.</h2>
-      <p>Enter the email address you signed up with. We will show your Common Ground token and the tool credits attached to it — Codex, Figma and Mobbin.</p>
+      <p>Enter the approved registration email. We’ll send a one-time sign-in link to that inbox. Any email provider works; you do not need a Google account.</p>
       <form class="gate-form" id="gate-form" novalidate>
         <label for="email">Your registration email</label>
         <input type="email" id="email" name="email" placeholder="you@example.com"
                autocomplete="email" inputmode="email" spellcheck="false" aria-describedby="gate-hint gate-error" required>
-        <button type="submit">Show my token <span aria-hidden="true">→</span></button>
+        <button type="submit">Email me a sign-in link <span aria-hidden="true">→</span></button>
       </form>
-      <p class="gate-hint" id="gate-hint">Wireframe demo — try <b>ada@example.com</b>, <b>jun@example.com</b>, <b>mentor@example.com</b> or <b>waitlist@example.com</b>.</p>
-      <p class="gate-error" id="gate-error" role="alert"></p>
+      <p class="gate-hint" id="gate-hint">After opening the link, you’ll return here to claim available promo offers and save your team’s submission.</p>
+      <p class="gate-error" id="gate-error" role="alert"></p><p class="gate-hint" id="gate-status" role="status"></p><button class="btn btn-sm" id="portal-signout" type="button" hidden>Sign out</button>
     </div>
   </section>
 
@@ -97,7 +97,7 @@
       </div>
       <div class="token-block">
         <div>
-          <span class="label">COMMON GROUND TOKEN</span>
+          <span class="label">BUILDER ACCESS</span>
           <div class="token-value" id="p-token">—</div>
         </div>
         <button id="token-copy" class="copy-btn" data-copy-target="p-token" type="button">Copy token</button>
@@ -262,8 +262,8 @@
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011"></script>
 <script src="./assets/data.js?v=20261003-project"></script>
-<script src="./assets/portal.js?v=20261011-judging-form"></script>
-<script src="./assets/tool-code-claim.js?v=20261011"></script>
-<script src="./assets/submission-sync.js?v=20261011"></script>
+<script src="./assets/portal.js?v=20261011-auth-vote"></script>
+<script src="./assets/tool-code-claim.js?v=20261011-auth-vote"></script>
+<script src="./assets/submission-sync.js?v=20261011-auth-vote"></script>
 </body>
 </html>
