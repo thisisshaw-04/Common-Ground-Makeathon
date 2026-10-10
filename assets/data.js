@@ -22,7 +22,7 @@
         { title: 'What this is',
           body: 'One Sunday. One thing worth making. Join us at SQ Collective on 11 October, from 9am to 5pm. Kick off together, find your team, build, and share what you made before the day is out.' },
         { title: 'What you get',
-          body: 'Every confirmed builder gets a Common Ground token. That token unlocks the tool credits below — Codex, Figma and Mobbin — plus food, a desk, power, and people who know things you do not.' },
+          body: 'Approved attendees sign in with their registration email to submit a project, claim available tool offers and vote in People’s Choice. The roster and promo links are kept private in Supabase.' },
         { title: 'What we ask',
           body: 'Build in the open. Help the team next to you when they are stuck. Ship something honest on Sunday, even if it is held together with tape.' }
       ],
@@ -38,51 +38,18 @@
         { time: '17:00', title: 'Close', detail: 'That is a wrap. Keep building in the open.' }
       ],
       faq: [
-        { q: 'I signed up with a different email.', a: 'Use the address on your confirmation email. If that still fails, find us at the front desk and we will merge the records.' },
+        { q: 'I can’t access the builder workspace.', a: 'Use the exact email on your approved attendee registration. If you have trouble, contact an organiser.' },
         { q: 'Do I need a team before Sunday?', a: 'No. Come with a team or meet one during the morning kick-off.' },
         { q: 'How long do the tool credits last?', a: 'Each credit has its own window — check the card. Redeem them before the event, not during.' },
         { q: 'Can I bring existing work?', a: 'Bring libraries, components and boilerplate. Do not bring a finished product.' }
       ]
     },
 
-    /* The redeemable tool credits shown on a builder's token page. */
-    perks: [
-      { id: 'codex', name: 'Codex', kind: 'AI PAIR PROGRAMMER',
-        value: '3 months Pro', window: 'REDEEM BEFORE THE EVENT',
-        blurb: 'Full Pro access for the duration of the event and two months after, so the thing you start here does not stall on Monday.',
-        redeemUrl: 'https://example.com/redeem/codex',
-        steps: ['Open the redeem link', 'Sign in with the email below', 'Paste your code at checkout'] },
-      { id: 'figma', name: 'Figma', kind: 'DESIGN + PROTOTYPING',
-        value: 'Pro seat, 90 days', window: 'REDEEM BEFORE THE EVENT',
-        blurb: 'A Pro seat on the Common Ground org, with the shared team library, the demo deck template and the component kit already in it.',
-        redeemUrl: 'https://example.com/redeem/figma',
-        steps: ['Open the redeem link', 'Accept the org invite', 'Your seat upgrades automatically'] },
-      { id: 'mobbin', name: 'Mobbin', kind: 'UI REFERENCE LIBRARY',
-        value: 'Pro, 6 months', window: 'REDEEM ANY TIME',
-        blurb: 'Every screen and flow in the library, unlocked. Useful during your build when you know the pattern exists but cannot remember who did it well.',
-        redeemUrl: 'https://example.com/redeem/mobbin',
-        steps: ['Open the redeem link', 'Create or sign in to your account', 'Enter the code under Billing'] }
-    ],
+    /* Promo claim inventory is private in Supabase. */
+    perks: [],
 
-    /* Wireframe roster. Replace with a real participants table. */
-    participants: [
-      { email: 'ada@example.com', name: 'Ada Okonkwo', team: 'Team Driftwood', ticket: 'BUILDER',
-        status: 'confirmed', token: 'CG-7K4M-QX21',
-        codes: { codex: 'CDX-8841-RRTP', figma: 'FIG-2093-LMQZ', mobbin: 'MOB-5517-VVKD' },
-        claimed: { codex: true, figma: false, mobbin: false } },
-      { email: 'jun@example.com', name: 'Jun Park', team: 'Team Driftwood', ticket: 'BUILDER',
-        status: 'confirmed', token: 'CG-2P9X-HW40',
-        codes: { codex: 'CDX-1120-BQNE', figma: 'FIG-7734-KPAX', mobbin: 'MOB-9028-ZTRC' },
-        claimed: { codex: false, figma: false, mobbin: false } },
-      { email: 'mentor@example.com', name: 'Rosa Lindqvist', team: 'Mentor pool', ticket: 'MENTOR',
-        status: 'confirmed', token: 'CG-5D1T-JE83',
-        codes: { codex: 'CDX-3312-WWYL', figma: 'FIG-6650-WQDR', mobbin: 'MOB-4471-XNBH' },
-        claimed: { codex: true, figma: true, mobbin: true } },
-      { email: 'waitlist@example.com', name: 'Theo Marchetti', team: '—', ticket: 'BUILDER',
-        status: 'waitlist', token: '—',
-        codes: { codex: '', figma: '', mobbin: '' },
-        claimed: { codex: false, figma: false, mobbin: false } }
-    ]
+    /* The approved attendee roster stays private in Supabase. */
+    participants: []
   };
 
   function clone(v) { return JSON.parse(JSON.stringify(v)); }
