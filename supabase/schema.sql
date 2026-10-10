@@ -22,13 +22,49 @@ create table if not exists public.submissions (
   constraint ready_submission_complete check (
     status <> 'ready' or (
       nullif(trim(project->>'name'), '') is not null
-      and nullif(trim(project->>'description'), '') is not null
-      and (
-        coalesce(project->>'demo', '') ~* '^https?://'
-        or coalesce(project->>'source', '') ~* '^https?://'
-      )
+      and (case when jsonb_typeof(project->'tracks') = 'array' then jsonb_array_length(project->'tracks') between 1 and 2 else false end)
+      and project->'tracks' <@ '["Design × Tech","Culture × Tech","Best Use of Tech","Common Ground Award"]'::jsonb
+      and nullif(trim(project->>'oneLiner'), '') is not null
+      and nullif(trim(project->>'inspiration'), '') is not null
+      and nullif(trim(project->>'solution'), '') is not null
+      and nullif(trim(project->>'interesting'), '') is not null
+      and nullif(trim(project->>'technology'), '') is not null
+      and nullif(trim(project->>'made'), '') is not null
+      and nullif(trim(project->>'experiment'), '') is not null
+      and nullif(trim(project->>'next'), '') is not null
+      and (coalesce(project->>'demo', '') ~* '^https?://' or coalesce(project->>'video', '') ~* '^https?://')
+      and (coalesce((project->>'noCode')::boolean, false) or coalesce(project->>'source', '') ~* '^https?://')
+      and (not (project->'tracks' ? 'Design × Tech') or nullif(trim(project->>'designReflection'), '') is not null)
+      and (not (project->'tracks' ? 'Culture × Tech') or nullif(trim(project->>'cultureReflection'), '') is not null)
+      and nullif(trim(project->>'collaboration'), '') is not null
+      and nullif(trim(project->>'attribution'), '') is not null
       and nullif(trim(team->>'name'), '') is not null
     )
+  )
+);
+
+-- Reapply readiness checks when the schema is rerun on an existing project.
+alter table public.submissions drop constraint if exists ready_submission_complete;
+alter table public.submissions add constraint ready_submission_complete check (
+  status <> 'ready' or (
+    nullif(trim(project->>'name'), '') is not null
+    and (case when jsonb_typeof(project->'tracks') = 'array' then jsonb_array_length(project->'tracks') between 1 and 2 else false end)
+    and project->'tracks' <@ '["Design × Tech","Culture × Tech","Best Use of Tech","Common Ground Award"]'::jsonb
+    and nullif(trim(project->>'oneLiner'), '') is not null
+    and nullif(trim(project->>'inspiration'), '') is not null
+    and nullif(trim(project->>'solution'), '') is not null
+    and nullif(trim(project->>'interesting'), '') is not null
+    and nullif(trim(project->>'technology'), '') is not null
+    and nullif(trim(project->>'made'), '') is not null
+    and nullif(trim(project->>'experiment'), '') is not null
+    and nullif(trim(project->>'next'), '') is not null
+    and (coalesce(project->>'demo', '') ~* '^https?://' or coalesce(project->>'video', '') ~* '^https?://')
+    and (coalesce((project->>'noCode')::boolean, false) or coalesce(project->>'source', '') ~* '^https?://')
+    and (not (project->'tracks' ? 'Design × Tech') or nullif(trim(project->>'designReflection'), '') is not null)
+    and (not (project->'tracks' ? 'Culture × Tech') or nullif(trim(project->>'cultureReflection'), '') is not null)
+    and nullif(trim(project->>'collaboration'), '') is not null
+    and nullif(trim(project->>'attribution'), '') is not null
+    and nullif(trim(team->>'name'), '') is not null
   )
 );
 
