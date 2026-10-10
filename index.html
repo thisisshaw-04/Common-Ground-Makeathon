@@ -117,6 +117,14 @@
       <span class="eyebrow">THEN / YOUR SUBMISSION</span>
       <h2 id="submission-title">Show us what you made.</h2>
       <p>Start your project draft here. Keep refining it as you build.</p>
+      <div class="submission-auth" id="submission-auth">
+        <form id="submission-auth-form">
+          <label class="field"><span>BUILDER EMAIL</span><input id="submission-auth-email" type="email" autocomplete="email" required></label>
+          <button class="btn" type="submit">Email me a sign-in link</button>
+        </form>
+        <button class="btn btn-sm" id="submission-signout" type="button" hidden>Sign out</button>
+        <p id="submission-auth-status" class="helper" role="status">Sign in with your registration email to submit centrally.</p>
+      </div>
       <p id="submission-team" class="helper"></p>
       <form id="submission-form" novalidate>
         <label class="field"><span>PROJECT NAME *</span><input id="project-name" maxlength="150" required></label>
@@ -164,7 +172,11 @@
 
 <div id="toast" class="toast" role="status"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./assets/backend-config.js?v=20261011"></script>
+<script src="./assets/submission-auth.js?v=20261011"></script>
 <script src="./assets/data.js?v=20261003-project"></script>
 <script src="./assets/portal.js?v=20261003-project"></script>
+<script src="./assets/submission-sync.js?v=20261011"></script>
 </body>
 </html>
