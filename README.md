@@ -1,11 +1,12 @@
 # Common Ground — Portal
 
-Wireframe for the **Common Ground** makeathon portal. Two pages, no build step, no backend.
+Static **Common Ground** makeathon portal. The builder and organiser pages are plain HTML/CSS/JS; central project submissions use Supabase.
 
 | Page | Who it is for | What it does |
 | --- | --- | --- |
 | [`index.html`](index.html) | Builders | Explains the event, takes the email someone signed up with, and shows their Common Ground token plus the Codex / Figma / Mobbin codes attached to it. |
-| [`admin.html`](admin.html) | Organisers | Edits everything on the front portal — copy, schedule, FAQ, tool credits and the participant roster. |
+| [`admin.html`](admin.html) | Organisers | Edits the front portal's copy, schedule, FAQ, tool credits and participant roster in this browser. |
+| [`submissions.html`](submissions.html) | Organisers | Secure inbox for centrally saved project submissions (requires Supabase setup). |
 
 ## Run it
 
@@ -137,8 +138,20 @@ In the organiser console, Event details → Codes available from defaults to 10 
 Once a confirmed builder has a token and every configured tool code, the team section appears below the credits. The builder is the team contact; they can save a team name and add/remove teammates with names and unique email addresses. Drafts are stored separately per contact in localStorage (`cg-team-draft-v1:<email>`), survive reloads, and are not sent to organisers or included in the organiser JSON export. Central collection requires a backend or submission service. Changing the release date in the organiser console affects only that browser; publish the seed setting to change it for everyone.
 
 
-## Project submission base
+## Central project submissions
 
-Below the team form, eligible builders can save incomplete project drafts (name, description, demo URL and source URL), mark a completed draft ready locally, and download a JSON copy. Ready requires a saved team, name, description and at least one HTTP(S) link. All controls explicitly state that nothing is sent to organisers. Editing a ready project requires saving or marking it ready again. Download saves the current form as a draft.
+Builders sign in with a one-time email link and save their team and project drafts to Supabase. They can mark a submission ready once it has a team name, project name, description, and at least one HTTP(S) link. The organiser inbox is `submissions.html`; only organiser emails can read all rows. Database policies restrict builders to their own row and require their email to be on the eligible-participant list. Existing browser drafts remain local until the builder saves them after signing in.
 
-The `projectStore` adapter in `assets/portal.js` isolates local storage (`cg-project-draft-v1:<email>`). Records contain schemaVersion, eventId, ownerEmail, status, project, a saved team snapshot and updatedAt. Replace its load/save operations with authenticated API calls later; validate identity, team membership, URLs and deadlines server-side. Drafts are not included in the organiser export.
+### Supabase setup
+
+1. In the Supabase SQL Editor, run [`supabase/schema.sql`](supabase/schema.sql).
+2. In Supabase Authentication → URL Configuration, set the Site URL to the deployed GitHub Pages URL and allow redirects to `https://thisisshaw-04.github.io/Common-Ground-Makeathon/index.html` and `https://thisisshaw-04.github.io/Common-Ground-Makeathon/submissions.html`. Add `http://localhost:5180/**` for local development.
+3. Add organiser emails in the SQL Editor, replacing the example with each organiser's lower-case email:
+   ```sql
+   insert into public.organizers (email) values ('organizer@example.com')
+   on conflict (email) do nothing;
+   ```
+4. Import a one-column CSV of confirmed builders' lower-case emails into `public.eligible_participants`. Do not add waitlisted or cancelled registrations.
+5. The browser client uses the project's URL and publishable key in `assets/backend-config.js`. The publishable key is expected to be public; never put a Supabase secret or service-role key in the site.
+
+Supabase Auth must be configured for the deployed site before magic links can return to it. The browser uses Supabase RLS and the publishable key; no privileged key is shipped to GitHub Pages.
