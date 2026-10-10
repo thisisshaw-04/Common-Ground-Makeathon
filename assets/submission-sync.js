@@ -116,6 +116,10 @@
       team: team,
       updated_at: new Date().toISOString()
     }, { onConflict: 'event_id,user_id' });
+    if (result.error && result.error.code === '23505') {
+      showStatus('A submission for this team name already exists. Ask that teammate to update it instead of creating another entry.', true);
+      return false;
+    }
     if (result.error) throw result.error;
     showStatus(status === 'ready' ? 'Submission marked ready and saved for the organisers.' : 'Draft saved centrally for the organisers.');
     $('submission-feedback').textContent = status === 'ready' ? 'Submission saved centrally and marked ready.' : 'Draft saved centrally. You can return to edit it.';
