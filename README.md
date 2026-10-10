@@ -4,7 +4,7 @@ Static **Common Ground** makeathon portal. The builder and organiser pages are p
 
 | Page | Who it is for | What it does |
 | --- | --- | --- |
-| [`index.html`](index.html) | Builders | Explains the event, takes the email someone signed up with, and shows their Common Ground token plus the Codex / Figma / Mobbin codes attached to it. |
+| [`index.html`](index.html) | Builders | Explains the event, takes the email someone signed up with, and shows their Common Ground token and tool credits. OpenAI codes are claimed once per approved builder, first come, first served. |
 | [`admin.html`](admin.html) | Organisers | Edits the front portal's copy, schedule, FAQ, tool credits and participant roster in this browser. |
 | [`submissions.html`](submissions.html) | Organisers | Secure inbox for centrally saved project submissions (requires Supabase setup). |
 
@@ -135,7 +135,7 @@ Event: Sunday, 11 October 2026, 9am–5pm at SQ Collective. The one-day programm
 
 In the organiser console, Event details → Codes available from defaults to 10 October 2026 at midnight WIB (Asia/Jakarta). A blank date enables immediate access in the current browser. Confirmed builders see tokens and redeemable codes on or after this date; waiting-list entries remain ineligible. This is a client-side prototype gate, not secure embargo enforcement: sample codes are included in the source. Real codes require an authenticated server with server-side release checks.
 
-Once a confirmed builder has a token and every configured tool code, the team section appears below the credits. The builder is the team contact; they can save a team name and add/remove teammates with names and unique email addresses. Drafts are stored separately per contact in localStorage (`cg-team-draft-v1:<email>`), survive reloads, and are not sent to organisers or included in the organiser JSON export. Central collection requires a backend or submission service. Changing the release date in the organiser console affects only that browser; publish the seed setting to change it for everyone.
+Once a confirmed builder has a token and every non-OpenAI configured tool code, the team section appears below the credits. The OpenAI code is claimed separately through Supabase. The builder is the team contact; they can save a team name and add/remove teammates with names and unique email addresses. Drafts are stored separately per contact in localStorage (`cg-team-draft-v1:<email>`), survive reloads, and are not sent to organisers or included in the organiser JSON export. Central collection requires a backend or submission service. Changing the release date in the organiser console affects only that browser; publish the seed setting to change it for everyone.
 
 
 ## Central project submissions
@@ -153,5 +153,6 @@ Builders sign in with a one-time email link and save their team and project draf
    ```
 4. Import a one-column CSV of confirmed builders' lower-case emails into `public.eligible_participants`. Do not add waitlisted or cancelled registrations.
 5. The browser client uses the project's URL and publishable key in `assets/backend-config.js`. The publishable key is expected to be public; never put a Supabase secret or service-role key in the site.
+6. OpenAI codes are stored only in `private.tool_code_inventory` in Supabase. The builder page calls `claim_tool_code('openai')` after email sign-in; the first 100 approved builders to claim receive one code, and repeat requests retrieve the same code. Do not commit code links to GitHub.
 
 Supabase Auth must be configured for the deployed site before magic links can return to it. The browser uses Supabase RLS and the publishable key; no privileged key is shipped to GitHub Pages.
