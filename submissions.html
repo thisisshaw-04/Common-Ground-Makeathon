@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="./assets/portal.css?v=20261002-team">
 <link rel="stylesheet" href="./assets/identity.css?v=20261011-submissions">
+<link rel="stylesheet" href="./assets/workflow.css?v=20261011-complete">
 <style>
 .inbox-hero{padding:56px 0 38px;border-bottom:1px solid var(--line)}
 .inbox-hero h1{font-size:clamp(38px,6vw,72px);letter-spacing:-.06em;margin:12px 0}
@@ -31,6 +32,22 @@
 .submission-links a{text-decoration:underline;text-underline-offset:3px}
 #inbox-message{min-height:1.5em}
 #inbox-message.error{color:#a22222}
+.people-choice-admin{border:1px solid var(--line-hard);padding:20px;margin:24px 0;background:#f8f8f3}
+.people-choice-admin h2{font-size:23px;letter-spacing:-.04em}
+.people-choice-admin p{line-height:1.55}
+.finalist-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px;margin:16px 0}
+.finalist-option{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);background:#fff;line-height:1.4}
+.finalist-option input{margin-top:3px;accent-color:#7d8d00}
+.finalist-option small{display:block;color:var(--muted);font:10px var(--mono);margin-top:4px}
+.people-choice-actions{display:flex;gap:10px;flex-wrap:wrap}
+#people-choice-message.error{color:#a22222}
+.people-choice-results{margin-top:16px;border-top:1px solid var(--line);padding-top:10px}
+.submission-fields{display:grid;gap:12px;margin-top:8px}
+.submission-detail{border-top:1px solid var(--line);padding-top:10px}
+.submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
+.submission-detail p{margin-top:5px}
+.submission-tracks{display:flex;gap:8px;flex-wrap:wrap}
+.submission-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--line-hard);border-radius:999px}
 </style>
 </head>
 <body class="admin-page">
@@ -38,13 +55,13 @@
 <header class="topbar">
   <a class="brand" href="./"><span class="brand-mark"></span>COMMON GROUND</a>
   <span class="top-caption">ORGANISER / SUBMISSIONS</span>
-  <a class="top-link" href="./admin.html">Organiser console ↗</a>
+  <a class="top-link" href="./index.html#builder-access">Builder portal ↗</a>
 </header>
 <main id="main-content">
   <section class="inbox-hero">
     <span class="eyebrow">COMMON GROUND / BUILDS</span>
     <h1>Submission inbox.</h1>
-    <p class="helper">Sign in with an organiser email to view builders’ saved drafts and ready submissions.</p>
+    <p class="helper">Organisers can review every submission, score the judging rubric, publish the People’s Choice shortlist and control voting.</p>
   </section>
   <section class="inbox-panel">
     <div class="inbox-auth" id="inbox-auth">
@@ -52,12 +69,12 @@
         <label class="field"><span>ORGANISER EMAIL</span><input id="inbox-email" type="email" autocomplete="email" required></label>
         <button class="btn btn-primary" type="submit">Email me a sign-in link</button>
       </form>
-      <p id="inbox-message" class="helper" role="status">Only emails listed in the Supabase organisers table can see submissions.</p>
+      <p id="inbox-message" class="helper" role="status">Only emails listed in the Supabase organisers table can see submissions. Every rubric criterion is scored 1–5 and equally weighted.</p>
       <button class="btn btn-sm" id="inbox-signout" type="button" hidden>Sign out</button>
     </div>
     <div class="inbox-list" id="inbox-list" hidden>
       <div class="section-head">
-        <h2>Builder submissions</h2>
+        <h2>Builder submissions & judging</h2>
         <span class="eyebrow" id="inbox-count">0 SUBMISSIONS</span>
       </div>
       <div class="inbox-toolbar">
@@ -65,6 +82,31 @@
         <button class="btn" id="inbox-refresh" type="button">Refresh</button>
         <button class="btn" id="inbox-export" type="button">Download JSON</button>
       </div>
+      <section class="people-choice-admin" aria-labelledby="people-choice-admin-title">
+        <span class="eyebrow">AUDIENCE AWARD</span>
+        <h2 id="people-choice-admin-title">People’s Choice voting</h2>
+        <p class="helper">Select 2–8 ready submissions as finalists. Open voting when the audience is ready, then close it to reveal the tally. Each eligible attendee gets one verified-email vote.</p>
+        <p id="people-choice-message" class="helper" role="status">Loading voting controls…</p>
+        <div id="people-choice-options" class="finalist-options"></div>
+        <div class="people-choice-actions">
+          <button class="btn" id="people-choice-save-finalists" type="button">Save finalist list</button>
+          <button class="btn btn-primary" id="people-choice-open" type="button" hidden>Open voting</button>
+          <button class="btn" id="people-choice-close" type="button" hidden>Close voting</button>
+          <button class="btn" id="people-choice-results-button" type="button" hidden>Show results</button>
+        </div>
+        <div id="people-choice-results" class="people-choice-results" hidden></div>
+      </section>
+      <section class="workflow-card judging-panel" id="vote-controls" hidden>
+        <div class="section-head"><div><span class="eyebrow">PEOPLE’S CHOICE</span><h2>Finalist shortlist & voting</h2></div><div><strong id="vote-status">VOTING CLOSED</strong><p class="submission-meta" id="vote-count">0 votes recorded</p></div></div>
+        <p class="workflow-help">The shortlist is the four highest-scoring ready projects in Design × Tech and the four highest-scoring ready projects in Culture × Tech. If a project is nominated in both, it appears once. Cross-track awards are judged separately.</p>
+        <div class="judging-toolbar">
+          <span class="submission-meta" id="finalist-count">0 / 8 finalists selected</span>
+          <button class="btn" id="auto-finalists" type="button">Select top 4 per primary track</button>
+          <button class="btn btn-primary" id="save-finalists" type="button">Save finalist shortlist</button>
+          <button class="btn" id="vote-toggle" type="button">Open voting</button>
+        </div>
+        <div class="judge-results" id="vote-results"></div>
+      </section>
       <div class="inbox-grid" id="inbox-cards"></div>
     </div>
   </section>
@@ -73,6 +115,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011"></script>
-<script src="./assets/submissions-admin.js?v=20261011"></script>
+<script src="./assets/submissions-admin.js?v=20261011-complete"></script>
 </body>
 </html>
