@@ -68,6 +68,8 @@
 
   function renderResult(p) {
     current = p;
+    window.CGBuilderParticipant = p;
+    document.dispatchEvent(new CustomEvent('cg-builder-participant', { detail: { participant: p } }));
     clearError();
 
     $('p-name').textContent = p.name || p.email;
@@ -82,7 +84,7 @@
     $('token-copy').hidden = !open || !p.token || p.token === '—';
     $('release-notice').textContent = p.status === 'confirmed' && !open ? 'Your place is confirmed. Tokens and tool codes unlock on ' + CGData.releaseLabel(data.event) + '.' : '';
     $('release-notice').hidden = !$('release-notice').textContent;
-    var ready = open && p.token && p.token !== '—' && (data.perks || []).every(function (perk) { return p.codes && p.codes[perk.id]; });
+    var ready = open && p.token && p.token !== '—' && (data.perks || []).every(function (perk) { return (perk.id === 'codex' || perk.id === 'openai' || perk.id === 'figma' || perk.id === 'mobbin') || (p.codes && p.codes[perk.id]); });
     $('team-section').hidden = !ready;
     $('submission-section').hidden = !ready;
     if (ready) { loadTeam(p); loadProject(p); }
@@ -95,8 +97,9 @@
         '<p class="perk-steps" style="padding-left:0">STATUS · ' + esc(String(p.status || 'pending').toUpperCase()) + '</p></div>';
     } else {
       $('perks').innerHTML = (data.perks || []).map(function (perk) {
-        var code = open ? ((p.codes && p.codes[perk.id]) || '') : '';
-        var claimed = !!(p.claimed && p.claimed[perk.id]);
+        var hasClaimPool = perk.id === 'codex' || perk.id === 'openai' || perk.id === 'figma' || perk.id === 'mobbin';
+        var code = open && !hasClaimPool ? ((p.codes && p.codes[perk.id]) || '') : '';
+        var claimed = !hasClaimPool && !!(p.claimed && p.claimed[perk.id]);
         var steps = (perk.steps || []).map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
         return '<article class="perk' + (claimed ? ' claimed' : '') + '">' +
           '<div class="perk-head"><div><h3>' + esc(perk.name) + '</h3>' +
@@ -104,7 +107,7 @@
             '<span class="perk-value">' + esc(perk.value) + '</span></div>' +
           '<p>' + esc(perk.blurb) + '</p>' +
           '<div class="perk-code">' +
-            '<code id="code-' + esc(perk.id) + '">' + esc(open ? (code || 'NOT ISSUED') : 'AVAILABLE ' + CGData.releaseLabel(data.event)) + '</code>' +
+            '<code id="code-' + esc(perk.id) + '">' + esc(open ? (hasClaimPool ? 'CLAIM BELOW · FIRST COME, FIRST SERVED' : (code || 'NOT ISSUED')) : 'AVAILABLE ' + CGData.releaseLabel(data.event)) + '</code>' +
             (code ? '<button class="copy-btn btn-sm" type="button" data-copy-target="code-' + esc(perk.id) + '">Copy</button>' : '') +
           '</div>' +
           '<ol class="perk-steps">' + steps + '</ol>' +

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#fa1f93">
+<meta name="theme-color" content="#11120f">
 <title>Common Ground — Builder Portal</title>
 <meta name="description" content="Common Ground makeathon. Find your builder token and redeem your Codex, Figma and Mobbin credits.">
 <link rel="icon" href="./assets/favicon.svg">
@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="./assets/portal.css?v=20261003-project">
-<link rel="stylesheet" href="./assets/identity.css?v=20261011-minimal">
+<link rel="stylesheet" href="./assets/identity.css?v=20261011-submissions">
 </head>
 <body class="builder-page">
 <a class="skip-link" href="#main-content">Skip to content</a>
@@ -98,17 +98,61 @@
     <p id="release-notice" class="release-notice" role="status"></p>
     <div class="perks" id="perks"></div>
 
+    <section id="tool-code-claims" class="team-section code-claim" hidden aria-labelledby="tool-claim-title">
+      <span class="eyebrow">TOOL CREDITS / LIMITED CLAIMS</span>
+      <h2 id="tool-claim-title">Claim your tool codes.</h2>
+      <form id="tool-claim-login" hidden>
+        <label class="field"><span>APPROVED BUILDER EMAIL</span><input id="tool-claim-email" type="email" autocomplete="email" required></label>
+        <button class="btn" type="submit">Email me a sign-in link</button>
+      </form>
+      <div class="team-actions">
+        <button class="btn btn-sm" id="tool-claim-signout" type="button" hidden>Sign out</button>
+      </div>
+      <p id="tool-claim-auth-status" class="helper" role="status"></p>
+      <div class="tool-claim-grid">
+        <article class="perk">
+          <div class="perk-head"><div><h3>OpenAI</h3><div class="perk-kind">2500 CREDITS</div></div><span class="perk-value">100 codes</span></div>
+          <p>One code per approved builder, first come, first served.</p>
+          <button class="btn btn-primary" data-tool-claim="openai" type="button" hidden>Claim / retrieve code</button>
+          <p id="tool-claim-status-openai" class="helper" role="status"></p>
+          <div class="team-actions" id="tool-claim-output-openai" hidden><a id="tool-claim-link-openai" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open OpenAI link</a><code id="tool-claim-value-openai" hidden></code><button class="btn btn-sm" data-tool-copy="openai" type="button">Copy</button></div>
+        </article>
+        <article class="perk">
+          <div class="perk-head"><div><h3>Figma Make</h3><div class="perk-kind">STARTER TO PRO + MAKE</div></div><span class="perk-value">Up to 100</span></div>
+          <p>Upgrade a Starter team to Pro for Make access and 3,000 AI credits. First come, first served.</p>
+          <button class="btn btn-primary" data-tool-claim="figma" type="button" hidden>Claim / retrieve link</button>
+          <p id="tool-claim-status-figma" class="helper" role="status"></p>
+          <div class="team-actions" id="tool-claim-output-figma" hidden><a id="tool-claim-link-figma" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Figma promo</a><code id="tool-claim-value-figma" hidden></code><button class="btn btn-sm" data-tool-copy="figma" type="button">Copy</button></div>
+        </article>
+        <article class="perk">
+          <div class="perk-head"><div><h3>Mobbin Pro</h3><div class="perk-kind">3 MONTHS FREE</div></div><span class="perk-value">Up to 100</span></div>
+          <p>Use the code by 31 October 2026. A card is required; you can cancel immediately after signing up. First come, first served.</p>
+          <button class="btn btn-primary" data-tool-claim="mobbin" type="button" hidden>Claim / retrieve code</button>
+          <p id="tool-claim-status-mobbin" class="helper" role="status"></p>
+          <div class="team-actions" id="tool-claim-output-mobbin" hidden><a id="tool-claim-link-mobbin" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Mobbin link</a><code id="tool-claim-value-mobbin" hidden></code><button class="btn btn-sm" data-tool-copy="mobbin" type="button">Copy</button></div>
+        </article>
+      </div>
+    </section>
+
     <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
       <span class="eyebrow">NEXT / YOUR TEAM</span>
       <h2 id="team-title">Good things start with a team.</h2>
       <p>Add your team details for your submission. You are included as the team contact.</p>
       <p id="team-contact" class="helper"></p>
+      <div class="submission-auth" id="submission-auth">
+        <form id="submission-auth-form">
+          <label class="field"><span>BUILDER EMAIL</span><input id="submission-auth-email" type="email" autocomplete="email" required></label>
+          <button class="btn" type="submit">Email me a sign-in link</button>
+        </form>
+        <button class="btn btn-sm" id="submission-signout" type="button" hidden>Sign out</button>
+        <p id="submission-auth-status" class="helper" role="status">Sign in with your registration email to submit centrally.</p>
+      </div>
       <form id="team-form">
         <label class="field"><span>TEAM NAME</span><input id="team-name" required maxlength="100" autocomplete="organization"></label>
         <div id="team-members"></div>
         <button class="btn" id="add-teammate" type="button">+ Add teammate</button>
         <div class="team-actions"><button class="btn btn-primary" type="submit">Save team draft</button></div>
-        <p class="helper">This draft stays in this browser. It has not been sent to the organisers.</p>
+        <p class="helper">Sign in above, then save your team to send it to the organiser inbox. Without sign-in it stays on this device.</p>
         <p id="team-feedback" role="status" class="helper"></p>
       </form>
     </section>
@@ -126,14 +170,13 @@
           <label class="field"><span>GITHUB / SOURCE LINK</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
         </div>
         <p class="helper">Add at least one project link when your draft is ready.</p>
-        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Mark ready locally</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
-        <p class="helper">Saved on this device only. Marking ready does not send your project to organisers. Online submission will be connected later.</p>
+        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Mark ready and submit</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
+        <p class="helper">Sign in above to save drafts to the organiser inbox. Download draft saves a JSON copy to this device.</p>
         <p id="submission-feedback" class="helper" role="status"></p>
       </form>
     </section>
 
-    <p class="wire-note">Wireframe: codes are stored in your browser only. In production this screen is served after a
-      magic-link check, and each code is issued once per confirmed builder.</p>
+    <p class="wire-note">OpenAI codes are claimed through Supabase after email sign-in and issued once per approved builder. Other tool codes shown here are part of the local portal data.</p>
   </section>
 
   <!-- ============ SCHEDULE ============ -->
@@ -164,7 +207,12 @@
 
 <div id="toast" class="toast" role="status"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./assets/backend-config.js?v=20261011"></script>
+<script src="./assets/submission-auth.js?v=20261011"></script>
 <script src="./assets/data.js?v=20261003-project"></script>
-<script src="./assets/portal.js?v=20261003-project"></script>
+<script src="./assets/portal.js?v=20261011-code-claim"></script>
+<script src="./assets/tool-code-claim.js?v=20261011"></script>
+<script src="./assets/submission-sync.js?v=20261011"></script>
 </body>
 </html>
