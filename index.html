@@ -98,22 +98,39 @@
     <p id="release-notice" class="release-notice" role="status"></p>
     <div class="perks" id="perks"></div>
 
-    <section id="openai-code-claim" class="team-section code-claim" hidden aria-labelledby="openai-claim-title">
-      <span class="eyebrow">TOOL CREDIT / OPENAI</span>
-      <h2 id="openai-claim-title">Claim your OpenAI code.</h2>
-      <p>One code per approved builder. The first 100 approved builders to claim receive a code while supplies last.</p>
-      <form id="openai-claim-login" hidden>
-        <label class="field"><span>APPROVED BUILDER EMAIL</span><input id="openai-claim-email" type="email" autocomplete="email" required></label>
+    <section id="tool-code-claims" class="team-section code-claim" hidden aria-labelledby="tool-claim-title">
+      <span class="eyebrow">TOOL CREDITS / LIMITED CLAIMS</span>
+      <h2 id="tool-claim-title">Claim your tool codes.</h2>
+      <form id="tool-claim-login" hidden>
+        <label class="field"><span>APPROVED BUILDER EMAIL</span><input id="tool-claim-email" type="email" autocomplete="email" required></label>
         <button class="btn" type="submit">Email me a sign-in link</button>
       </form>
       <div class="team-actions">
-        <button class="btn btn-primary" id="openai-claim-button" type="button" hidden>Claim / retrieve my code</button>
-        <button class="btn btn-sm" id="openai-claim-signout" type="button" hidden>Sign out</button>
+        <button class="btn btn-sm" id="tool-claim-signout" type="button" hidden>Sign out</button>
       </div>
-      <p id="openai-claim-result" class="helper" role="status"></p>
-      <div id="openai-code-link" class="team-actions" hidden>
-        <a id="openai-code-anchor" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Open your OpenAI code</a>
-        <button class="btn" id="openai-code-copy" type="button">Copy code link</button>
+      <p id="tool-claim-auth-status" class="helper" role="status"></p>
+      <div class="tool-claim-grid">
+        <article class="perk">
+          <div class="perk-head"><div><h3>OpenAI</h3><div class="perk-kind">2500 CREDITS</div></div><span class="perk-value">100 codes</span></div>
+          <p>One code per approved builder, first come, first served.</p>
+          <button class="btn btn-primary" data-tool-claim="openai" type="button" hidden>Claim / retrieve code</button>
+          <p id="tool-claim-status-openai" class="helper" role="status"></p>
+          <div class="team-actions" id="tool-claim-output-openai" hidden><a id="tool-claim-link-openai" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open OpenAI link</a><code id="tool-claim-value-openai" hidden></code><button class="btn btn-sm" data-tool-copy="openai" type="button">Copy</button></div>
+        </article>
+        <article class="perk">
+          <div class="perk-head"><div><h3>Figma Make</h3><div class="perk-kind">STARTER TO PRO + MAKE</div></div><span class="perk-value">Up to 100</span></div>
+          <p>Upgrade a Starter team to Pro for Make access and 3,000 AI credits. First come, first served.</p>
+          <button class="btn btn-primary" data-tool-claim="figma" type="button" hidden>Claim / retrieve link</button>
+          <p id="tool-claim-status-figma" class="helper" role="status"></p>
+          <div class="team-actions" id="tool-claim-output-figma" hidden><a id="tool-claim-link-figma" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Figma promo</a><code id="tool-claim-value-figma" hidden></code><button class="btn btn-sm" data-tool-copy="figma" type="button">Copy</button></div>
+        </article>
+        <article class="perk">
+          <div class="perk-head"><div><h3>Mobbin Pro</h3><div class="perk-kind">3 MONTHS FREE</div></div><span class="perk-value">Up to 100</span></div>
+          <p>Use the code by 31 October 2026. A card is required; you can cancel immediately after signing up. First come, first served.</p>
+          <button class="btn btn-primary" data-tool-claim="mobbin" type="button" hidden>Claim / retrieve code</button>
+          <p id="tool-claim-status-mobbin" class="helper" role="status"></p>
+          <div class="team-actions" id="tool-claim-output-mobbin" hidden><a id="tool-claim-link-mobbin" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open Mobbin link</a><code id="tool-claim-value-mobbin" hidden></code><button class="btn btn-sm" data-tool-copy="mobbin" type="button">Copy</button></div>
+        </article>
       </div>
     </section>
 
@@ -195,7 +212,7 @@
 <script src="./assets/submission-auth.js?v=20261011"></script>
 <script src="./assets/data.js?v=20261003-project"></script>
 <script src="./assets/portal.js?v=20261011-code-claim"></script>
-<script src="./assets/openai-code-claim.js?v=20261011"></script>
+<script src="./assets/tool-code-claim.js?v=20261011"></script>
 <script src="./assets/submission-sync.js?v=20261011"></script>
 </body>
 </html>
