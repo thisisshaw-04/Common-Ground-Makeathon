@@ -103,6 +103,14 @@
       <h2 id="team-title">Good things start with a team.</h2>
       <p>Add your team details for your submission. You are included as the team contact.</p>
       <p id="team-contact" class="helper"></p>
+      <div class="submission-auth" id="submission-auth">
+        <form id="submission-auth-form">
+          <label class="field"><span>BUILDER EMAIL</span><input id="submission-auth-email" type="email" autocomplete="email" required></label>
+          <button class="btn" type="submit">Email me a sign-in link</button>
+        </form>
+        <button class="btn btn-sm" id="submission-signout" type="button" hidden>Sign out</button>
+        <p id="submission-auth-status" class="helper" role="status">Sign in with your registration email to submit centrally.</p>
+      </div>
       <form id="team-form">
         <label class="field"><span>TEAM NAME</span><input id="team-name" required maxlength="100" autocomplete="organization"></label>
         <div id="team-members"></div>
@@ -117,14 +125,6 @@
       <span class="eyebrow">THEN / YOUR SUBMISSION</span>
       <h2 id="submission-title">Show us what you made.</h2>
       <p>Start your project draft here. Keep refining it as you build.</p>
-      <div class="submission-auth" id="submission-auth">
-        <form id="submission-auth-form">
-          <label class="field"><span>BUILDER EMAIL</span><input id="submission-auth-email" type="email" autocomplete="email" required></label>
-          <button class="btn" type="submit">Email me a sign-in link</button>
-        </form>
-        <button class="btn btn-sm" id="submission-signout" type="button" hidden>Sign out</button>
-        <p id="submission-auth-status" class="helper" role="status">Sign in with your registration email to submit centrally.</p>
-      </div>
       <p id="submission-team" class="helper"></p>
       <form id="submission-form" novalidate>
         <label class="field"><span>PROJECT NAME *</span><input id="project-name" maxlength="150" required></label>
@@ -134,7 +134,7 @@
           <label class="field"><span>GITHUB / SOURCE LINK</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
         </div>
         <p class="helper">Add at least one project link when your draft is ready.</p>
-        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Mark ready locally</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
+        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Mark ready and submit</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
         <p class="helper">Saved on this device only. Marking ready does not send your project to organisers. Online submission will be connected later.</p>
         <p id="submission-feedback" class="helper" role="status"></p>
       </form>
