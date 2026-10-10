@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#11120f">
+<title>Common Ground — Submission Inbox</title>
+<link rel="icon" href="./assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="./assets/portal.css?v=20261002-team">
+<link rel="stylesheet" href="./assets/identity.css?v=20261011-minimal">
+<style>
+.inbox-hero{padding:56px 0 38px;border-bottom:1px solid var(--line)}
+.inbox-hero h1{font-size:clamp(38px,6vw,72px);letter-spacing:-.06em;margin:12px 0}
+.inbox-panel{max-width:980px;margin:36px auto}
+.inbox-auth,.inbox-list{border:1px solid var(--line-hard);padding:clamp(20px,4vw,36px);background:#fff}
+.inbox-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:22px 0}
+.inbox-toolbar select{padding:10px 12px;border:1px solid var(--line-hard);background:var(--paper);font:12px var(--mono)}
+.inbox-grid{display:grid;gap:14px}
+.submission-card{border:1px solid var(--line);padding:20px;display:grid;gap:8px}
+.submission-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.submission-card h2{font-size:21px;letter-spacing:-.04em}
+.submission-card p{margin:0;line-height:1.6;color:#55574e;white-space:pre-wrap;overflow-wrap:anywhere}
+.submission-meta{font:11px var(--mono);color:var(--muted)}
+.submission-badge{font:10px var(--mono);border:1px solid currentColor;padding:4px 8px;text-transform:uppercase}
+.submission-badge.ready{color:#555d00;background:#f7ffd1}
+.submission-links{display:flex;gap:16px;flex-wrap:wrap;font:12px var(--mono)}
+.submission-links a{text-decoration:underline;text-underline-offset:3px}
+#inbox-message{min-height:1.5em}
+#inbox-message.error{color:#a22222}
+</style>
+</head>
+<body class="admin-page">
+<a class="skip-link" href="#main-content">Skip to content</a>
+<header class="topbar">
+  <a class="brand" href="./"><span class="brand-mark"></span>COMMON GROUND</a>
+  <span class="top-caption">ORGANISER / SUBMISSIONS</span>
+  <a class="top-link" href="./admin.html">Organiser console ↗</a>
+</header>
+<main id="main-content">
+  <section class="inbox-hero">
+    <span class="eyebrow">COMMON GROUND / BUILDS</span>
+    <h1>Submission inbox.</h1>
+    <p class="helper">Sign in with an organiser email to view builders’ saved drafts and ready submissions.</p>
+  </section>
+  <section class="inbox-panel">
+    <div class="inbox-auth" id="inbox-auth">
+      <form id="inbox-login">
+        <label class="field"><span>ORGANISER EMAIL</span><input id="inbox-email" type="email" autocomplete="email" required></label>
+        <button class="btn btn-primary" type="submit">Email me a sign-in link</button>
+      </form>
+      <p id="inbox-message" class="helper" role="status">Only emails listed in the Supabase organisers table can see submissions.</p>
+      <button class="btn btn-sm" id="inbox-signout" type="button" hidden>Sign out</button>
+    </div>
+    <div class="inbox-list" id="inbox-list" hidden>
+      <div class="section-head">
+        <h2>Builder submissions</h2>
+        <span class="eyebrow" id="inbox-count">0 SUBMISSIONS</span>
+      </div>
+      <div class="inbox-toolbar">
+        <label class="field"><span>STATUS</span><select id="inbox-filter"><option value="">All submissions</option><option value="draft">Draft</option><option value="ready">Ready</option></select></label>
+        <button class="btn" id="inbox-refresh" type="button">Refresh</button>
+        <button class="btn" id="inbox-export" type="button">Download JSON</button>
+      </div>
+      <div class="inbox-grid" id="inbox-cards"></div>
+    </div>
+  </section>
+</main>
+<footer><span>COMMON GROUND © 2026 — ORGANISER INBOX</span><span>PRIVATE SUBMISSIONS</span></footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="./assets/backend-config.js?v=20261011"></script>
+<script src="./assets/submission-auth.js?v=20261011"></script>
+<script src="./assets/submissions-admin.js?v=20261011"></script>
+</body>
+</html>
