@@ -98,6 +98,25 @@
     <p id="release-notice" class="release-notice" role="status"></p>
     <div class="perks" id="perks"></div>
 
+    <section id="openai-code-claim" class="team-section code-claim" hidden aria-labelledby="openai-claim-title">
+      <span class="eyebrow">TOOL CREDIT / OPENAI</span>
+      <h2 id="openai-claim-title">Claim your OpenAI code.</h2>
+      <p>One code per approved builder. The first 100 approved builders to claim receive a code while supplies last.</p>
+      <form id="openai-claim-login" hidden>
+        <label class="field"><span>APPROVED BUILDER EMAIL</span><input id="openai-claim-email" type="email" autocomplete="email" required></label>
+        <button class="btn" type="submit">Email me a sign-in link</button>
+      </form>
+      <div class="team-actions">
+        <button class="btn btn-primary" id="openai-claim-button" type="button" hidden>Claim / retrieve my code</button>
+        <button class="btn btn-sm" id="openai-claim-signout" type="button" hidden>Sign out</button>
+      </div>
+      <p id="openai-claim-result" class="helper" role="status"></p>
+      <div id="openai-code-link" class="team-actions" hidden>
+        <a id="openai-code-anchor" class="btn btn-primary" target="_blank" rel="noopener noreferrer">Open your OpenAI code</a>
+        <button class="btn" id="openai-code-copy" type="button">Copy code link</button>
+      </div>
+    </section>
+
     <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
       <span class="eyebrow">NEXT / YOUR TEAM</span>
       <h2 id="team-title">Good things start with a team.</h2>
@@ -176,7 +195,8 @@
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011"></script>
 <script src="./assets/data.js?v=20261003-project"></script>
-<script src="./assets/portal.js?v=20261003-project"></script>
+<script src="./assets/portal.js?v=20261011-code-claim"></script>
+<script src="./assets/openai-code-claim.js?v=20261011"></script>
 <script src="./assets/submission-sync.js?v=20261011"></script>
 </body>
 </html>
