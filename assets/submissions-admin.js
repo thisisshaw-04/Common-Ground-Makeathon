@@ -5,6 +5,7 @@
   var allRows = [];
   var $ = function (id) { return document.getElementById(id); };
   var escape = function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
+  function safeHref(value) { try { var url = new URL(value); return /^https?:$/.test(url.protocol) ? escape(url.href) : ''; } catch (_err) { return ''; } }
   function message(text, error) {
     $('inbox-message').textContent = text;
     $('inbox-message').classList.toggle('error', !!error);
@@ -21,8 +22,8 @@
       var project = row.project || {}, team = row.team || {};
       var members = Array.isArray(team.members) ? team.members : [];
       var links = [
-        project.demo ? '<a href="' + escape(project.demo) + '" target="_blank" rel="noopener noreferrer">Demo ↗</a>' : '',
-        project.source ? '<a href="' + escape(project.source) + '" target="_blank" rel="noopener noreferrer">Source ↗</a>' : ''
+        project.demo ? '<a href="' + safeHref(project.demo) + '" target="_blank" rel="noopener noreferrer">Demo ↗</a>' : '',
+        project.source ? '<a href="' + safeHref(project.source) + '" target="_blank" rel="noopener noreferrer">Source ↗</a>' : ''
       ].filter(Boolean).join('');
       return '<article class="submission-card"><header><div><h2>' + escape(project.name || 'Untitled project') + '</h2>' +
         '<span class="submission-meta">' + escape(row.owner_email) + ' · ' + escape(team.name || 'No team') + '</span></div>' +
