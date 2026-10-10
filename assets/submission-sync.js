@@ -72,6 +72,11 @@
     if (!project.tracks.length || project.tracks.length > 2) return 'Choose one or two award tracks.';
     if (wordCount([project.oneLiner, project.inspiration, project.solution, project.interesting]) > 100) return 'Keep the Project Overview within 100 words total.';
     if (wordCount([project.technology, project.made, project.experiment, project.next]) > 100) return 'Keep The Build within 100 words total.';
+    var links = [project.demo, project.video, project.source, project.prototype].filter(Boolean);
+    for (var i = 0; i < links.length; i++) {
+      try { if (!/^https?:$/.test(new URL(links[i]).protocol)) throw new Error(); }
+      catch (_err) { return 'Use complete http:// or https:// URLs for project links.'; }
+    }
     if (!(project.demo || project.video)) return 'Add a live demo or a demo video so judges can experience the project.';
     if (!project.noCode && !project.source) return 'Add a GitHub/source code link, or mark that the project is not based on code.';
     if (project.tracks.indexOf('Design × Tech') !== -1 && !project.designReflection) return 'Add the Design × Tech reflection for that track.';
@@ -220,6 +225,7 @@
     $(id).addEventListener('input', updateSubmissionGuidance);
   });
   updateSubmissionGuidance();
+  document.addEventListener('cg-project-draft-loaded', updateSubmissionGuidance);
 
   $('submission-auth-form').addEventListener('submit', async function (event) {
     event.preventDefault();
