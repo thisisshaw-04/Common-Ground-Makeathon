@@ -3,23 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#11120f">
+<meta name="theme-color" content="#ffc814">
 <title>Common Ground — Builder Portal</title>
-<meta name="description" content="Common Ground makeathon. Find your builder token and redeem your Codex, Figma and Mobbin credits.">
+<meta name="description" content="Common Ground makeathon. Verify your attendee email, claim limited partner offers, submit a project, and browse ready builds.">
 <link rel="icon" href="./assets/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="./assets/portal.css?v=20261003-project">
-<link rel="stylesheet" href="./assets/identity.css?v=20261011-submissions">
+<link rel="stylesheet" href="./assets/identity.css?v=20261011-deck-style">
 <style>
-#submission-form fieldset{border:1px solid var(--line);padding:18px;margin:22px 0;min-width:0}
+#submission-form fieldset{border:1px solid var(--ink);border-radius:14px;padding:18px;margin:22px 0;min-width:0}
 #submission-form legend{font:12px var(--mono);letter-spacing:.06em;padding:0 8px}
 #submission-form legend small{display:block;color:var(--muted);font:11px var(--mono);letter-spacing:0;margin-top:5px}
 #submission-form fieldset .field{margin:14px 0}
 #submission-form .track-picker label{display:inline-flex;align-items:center;gap:7px;margin:10px 18px 4px 0;font-size:14px}
-#submission-form input[type=checkbox]{accent-color:#181914;width:16px;height:16px;vertical-align:middle}
+#submission-form input[type=checkbox]{accent-color:var(--acid);width:16px;height:16px;vertical-align:middle}
 #submission-form [hidden]{display:none!important}
+.project-gallery[hidden]{display:none!important}
+.project-gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.project-gallery-card{border:1px solid var(--ink);border-radius:14px;padding:22px;background:#fff;display:grid;align-content:start;gap:12px}
+.project-gallery-card h3{font-size:clamp(21px,3vw,29px);letter-spacing:-.04em}
+.project-gallery-card p{line-height:1.6;color:#333;white-space:pre-wrap;overflow-wrap:anywhere}
+.project-gallery-card .gallery-team{font:11px var(--mono);color:var(--muted);text-transform:uppercase}
+.project-gallery-tracks,.project-gallery-links{display:flex;gap:8px;flex-wrap:wrap}
+.project-gallery-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--ink);border-radius:999px;background:var(--acid)}
+.project-gallery-links a{font:11px var(--mono);text-decoration:underline;text-underline-offset:3px}
 </style>
 </head>
 <body class="builder-page">
@@ -33,7 +42,7 @@
 
 <main id="main-content">
   <nav class="portal-nav" aria-label="On this page">
-    <a href="#overview">Overview</a><a href="#gate">Your token <span>↗</span></a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a><a href="./vote.html">People’s Choice</a>
+    <a href="#overview">Overview</a><a href="#gate">Your access <span>↗</span></a><a href="#project-gallery" data-gallery-nav hidden>Project gallery</a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a><a href="./vote.html">People’s Choice</a>
     <span class="nav-note">One Sunday. Make something.</span>
   </nav>
 
@@ -66,12 +75,12 @@
     <div class="intro-grid" id="intro-grid"></div>
   </section>
 
-  <!-- ============ TOKEN GATE ============ -->
+  <!-- ============ ATTENDEE ACCESS ============ -->
   <section class="gate" id="gate" aria-labelledby="gate-title">
-    <div class="gate-aside" aria-hidden="true"><span class="gate-symbol">✳</span><span>ONE TOKEN.<br>YOUR BUILDING BLOCKS.</span><div class="tool-labels"><span>Codex</span><span>Figma</span><span>Mobbin</span></div></div>
+    <div class="gate-aside" aria-hidden="true"><span class="gate-symbol">✳</span><span>ONE VERIFIED EMAIL.<br>YOUR BUILDER ACCESS.</span><div class="tool-labels"><span>Codex</span><span>Figma</span><span>Mobbin</span></div></div>
     <div class="gate-inner">
-      <span class="eyebrow">02 / YOUR TOKEN</span>
-      <h2 id="gate-title">Find your builder token.</h2>
+      <span class="eyebrow">02 / YOUR ACCESS</span>
+      <h2 id="gate-title">Sign in to your builder portal.</h2>
       <p>Enter the approved registration email. We’ll send a one-time sign-in link to that inbox. Any email provider works; you do not need a Google account.</p>
       <form class="gate-form" id="gate-form" novalidate>
         <label for="email">Your registration email</label>
@@ -97,10 +106,10 @@
       </div>
       <div class="token-block">
         <div>
-          <span class="label">BUILDER ACCESS</span>
+          <span class="label">ATTENDEE STATUS</span>
           <div class="token-value" id="p-token">—</div>
         </div>
-        <button id="token-copy" class="copy-btn" data-copy-target="p-token" type="button">Copy token</button>
+        <button id="token-copy" class="copy-btn" data-copy-target="p-token" type="button">Copy status</button>
       </div>
     </div>
 
@@ -227,7 +236,17 @@
       </form>
     </section>
 
-    <p class="wire-note">OpenAI codes are claimed through Supabase after email sign-in and issued once per approved builder. Other tool codes shown here are part of the local portal data.</p>
+    <p class="wire-note">Partner offers are claimed through Supabase after attendee email verification. Each offer is limited and claimed first come, first served.</p>
+  </section>
+
+  <!-- ============ PROJECT GALLERY ============ -->
+  <section class="section project-gallery" id="project-gallery" hidden aria-labelledby="project-gallery-title">
+    <div class="section-head">
+      <h2 id="project-gallery-title">Projects in the room</h2>
+      <span class="eyebrow">BUILDER GALLERY</span>
+    </div>
+    <p id="project-gallery-message" class="helper" role="status">Checking attendee access…</p>
+    <div id="project-gallery-cards" class="project-gallery-grid"></div>
   </section>
 
   <!-- ============ SCHEDULE ============ -->
@@ -260,9 +279,10 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
-<script src="./assets/submission-auth.js?v=20261011"></script>
-<script src="./assets/data.js?v=20261003-project"></script>
-<script src="./assets/portal.js?v=20261011-auth-vote"></script>
+<script src="./assets/submission-auth.js?v=20261011-root-redirect"></script>
+<script src="./assets/data.js?v=20261011-published-copy"></script>
+<script src="./assets/portal.js?v=20261011-gallery"></script>
+<script src="./assets/project-gallery.js?v=20261011-gallery"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-vote"></script>
 <script src="./assets/submission-sync.js?v=20261011-auth-vote"></script>
 </body>

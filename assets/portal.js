@@ -1,10 +1,11 @@
 /* Common Ground — front portal (builder-facing).
-   Renders event content from CGData and looks up a token by email. */
+   Renders the event portal and checks attendee eligibility with Supabase. */
 (function () {
   'use strict';
 
   var data = CGData.load();
   var current = null;
+  window.CGBuilderEligibility = false;
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -73,7 +74,9 @@
   function clearBuilderAccess() {
     current = null;
     window.CGBuilderParticipant = null;
+    window.CGBuilderEligibility = false;
     document.dispatchEvent(new CustomEvent('cg-builder-participant', { detail: { participant: null } }));
+    document.dispatchEvent(new CustomEvent('cg-builder-eligibility', { detail: { eligible: false } }));
     $('result').classList.remove('visible');
     $('team-section').hidden = true;
     $('submission-section').hidden = true;
@@ -132,7 +135,9 @@
   function renderResult(p) {
     current = p;
     window.CGBuilderParticipant = p;
+    window.CGBuilderEligibility = true;
     document.dispatchEvent(new CustomEvent('cg-builder-participant', { detail: { participant: p } }));
+    document.dispatchEvent(new CustomEvent('cg-builder-eligibility', { detail: { eligible: true, email: p.email } }));
     clearError();
 
     $('p-name').textContent = p.name || p.email;

@@ -30,7 +30,7 @@
       if (!client) throw new Error('Submission sign-in is not configured yet.');
       var result = await client.auth.signInWithOtp({
         email: email,
-        options: { emailRedirectTo: window.location.origin + window.location.pathname }
+        options: { emailRedirectTo: new URL('./', window.location.href).href }
       });
       if (result.error) throw result.error;
       return result;
