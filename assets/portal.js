@@ -36,23 +36,182 @@
     $('top-caption').textContent = 'BUILDER PORTAL / ' + e.edition;
     document.title = e.name + ' — Builder Portal';
 
-    $('intro-grid').innerHTML = (e.intro || []).map(function (block, i) {
-      return '<article class="intro-card">' +
-        '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span>' +
-        '<h3>' + esc(block.title) + '</h3>' +
-        '<p>' + esc(block.body) + '</p></article>';
-    }).join('');
-
-    $('schedule').innerHTML = (e.schedule || []).map(function (row) {
-      return '<div class="sched-row">' +
+    $('schedule').innerHTML = (e.schedule || []).map(function (row, index) {
+      return '<div class="sched-row" data-schedule-index="' + index + '">' +
         '<time>' + esc(row.time) + '</time>' +
         '<strong>' + esc(row.title) + '</strong>' +
         '<span>' + esc(row.detail) + '</span></div>';
     }).join('');
+    renderTimelineLabels();
 
     $('faq').innerHTML = (e.faq || []).map(function (item) {
       return '<div><h3>' + esc(item.q) + '</h3><p>' + esc(item.a) + '</p></div>';
     }).join('');
+  }
+
+
+  /* ---------------- tab navigation ---------------- */
+  var panelNames = ['part-a', 'part-b', 'part-c'];
+  function activatePanel(name, updateHash) {
+    if (panelNames.indexOf(name) === -1) return;
+    document.querySelectorAll('[data-portal-panel]').forEach(function (panel) {
+      panel.hidden = panel.getAttribute('data-portal-panel') !== name;
+    });
+    document.querySelectorAll('.portal-tab[role="tab"]').forEach(function (tab) {
+      var active = tab.getAttribute('data-panel-select') === name;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+      tab.tabIndex = active ? 0 : -1;
+    });
+    if (updateHash) history.replaceState(null, '', '#' + name);
+    document.dispatchEvent(new CustomEvent('cg-portal-tab-change', {detail:{panel:name}}));
+  }
+  document.addEventListener('click', function (event) {
+    var control = event.target.closest('[data-panel-select]');
+    if (!control) return;
+    event.preventDefault();
+    activatePanel(control.getAttribute('data-panel-select'), true);
+  });
+  document.querySelectorAll('.portal-tab[role="tab"]').forEach(function (tab, index, tabs) {
+    tab.addEventListener('keydown', function (event) {
+      var next = null;
+      if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+      if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+      if (next === null) return;
+      event.preventDefault();
+      tabs[next].focus();
+      activatePanel(tabs[next].getAttribute('data-panel-select'), true);
+    });
+  });
+  var hashMatch = location.hash.match(/^#(?:part-|portal-tab-)([abc])$/i);
+  activatePanel(hashMatch ? 'part-' + hashMatch[1].toLowerCase() : 'part-a', false);
+
+  /* ---------------- live schedule and server cutoff ---------------- */
+  var EVENT_START_AT = Date.parse('2026-10-11T09:00:00+08:00');
+  var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-11T15:15:00+08:00');
+  var EVENT_END_AT = Date.parse('2026-10-11T17:00:00+08:00');
+  var serverClockOffset = 0;
+  var eventStatus = {
+    current_at: new Date().toISOString(),
+    submissions_closed: Date.now() >= SUBMISSION_CUTOFF_AT,
+    gallery_open: Date.now() >= SUBMISSION_CUTOFF_AT,
+    voting_open: Date.now() >= SUBMISSION_CUTOFF_AT && Date.now() < EVENT_END_AT,
+    authoritative: false
+  };
+  window.CGEventStatus = eventStatus;
+
+  function eventNow() { return Date.now() + serverClockOffset; }
+  function renderTimelineLabels() {
+    var target = $('timeline-labels');
+    if (!target) return;
+    var rows = data.event.schedule || [];
+    var indices = [0, 2, 5, 6, rows.length - 1].filter(function (value, index, all) {
+      return value >= 0 && all.indexOf(value) === index;
+    });
+    target.innerHTML = indices.map(function (index) {
+      return '<span data-timeline-index="' + index + '">' + esc(rows[index].time) + '</span>';
+    }).join('');
+  }
+  function formatCountdown(ms) {
+    var seconds = Math.max(0, Math.floor(ms / 1000));
+    var hours = Math.floor(seconds / 3600);
+    var minutes = Math.floor((seconds % 3600) / 60);
+    var remainder = seconds % 60;
+    return (hours ? hours + 'h ' : '') + minutes + 'm ' + remainder + 's';
+  }
+  function updateScheduleProgress() {
+    var now = eventNow();
+    var span = EVENT_END_AT - EVENT_START_AT;
+    var progress = Math.max(0, Math.min(1, (now - EVENT_START_AT) / span));
+    var fill = $('timeline-fill'), cursor = $('timeline-cursor');
+    if (fill) fill.style.width = (progress * 100) + '%';
+    if (cursor) cursor.style.left = (progress * 100) + '%';
+
+    var rows = data.event.schedule || [];
+    var activeIndex = 0;
+    rows.forEach(function (row, index) {
+      var at = Date.parse('2026-10-11T' + row.time + ':00+08:00');
+      if (now >= at) activeIndex = index;
+    });
+    document.querySelectorAll('.sched-row').forEach(function (row) {
+      var index = Number(row.getAttribute('data-schedule-index'));
+      row.classList.toggle('is-active', now >= EVENT_START_AT && now < EVENT_END_AT && index === activeIndex);
+      row.classList.toggle('is-complete', now >= EVENT_START_AT && index < activeIndex);
+      if (index === activeIndex && now >= EVENT_START_AT && now < EVENT_END_AT) row.setAttribute('aria-current', 'step');
+      else row.removeAttribute('aria-current');
+    });
+    document.querySelectorAll('[data-timeline-index]').forEach(function (label) {
+      label.classList.toggle('active', Number(label.getAttribute('data-timeline-index')) === activeIndex);
+    });
+
+    var phase = $('current-event-phase'), label = $('countdown-label'), countdown = $('submission-countdown');
+    if (phase) {
+      if (now < EVENT_START_AT) phase.textContent = 'Check-in starts at 9:00 AM';
+      else if (now >= EVENT_END_AT) phase.textContent = 'The event has ended';
+      else phase.textContent = 'Now: ' + (rows[activeIndex] ? rows[activeIndex].title : 'Makeathon');
+    }
+    if (now < SUBMISSION_CUTOFF_AT) {
+      if (label) label.textContent = 'SUBMISSIONS CLOSE IN';
+      if (countdown) countdown.textContent = formatCountdown(SUBMISSION_CUTOFF_AT - now);
+    } else if (now < EVENT_END_AT) {
+      if (label) label.textContent = 'VOTING CLOSES IN';
+      if (countdown) countdown.textContent = formatCountdown(EVENT_END_AT - now);
+    } else {
+      if (label) label.textContent = 'SUBMISSIONS + VOTING';
+      if (countdown) countdown.textContent = 'Closed';
+    }
+  }
+  function updateSubmissionAvailability() {
+    var closed = !!eventStatus.submissions_closed;
+    var eligible = window.CGBuilderEligibility === true;
+    var codeAccess = !!(current && current.status === 'confirmed' && CGData.codesOpen(data.event));
+    var canSubmit = eligible && codeAccess && !closed;
+    if ($('team-section')) $('team-section').hidden = !canSubmit;
+    if ($('submission-section')) $('submission-section').hidden = !canSubmit;
+    if ($('submission-locked')) $('submission-locked').hidden = closed || canSubmit;
+  }
+  function publishEventStatus(next) {
+    eventStatus = next;
+    window.CGEventStatus = eventStatus;
+    updateSubmissionAvailability();
+    document.dispatchEvent(new CustomEvent('cg-event-status', {detail:eventStatus}));
+    updateScheduleProgress();
+  }
+  function localEventFallback() {
+    var now = Date.now();
+    var closed = now >= SUBMISSION_CUTOFF_AT;
+    return {
+      current_at: new Date(now).toISOString(),
+      submissions_closed: closed,
+      gallery_open: closed,
+      voting_open: closed && now < EVENT_END_AT,
+      authoritative: false
+    };
+  }
+  async function refreshEventStatus() {
+    var client = window.CGSubmission && window.CGSubmission.client;
+    if (!client) {
+      publishEventStatus(localEventFallback());
+      return;
+    }
+    try {
+      var result = await client.rpc('get_common_ground_event_state');
+      if (result.error) throw result.error;
+      var row = Array.isArray(result.data) ? result.data[0] : result.data;
+      if (!row || !row.current_at) throw new Error('Missing event status');
+      var serverNow = Date.parse(row.current_at);
+      if (!Number.isFinite(serverNow)) throw new Error('Invalid event time');
+      serverClockOffset = serverNow - Date.now();
+      publishEventStatus({
+        current_at: row.current_at,
+        submissions_closed: !!row.submissions_closed,
+        gallery_open: !!row.gallery_open,
+        voting_open: !!row.voting_open,
+        authoritative: true
+      });
+    } catch (_error) {
+      publishEventStatus(localEventFallback());
+    }
   }
 
   /* ---------------- authenticated builder access ---------------- */
@@ -80,6 +239,7 @@
     $('result').classList.remove('visible');
     $('team-section').hidden = true;
     $('submission-section').hidden = true;
+    updateSubmissionAvailability();
     $('p-detail').textContent = '—';
     $('perks').innerHTML = '';
   }
@@ -152,9 +312,10 @@
     $('token-copy').hidden = true;
     $('release-notice').textContent = p.status === 'confirmed' && !open ? 'Your builder access is confirmed. Promo claims and submissions open on ' + CGData.releaseLabel(data.event) + '.' : '';
     $('release-notice').hidden = !$('release-notice').textContent;
-    var ready = open;
+    var ready = open && !eventStatus.submissions_closed;
     $('team-section').hidden = !ready;
     $('submission-section').hidden = !ready;
+    updateSubmissionAvailability();
     if (ready) { loadTeam(p); loadProject(p); }
 
     // The real offers are shown in the authenticated Supabase claim panel below.
@@ -255,7 +416,7 @@
     $('submission-feedback').textContent = saved ? (saved.status === 'ready' ? 'Saved submission loaded.' : 'Saved project draft loaded.') : 'No project draft saved yet.';
   }
   function saveProject() {
-    if (!current || $('submission-section').hidden || !CGData.codesOpen(data.event)) return null;
+    if (!current || $('submission-section').hidden || !CGData.codesOpen(data.event) || eventStatus.submissions_closed) return null;
     var project = {};
     Object.keys(projectFieldIds).forEach(function (key) { project[key] = $(projectFieldIds[key]).value.trim(); });
     project.tracks = Array.prototype.slice.call(document.querySelectorAll('input[name="project-track"]:checked')).map(function (input) { return input.value; });
@@ -358,9 +519,12 @@
       wasOpen = isOpen;
       if (current) renderResult(current);
     }
+    updateScheduleProgress();
   }, 1000);
+  setInterval(refreshEventStatus, 15000);
 
   renderEvent();
+  refreshEventStatus();
   if (new URLSearchParams(location.search).has('email')) {
     history.replaceState(null, '', location.pathname + location.hash);
   }
