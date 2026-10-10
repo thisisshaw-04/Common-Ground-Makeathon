@@ -9,6 +9,7 @@
   var finalistIds = [];
   var votingOpen = false;
   var voteCount = 0;
+  var votingStatusTimer = null;
   var $ = function (id) { return document.getElementById(id); };
   var escape = function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   function safeHref(value) { try { var url = new URL(value); return /^https?:$/.test(url.protocol) ? escape(url.href) : ''; } catch (_err) { return ''; } }
@@ -230,7 +231,6 @@
     $('people-choice-pause').hidden = !votingOpen;
     $('people-choice-resume').hidden = votingOpen || !paused || now >= ends;
     $('people-choice-results-button').hidden = votingOpen;
-    $('people-choice-results').hidden = true;
   }
 
   $('judging-shortlist').addEventListener('click', autoSelectShortlist);
@@ -283,6 +283,9 @@
     $('inbox-list').hidden = false;
     render();
     await refreshPeopleChoice();
+    if (!votingStatusTimer) votingStatusTimer = window.setInterval(function () {
+      refreshPeopleChoice().catch(function () { /* Keep the last known status visible. */ });
+    }, 15000);
     message('Loaded the latest submissions and voting status.');
   }
   async function handleSession(session) {
