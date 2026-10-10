@@ -12,6 +12,15 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="./assets/portal.css?v=20261003-project">
 <link rel="stylesheet" href="./assets/identity.css?v=20261011-submissions">
+<style>
+#submission-form fieldset{border:1px solid var(--line);padding:18px;margin:22px 0;min-width:0}
+#submission-form legend{font:12px var(--mono);letter-spacing:.06em;padding:0 8px}
+#submission-form legend small{display:block;color:var(--muted);font:11px var(--mono);letter-spacing:0;margin-top:5px}
+#submission-form fieldset .field{margin:14px 0}
+#submission-form .track-picker label{display:inline-flex;align-items:center;gap:7px;margin:10px 18px 4px 0;font-size:14px}
+#submission-form input[type=checkbox]{accent-color:#181914;width:16px;height:16px;vertical-align:middle}
+#submission-form [hidden]{display:none!important}
+</style>
 </head>
 <body class="builder-page">
 <a class="skip-link" href="#main-content">Skip to content</a>
@@ -19,12 +28,12 @@
 <header class="topbar">
   <a class="brand" href="./"><span class="brand-mark"></span>COMMON GROUND</a>
   <span class="top-caption" id="top-caption">BUILDER PORTAL / EDITION 01</span>
-  <a class="top-link" href="./admin.html">Organiser view <span>↗</span></a>
+  <a class="top-link" href="./vote.html">People’s Choice <span>↗</span></a>
 </header>
 
 <main id="main-content">
   <nav class="portal-nav" aria-label="On this page">
-    <a href="#overview">Overview</a><a href="#gate">Your token <span>↗</span></a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a>
+    <a href="#overview">Overview</a><a href="#gate">Your token <span>↗</span></a><a href="#weekend">Schedule</a><a href="#questions">FAQ</a><a href="./vote.html">People’s Choice</a>
     <span class="nav-note">One Sunday. Make something.</span>
   </nav>
 
@@ -34,7 +43,7 @@
       <span class="eyebrow" id="hero-edition">EDITION 01 / 2026</span>
       <h1>Build the <em>thing</em>,<br>not the deck.</h1>
       <p id="hero-tagline">A one-day makeathon for people who would rather build the thing than describe it.</p>
-      <div class="hero-actions"><a class="primary-link" href="#gate">Get your builder token <span aria-hidden="true">↗</span></a><a class="text-link" href="#weekend">Explore the day ↓</a></div>
+      <div class="hero-actions"><a class="primary-link" href="#gate">Sign in for codes & submissions <span aria-hidden="true">↗</span></a><a class="text-link" href="#weekend">Explore the day ↓</a></div>
     </div>
     <div class="hero-meta">
       <span class="event-card-label">THE DAY AT A GLANCE <span aria-hidden="true">✳</span></span>
@@ -63,15 +72,15 @@
     <div class="gate-inner">
       <span class="eyebrow">02 / YOUR TOKEN</span>
       <h2 id="gate-title">Find your builder token.</h2>
-      <p>Enter the email address you signed up with. We will show your Common Ground token and the tool credits attached to it — Codex, Figma and Mobbin.</p>
+      <p>Enter the approved registration email. We’ll send a one-time sign-in link to that inbox. Any email provider works; you do not need a Google account.</p>
       <form class="gate-form" id="gate-form" novalidate>
         <label for="email">Your registration email</label>
         <input type="email" id="email" name="email" placeholder="you@example.com"
                autocomplete="email" inputmode="email" spellcheck="false" aria-describedby="gate-hint gate-error" required>
-        <button type="submit">Show my token <span aria-hidden="true">→</span></button>
+        <button type="submit">Email me a sign-in link <span aria-hidden="true">→</span></button>
       </form>
-      <p class="gate-hint" id="gate-hint">Wireframe demo — try <b>ada@example.com</b>, <b>jun@example.com</b>, <b>mentor@example.com</b> or <b>waitlist@example.com</b>.</p>
-      <p class="gate-error" id="gate-error" role="alert"></p>
+      <p class="gate-hint" id="gate-hint">After opening the link, you’ll return here to claim available promo offers and save your team’s submission.</p>
+      <p class="gate-error" id="gate-error" role="alert"></p><p class="gate-hint" id="gate-status" role="status"></p><button class="btn btn-sm" id="portal-signout" type="button" hidden>Sign out</button>
     </div>
   </section>
 
@@ -88,7 +97,7 @@
       </div>
       <div class="token-block">
         <div>
-          <span class="label">COMMON GROUND TOKEN</span>
+          <span class="label">BUILDER ACCESS</span>
           <div class="token-value" id="p-token">—</div>
         </div>
         <button id="token-copy" class="copy-btn" data-copy-target="p-token" type="button">Copy token</button>
@@ -160,18 +169,60 @@
     <section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
       <span class="eyebrow">THEN / YOUR SUBMISSION</span>
       <h2 id="submission-title">Show us what you made.</h2>
-      <p>Start your project draft here. Keep refining it as you build.</p>
+      <p>Submit one entry per team. Choose up to two award tracks, then save drafts as you build. Only one teammate should submit for your team.</p>
       <p id="submission-team" class="helper"></p>
       <form id="submission-form" novalidate>
-        <label class="field"><span>PROJECT NAME *</span><input id="project-name" maxlength="150" required></label>
-        <label class="field"><span>WHAT DID YOU BUILD? *</span><textarea id="project-description" maxlength="5000" required placeholder="The problem, your solution, and what you learned."></textarea></label>
-        <div class="field-row">
-          <label class="field"><span>DEMO LINK</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
-          <label class="field"><span>GITHUB / SOURCE LINK</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
-        </div>
-        <p class="helper">Add at least one project link when your draft is ready.</p>
-        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Mark ready and submit</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
-        <p class="helper">Sign in above to save drafts to the organiser inbox. Download draft saves a JSON copy to this device.</p>
+        <label class="field"><span>PROJECT NAME *</span><input id="project-name" maxlength="150"></label>
+        <fieldset class="field track-picker">
+          <legend>AWARD TRACKS * <small>Choose up to two</small></legend>
+          <label><input type="checkbox" name="project-track" value="Design × Tech"> Design × Tech</label>
+          <label><input type="checkbox" name="project-track" value="Culture × Tech"> Culture × Tech</label>
+          <label><input type="checkbox" name="project-track" value="Best Use of Tech"> Best Use of Tech</label>
+          <label><input type="checkbox" name="project-track" value="Common Ground Award"> Common Ground Award</label>
+          <p id="track-count" class="helper" role="status">0 of 2 selected</p>
+          <p class="helper">Design × Tech and Culture × Tech are judged tracks. Best Use of Tech and Common Ground are cross-track awards. Teams nominated for both judged tracks may be considered by both panels. Judges score Concept, Track Fit, Execution, and Presentation equally (1–5 each); People’s Choice is separate.</p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>PROJECT OVERVIEW <small>100 words maximum across these four fields</small></legend>
+          <label class="field"><span>ONE-LINER *</span><input id="project-one-liner" maxlength="300"></label>
+          <label class="field"><span>PROBLEM OR INSPIRATION *</span><textarea id="project-inspiration" maxlength="1500"></textarea></label>
+          <label class="field"><span>THE SOLUTION *</span><textarea id="project-solution" maxlength="1500"></textarea></label>
+          <label class="field"><span>WHAT MAKES IT INTERESTING? *</span><textarea id="project-interesting" maxlength="1500"></textarea></label>
+          <p id="overview-count" class="helper" role="status">0 / 100 words</p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>THE BUILD <small>100 words maximum across these four fields</small></legend>
+          <label class="field"><span>TECHNOLOGY USED *</span><textarea id="project-technology" maxlength="1500"></textarea></label>
+          <label class="field"><span>WHAT DID YOU MAKE? *</span><textarea id="project-made" maxlength="1500" placeholder="What works now: prototype, interactive demo, or functioning MVP?"></textarea></label>
+          <label class="field"><span>WHAT DID YOU EXPERIMENT WITH? *</span><textarea id="project-experiment" maxlength="1500"></textarea></label>
+          <label class="field"><span>WHAT WOULD YOU DO NEXT? *</span><textarea id="project-next" maxlength="1500"></textarea></label>
+          <p id="build-count" class="helper" role="status">0 / 100 words</p>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>PROJECT LINKS & DEMO</legend>
+          <p class="helper">Make links accessible to judges. Include a demo or video; add setup instructions if needed.</p>
+          <label class="field"><span>LIVE DEMO / DEPLOYED PROJECT</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
+          <label class="field"><span>DEMO VIDEO</span><input id="project-video" type="url" placeholder="https://…" maxlength="2000"></label>
+          <label class="field"><span>GITHUB / SOURCE CODE</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
+          <label class="field"><span>FIGMA / PROTOTYPE (OPTIONAL)</span><input id="project-prototype" type="url" placeholder="https://…" maxlength="2000"></label>
+          <label><input id="project-no-code" type="checkbox"> This project is not based on code</label>
+          <label class="field"><span>OTHER SUPPORTING MATERIALS OR TRY-IT INSTRUCTIONS</span><textarea id="project-supporting" maxlength="3000"></textarea></label>
+        </fieldset>
+
+        <fieldset class="field">
+          <legend>TRACK-SPECIFIC REFLECTION</legend>
+          <label class="field" id="design-reflection-field" hidden><span>DESIGN × TECH: How does your project push interaction, interfaces, or the relationship between people and technology in a new direction?</span><textarea id="project-design-reflection" maxlength="3000"></textarea></label>
+          <label class="field" id="culture-reflection-field" hidden><span>CULTURE × TECH: How does your project meaningfully engage with, reinterpret, or preserve the cultural subject it explores?</span><textarea id="project-culture-reflection" maxlength="3000"></textarea></label>
+        </fieldset>
+
+        <label class="field"><span>TEAM & COLLABORATION *</span><textarea id="project-collaboration" maxlength="3000" placeholder="How did different skills, disciplines, or perspectives come together? What did you discover by working together?"></textarea></label>
+        <label class="field"><span>AI & TOOL ATTRIBUTION *</span><textarea id="project-attribution" maxlength="3000" placeholder="List AI tools, models, external resources, and third-party assets, datasets, or references—and what you used them for. Write “None” if not applicable."></textarea></label>
+        <p class="helper">A thoughtful one-day prototype can score higher than a technically complex project. Focus on what you explored, built, and learned.</p>
+        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Submit final entry</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
+        <p class="helper">Save drafts as you build. Only one teammate should submit the team’s final entry by the submission deadline.</p>
         <p id="submission-feedback" class="helper" role="status"></p>
       </form>
     </section>
@@ -211,8 +262,8 @@
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011"></script>
 <script src="./assets/data.js?v=20261003-project"></script>
-<script src="./assets/portal.js?v=20261011-code-claim"></script>
-<script src="./assets/tool-code-claim.js?v=20261011"></script>
-<script src="./assets/submission-sync.js?v=20261011"></script>
+<script src="./assets/portal.js?v=20261011-auth-vote"></script>
+<script src="./assets/tool-code-claim.js?v=20261011-auth-vote"></script>
+<script src="./assets/submission-sync.js?v=20261011-auth-vote"></script>
 </body>
 </html>

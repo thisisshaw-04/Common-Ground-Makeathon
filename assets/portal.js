@@ -54,16 +54,79 @@
     }).join('');
   }
 
-  /* ---------------- token lookup ---------------- */
+  /* ---------------- authenticated builder access ---------------- */
   function showError(msg) {
     var el = $('gate-error');
-    el.innerHTML = msg;
+    el.textContent = msg;
     el.classList.add('visible');
     $('result').classList.remove('visible');
   }
 
   function clearError() {
     $('gate-error').classList.remove('visible');
+  }
+
+  function setGateStatus(message) {
+    $('gate-status').textContent = message || '';
+  }
+
+  function clearBuilderAccess() {
+    current = null;
+    window.CGBuilderParticipant = null;
+    document.dispatchEvent(new CustomEvent('cg-builder-participant', { detail: { participant: null } }));
+    $('result').classList.remove('visible');
+    $('team-section').hidden = true;
+    $('submission-section').hidden = true;
+    $('p-detail').textContent = '—';
+    $('perks').innerHTML = '';
+  }
+
+  var accessCheck = 0;
+  async function handlePortalSession(session) {
+    var request = ++accessCheck;
+    var user = session && session.user;
+    $('portal-signout').hidden = !user;
+    if (!user) {
+      clearBuilderAccess();
+      setGateStatus('');
+      return;
+    }
+    var email = String(user.email || '').trim().toLowerCase();
+    if (!email) {
+      clearBuilderAccess();
+      showError('This sign-in does not include an email address. Contact an organiser.');
+      return;
+    }
+    var client = window.CGSubmission && window.CGSubmission.client;
+    if (!client) {
+      clearBuilderAccess();
+      showError('Secure sign-in is not configured yet. Contact an organiser.');
+      return;
+    }
+    try {
+      var result = await client.rpc('is_current_user_eligible');
+      if (request !== accessCheck) return;
+      if (result.error) throw result.error;
+      if (result.data !== true) {
+        clearBuilderAccess();
+        showError('This email is not on the approved builder list. If you registered with a different address, sign out and try that one.');
+        return;
+      }
+      clearError();
+      setGateStatus('Signed in and verified. Your claims and team draft are tied to this email.');
+      renderResult({
+        email: email,
+        name: user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name) || email,
+        team: '',
+        ticket: 'BUILDER',
+        status: 'confirmed',
+        token: ''
+      });
+    } catch (_err) {
+      if (request !== accessCheck) return;
+      clearBuilderAccess();
+      showError('We could not verify this account right now. Please reload and try again.');
+    }
   }
 
   function renderResult(p) {
@@ -80,43 +143,17 @@
     status.className = 'badge ' + (p.status === 'confirmed' ? 'ok' : 'warn');
 
     var open = p.status === 'confirmed' && CGData.codesOpen(data.event);
-    $('p-token').textContent = open ? (p.token || '—') : 'Not available yet';
-    $('token-copy').hidden = !open || !p.token || p.token === '—';
-    $('release-notice').textContent = p.status === 'confirmed' && !open ? 'Your place is confirmed. Tokens and tool codes unlock on ' + CGData.releaseLabel(data.event) + '.' : '';
+    $('p-token').textContent = open ? 'APPROVED BUILDER' : 'ACCESS NOT AVAILABLE';
+    $('token-copy').hidden = true;
+    $('release-notice').textContent = p.status === 'confirmed' && !open ? 'Your builder access is confirmed. Promo claims and submissions open on ' + CGData.releaseLabel(data.event) + '.' : '';
     $('release-notice').hidden = !$('release-notice').textContent;
-    var ready = open && p.token && p.token !== '—' && (data.perks || []).every(function (perk) { return (perk.id === 'codex' || perk.id === 'openai' || perk.id === 'figma' || perk.id === 'mobbin') || (p.codes && p.codes[perk.id]); });
+    var ready = open;
     $('team-section').hidden = !ready;
     $('submission-section').hidden = !ready;
     if (ready) { loadTeam(p); loadProject(p); }
 
-    if (p.status !== 'confirmed') {
-      $('perks').innerHTML =
-        '<div class="perk"><div class="perk-head"><h3>Nothing to redeem yet</h3></div>' +
-        '<p>Your place is not confirmed, so no tool credits have been issued. As soon as a spot opens we email you, ' +
-        'and this page fills in on its own.</p>' +
-        '<p class="perk-steps" style="padding-left:0">STATUS · ' + esc(String(p.status || 'pending').toUpperCase()) + '</p></div>';
-    } else {
-      $('perks').innerHTML = (data.perks || []).map(function (perk) {
-        var hasClaimPool = perk.id === 'codex' || perk.id === 'openai' || perk.id === 'figma' || perk.id === 'mobbin';
-        var code = open && !hasClaimPool ? ((p.codes && p.codes[perk.id]) || '') : '';
-        var claimed = !hasClaimPool && !!(p.claimed && p.claimed[perk.id]);
-        var steps = (perk.steps || []).map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('');
-        return '<article class="perk' + (claimed ? ' claimed' : '') + '">' +
-          '<div class="perk-head"><div><h3>' + esc(perk.name) + '</h3>' +
-            '<div class="perk-kind">' + esc(perk.kind) + '</div></div>' +
-            '<span class="perk-value">' + esc(perk.value) + '</span></div>' +
-          '<p>' + esc(perk.blurb) + '</p>' +
-          '<div class="perk-code">' +
-            '<code id="code-' + esc(perk.id) + '">' + esc(open ? (hasClaimPool ? 'CLAIM BELOW · FIRST COME, FIRST SERVED' : (code || 'NOT ISSUED')) : 'AVAILABLE ' + CGData.releaseLabel(data.event)) + '</code>' +
-            (code ? '<button class="copy-btn btn-sm" type="button" data-copy-target="code-' + esc(perk.id) + '">Copy</button>' : '') +
-          '</div>' +
-          '<ol class="perk-steps">' + steps + '</ol>' +
-          '<div class="perk-foot">' +
-            '<span class="perk-window">' + (open && claimed ? '<span class="claim-tag">✓ ALREADY REDEEMED</span>' : esc(open ? perk.window : 'Opens on release day')) + '</span>' +
-            (open && code ? '<a class="redeem" href="' + esc(perk.redeemUrl) + '" target="_blank" rel="noopener noreferrer">Redeem <span aria-hidden="true">↗</span></a>' : '') +
-          '</div></article>';
-      }).join('');
-    }
+    // The real offers are shown in the authenticated Supabase claim panel below.
+    $('perks').innerHTML = '';
 
     var result = $('result');
     result.classList.add('visible');
@@ -182,7 +219,14 @@
     load: function (p) { return JSON.parse(localStorage.getItem(this.key(p)) || 'null'); },
     save: function (p, record) { localStorage.setItem(this.key(p), JSON.stringify(record)); }
   };
-  var projectFields = ['name', 'description', 'demo', 'source'];
+  var projectFieldIds = {
+    name:'project-name', oneLiner:'project-one-liner', inspiration:'project-inspiration',
+    solution:'project-solution', interesting:'project-interesting', technology:'project-technology',
+    made:'project-made', experiment:'project-experiment', next:'project-next',
+    demo:'project-demo', video:'project-video', source:'project-source', prototype:'project-prototype',
+    supporting:'project-supporting', designReflection:'project-design-reflection',
+    cultureReflection:'project-culture-reflection', collaboration:'project-collaboration', attribution:'project-attribution'
+  };
   function updateProjectTeam() {
     var team = null;
     try { team = JSON.parse(localStorage.getItem(teamKey(current))); } catch (err) { /* No saved team. */ }
@@ -192,63 +236,78 @@
   function loadProject(p) {
     var saved = null;
     try { saved = projectStore.load(p); } catch (err) { /* An unreadable draft remains untouched until saved. */ }
-    projectFields.forEach(function (key) { $('project-' + key).value = saved && saved.project && saved.project[key] || ''; });
+    var project = saved && saved.project || {};
+    if (!project.solution && project.description) project.solution = project.description;
+    Object.keys(projectFieldIds).forEach(function (key) {
+      $(projectFieldIds[key]).value = project[key] || '';
+    });
+    $('project-no-code').checked = !!project.noCode;
+    document.querySelectorAll('input[name="project-track"]').forEach(function (input) {
+      input.checked = Array.isArray(project.tracks) && project.tracks.indexOf(input.value) !== -1;
+    });
     updateProjectTeam();
-    $('submission-feedback').textContent = saved ? (saved.status === 'ready' ? 'Marked ready locally. Not sent to organisers.' : 'Saved project draft loaded.') : 'No project draft saved yet.';
+    document.dispatchEvent(new Event('cg-project-draft-loaded'));
+    $('submission-feedback').textContent = saved ? (saved.status === 'ready' ? 'Saved submission loaded.' : 'Saved project draft loaded.') : 'No project draft saved yet.';
   }
-  function saveProject(ready) {
+  function saveProject() {
     if (!current || $('submission-section').hidden || !CGData.codesOpen(data.event)) return null;
     var project = {};
-    projectFields.forEach(function (key) { project[key] = $('project-' + key).value.trim(); });
-    var team = updateProjectTeam();
-    var error = '';
-    ['demo', 'source'].forEach(function (key) {
-      if (!project[key]) return;
-      try { if (!/^https?:$/.test(new URL(project[key]).protocol)) throw Error(); }
-      catch (err) { error = 'Use a complete http:// or https:// URL for your project links.'; }
-    });
-    if (ready && (!project.name || !project.description)) error = 'Add a project name and description before marking ready.';
-    if (ready && !project.demo && !project.source) error = 'Add a demo or source link before marking ready.';
-    if (ready && !team) error = 'Save your team details above first.';
-    if (error) { $('submission-feedback').textContent = error; return null; }
-    var record = {schemaVersion:1, eventId:'common-ground-2026-10-11', ownerEmail:current.email.trim().toLowerCase(), status:ready ? 'ready' : 'draft', project:project, team:team, updatedAt:new Date().toISOString()};
+    Object.keys(projectFieldIds).forEach(function (key) { project[key] = $(projectFieldIds[key]).value.trim(); });
+    project.tracks = Array.prototype.slice.call(document.querySelectorAll('input[name="project-track"]:checked')).map(function (input) { return input.value; });
+    project.noCode = $('project-no-code').checked;
+    var team = updateProjectTeam() || {};
+    var record = {schemaVersion:1, eventId:'common-ground-2026-10-11', ownerEmail:current.email.trim().toLowerCase(), status:'draft', project:project, team:team, updatedAt:new Date().toISOString()};
     try { projectStore.save(current, record); }
     catch (err) { $('submission-feedback').textContent = 'Could not save. Allow browser storage and try again.'; return null; }
-    $('submission-feedback').textContent = ready ? 'Marked ready locally. Your project has not been sent to organisers.' : 'Project draft saved on this device. You can come back to finish it.';
+    $('submission-feedback').textContent = 'Project draft saved on this device. You can come back to finish it.';
     return record;
   }
-  $('submission-form').addEventListener('submit', function (ev) { ev.preventDefault(); saveProject(false); });
+  $('submission-form').addEventListener('submit', function (ev) { ev.preventDefault(); saveProject(); });
   $('submission-form').addEventListener('input', function () { $('submission-feedback').textContent = 'Unsaved changes. Save your draft to keep these edits.'; });
-  $('project-ready').addEventListener('click', function () { saveProject(true); });
+  $('project-ready').addEventListener('click', function () { saveProject(); });
   $('project-download').addEventListener('click', function () {
-    var record = saveProject(false);
+    var record = saveProject();
     if (!record) return;
     var url = URL.createObjectURL(new Blob([JSON.stringify(record, null, 2)], {type:'application/json'}));
     var link = document.createElement('a'); link.href = url; link.download = 'common-ground-project-draft.json'; link.click();
     setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   });
 
-  $('gate-form').addEventListener('submit', function (ev) {
+  $('gate-form').addEventListener('submit', async function (ev) {
     ev.preventDefault();
-    var value = $('email').value.trim();
-
-    if (!value) { showError('Enter the email address you signed up with.'); return; }
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
-      showError('That does not look like an email address. Check for a typo.');
+    clearError();
+    setGateStatus('');
+    var value = $('email').value.trim().toLowerCase();
+    if (!value || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value)) {
+      showError('Enter a valid registration email address.');
       return;
     }
-
-    var person = CGData.findByEmail(data, value);
-    if (!person) {
-      showError('We cannot find <b>' + esc(value) + '</b> on the list. ' +
-        'Sign-ups are matched on the exact address from your confirmation email — ' +
-        'try another address, or find us at the front desk.');
+    var auth = window.CGSubmission;
+    if (!auth || !auth.client) {
+      showError('Supabase sign-in is not configured yet. Contact an organiser.');
       return;
     }
-    renderResult(person);
+    var session = auth.getSession();
+    if (session && session.user && String(session.user.email || '').trim().toLowerCase() === value) {
+      await handlePortalSession(session);
+      return;
+    }
+    try {
+      await auth.signIn(value);
+      setGateStatus('If this is your registered email, a one-time link is on its way. Open it on this device to continue.');
+    } catch (_err) {
+      showError('Could not send the sign-in link. Check the address and try again in a minute.');
+    }
   });
 
-  $('email').addEventListener('input', clearError);
+  $('email').addEventListener('input', function () { clearError(); setGateStatus(''); });
+  $('portal-signout').addEventListener('click', async function () {
+    try { await window.CGSubmission.signOut(); }
+    catch (_err) { showError('Could not sign out. Reload the page and try again.'); }
+  });
+  document.addEventListener('cg-submission-auth', function (event) {
+    handlePortalSession(event.detail && event.detail.session);
+  });
 
   /* ---------------- copy buttons (delegated) ---------------- */
   document.addEventListener('click', function (ev) {
@@ -284,10 +343,6 @@
     if (ev.key !== CGData.STORE_KEY) return;
     data = CGData.load();
     renderEvent();
-    if (current) {
-      var again = CGData.findByEmail(data, current.email);
-      if (again) renderResult(again); else $('result').classList.remove('visible');
-    }
     toast('Portal content updated');
   });
 
@@ -300,8 +355,15 @@
     }
   }, 1000);
 
-  /* Deep link: index.html?email=ada@example.com */
   renderEvent();
-  var qs = new URLSearchParams(location.search).get('email');
-  if (qs) { $('email').value = qs; $('gate-form').dispatchEvent(new Event('submit')); }
+  if (new URLSearchParams(location.search).has('email')) {
+    history.replaceState(null, '', location.pathname + location.hash);
+  }
+  if (!window.CGSubmission) {
+    showError('Supabase sign-in is not configured yet. Contact an organiser.');
+  } else {
+    window.CGSubmission.ready.then(handlePortalSession).catch(function () {
+      showError('Supabase could not start. Reload the page and try again.');
+    });
+  }
 })();

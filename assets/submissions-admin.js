@@ -3,6 +3,9 @@
   'use strict';
   var client = window.CGSubmission && window.CGSubmission.client;
   var allRows = [];
+  var finalistIds = [];
+  var votingOpen = false;
+  var voteCount = 0;
   var $ = function (id) { return document.getElementById(id); };
   var escape = function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   function safeHref(value) { try { var url = new URL(value); return /^https?:$/.test(url.protocol) ? escape(url.href) : ''; } catch (_err) { return ''; } }
@@ -21,18 +24,129 @@
     $('inbox-cards').innerHTML = rows.map(function (row) {
       var project = row.project || {}, team = row.team || {};
       var members = Array.isArray(team.members) ? team.members : [];
-      var links = [
-        project.demo ? '<a href="' + safeHref(project.demo) + '" target="_blank" rel="noopener noreferrer">Demo ↗</a>' : '',
-        project.source ? '<a href="' + safeHref(project.source) + '" target="_blank" rel="noopener noreferrer">Source ↗</a>' : ''
-      ].filter(Boolean).join('');
+      var linkItems = [
+        ['Live demo', project.demo], ['Demo video', project.video], ['Source code', project.source],
+        ['Figma / prototype', project.prototype]
+      ];
+      var links = linkItems.map(function (item) {
+        var href = item[1] && safeHref(item[1]);
+        return href ? '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + escape(item[0]) + ' ↗</a>' : '';
+      }).join('');
+      if (project.supporting) {
+        links += (links ? ' ' : '') + '<span>' + escape(project.supporting) + '</span>';
+      }
+      var labels = {
+        oneLiner:'One-liner', inspiration:'Problem / inspiration', solution:'Solution', interesting:'What makes it interesting?',
+        technology:'Technology used', made:'What works now', experiment:'Experiment / learning', next:'What they would do next',
+        designReflection:'Design × Tech reflection', cultureReflection:'Culture × Tech reflection',
+        collaboration:'Team & collaboration', attribution:'AI & tool attribution'
+      };
+      var fieldOrder = ['oneLiner','inspiration','solution','interesting','technology','made','experiment','next','designReflection','cultureReflection','collaboration','attribution'];
+      var fields = fieldOrder.filter(function (key) { return project[key]; }).map(function (key) {
+        return '<section class="submission-detail"><strong>' + escape(labels[key]) + '</strong><p>' + escape(project[key]) + '</p></section>';
+      }).join('');
+      var tracks = Array.isArray(project.tracks) ? project.tracks : [];
+      var memberNames = members.map(function (member) {
+        return escape(member.name || '') + (member.email ? ' · ' + escape(member.email) : '');
+      }).filter(Boolean).join('<br>');
       return '<article class="submission-card"><header><div><h2>' + escape(project.name || 'Untitled project') + '</h2>' +
         '<span class="submission-meta">' + escape(row.owner_email) + ' · ' + escape(team.name || 'No team') + '</span></div>' +
         '<span class="submission-badge ' + (row.status === 'ready' ? 'ready' : '') + '">' + escape(row.status) + '</span></header>' +
-        '<p>' + escape(project.description || 'No description yet.') + '</p>' +
+        (tracks.length ? '<div class="submission-tracks">' + tracks.map(function (track) { return '<span>' + escape(track) + '</span>'; }).join('') + '</div>' : '') +
+        (memberNames ? '<div class="submission-meta"><strong>Team members</strong><br>' + memberNames + '</div>' : '') +
         '<div class="submission-meta">' + escape(members.length + 1) + ' team member(s) · Updated ' + escape(new Date(row.updated_at).toLocaleString()) + '</div>' +
+        (fields ? '<div class="submission-fields">' + fields + '</div>' : '<p>No project details yet.</p>') +
         (links ? '<div class="submission-links">' + links + '</div>' : '') + '</article>';
     }).join('');
   }
+  function peopleChoiceMessage(text, isError) {
+    $('people-choice-message').textContent = text || '';
+    $('people-choice-message').classList.toggle('error', !!isError);
+  }
+  function renderFinalistOptions() {
+    var rows = allRows.filter(function (row) { return row.status === 'ready'; });
+    $('people-choice-options').innerHTML = rows.length ? rows.map(function (row) {
+      var project = row.project || {}, team = row.team || {};
+      var trackText = Array.isArray(project.tracks) ? project.tracks.join(' · ') : '';
+      var checked = finalistIds.indexOf(row.id) !== -1;
+      return '<label class="finalist-option"><input type="checkbox" data-finalist-selection value="' + escape(row.id) + '"' +
+        (checked ? ' checked' : '') + (votingOpen || voteCount > 0 ? ' disabled' : '') + '><span>' +
+        escape(project.name || 'Untitled project') + '<small>' + escape(team.name || 'No team') +
+        (trackText ? ' · ' + escape(trackText) : '') + '</small></span></label>';
+    }).join('') : '<p class="helper">No ready submissions are available to select yet.</p>';
+    var selected = document.querySelectorAll('[data-finalist-selection]:checked').length;
+    $('people-choice-save-finalists').disabled = votingOpen || voteCount > 0 || selected < 2 || selected > 8;
+    $('people-choice-open').hidden = votingOpen;
+    $('people-choice-close').hidden = !votingOpen;
+    $('people-choice-open').disabled = finalistIds.length < 2 || finalistIds.length > 8;
+    $('people-choice-results-button').hidden = votingOpen || voteCount === 0;
+  }
+  async function refreshPeopleChoice() {
+    var statusResult = await client.rpc('get_people_choice_admin_status', {p_event_id:'common-ground-2026-10-11'});
+    if (statusResult.error) throw statusResult.error;
+    var status = Array.isArray(statusResult.data) ? statusResult.data[0] : statusResult.data;
+    var idsResult = await client.rpc('get_people_choice_admin_finalist_ids', {p_event_id:'common-ground-2026-10-11'});
+    if (idsResult.error) throw idsResult.error;
+    finalistIds = (idsResult.data || []).map(function (row) { return row.submission_id; });
+    votingOpen = !!(status && status.voting_open);
+    voteCount = Number(status && status.vote_count || 0);
+    renderFinalistOptions();
+    peopleChoiceMessage(votingOpen
+      ? 'Voting is open · ' + finalistIds.length + ' finalists · ' + voteCount + ' ballots cast. Close the poll before viewing the tally.'
+      : finalistIds.length + ' finalists selected · ' + voteCount + ' ballots cast. ' +
+        (voteCount ? 'The finalist list is locked because voting has started.' : 'Select 2–8 ready submissions, then open voting when you are ready.'));
+  }
+  $('people-choice-options').addEventListener('change', renderFinalistOptions);
+  $('people-choice-save-finalists').addEventListener('click', async function () {
+    var ids = Array.prototype.map.call(document.querySelectorAll('[data-finalist-selection]:checked'), function (input) { return input.value; });
+    if (ids.length < 2 || ids.length > 8) {
+      peopleChoiceMessage('Select between 2 and 8 finalists.', true);
+      return;
+    }
+    this.disabled = true;
+    try {
+      var result = await client.rpc('set_people_choice_finalists', {
+        p_submission_ids: ids,
+        p_event_id: 'common-ground-2026-10-11'
+      });
+      if (result.error) throw result.error;
+      $('people-choice-results').hidden = true;
+      await refreshPeopleChoice();
+      peopleChoiceMessage(ids.length + ' finalists saved. Open voting when you are ready.');
+    } catch (error) {
+      peopleChoiceMessage(error && error.message ? error.message : 'Could not save finalists.', true);
+    } finally { renderFinalistOptions(); }
+  });
+  async function setVoting(open) {
+    try {
+      var result = await client.rpc('set_people_choice_voting', {
+        p_open: open,
+        p_event_id: 'common-ground-2026-10-11'
+      });
+      if (result.error) throw result.error;
+      $('people-choice-results').hidden = true;
+      await refreshPeopleChoice();
+    } catch (error) {
+      peopleChoiceMessage(error && error.message ? error.message : 'Could not update voting.', true);
+    }
+  }
+  $('people-choice-open').addEventListener('click', function () { setVoting(true); });
+  $('people-choice-close').addEventListener('click', function () { setVoting(false); });
+  $('people-choice-results-button').addEventListener('click', async function () {
+    try {
+      var result = await client.rpc('get_people_choice_results', {p_event_id:'common-ground-2026-10-11'});
+      if (result.error) throw result.error;
+      var rows = result.data || [];
+      $('people-choice-results').innerHTML = '<h3>People’s Choice tally</h3>' +
+        (rows.length ? '<ol>' + rows.map(function (row) {
+          return '<li>' + escape(row.project_name) + ' · ' + escape(row.team_name) + ' — <strong>' + escape(row.vote_count) + '</strong></li>';
+        }).join('') + '</ol>' : '<p>No finalists or votes to show.</p>');
+      $('people-choice-results').hidden = false;
+    } catch (error) {
+      peopleChoiceMessage(error && error.message ? error.message : 'Could not load results.', true);
+    }
+  });
+
   async function loadInbox() {
     if (!client) { message('Supabase is not configured on this site.', true); return; }
     message('Loading submissions…');
@@ -44,7 +158,8 @@
     allRows = result.data || [];
     $('inbox-list').hidden = false;
     render();
-    message('Loaded the latest submissions.');
+    await refreshPeopleChoice();
+    message('Loaded the latest submissions and People’s Choice controls.');
   }
   async function handleSession(session) {
     var user = session && session.user;
