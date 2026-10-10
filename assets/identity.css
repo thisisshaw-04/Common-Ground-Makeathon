@@ -91,3 +91,12 @@ input,textarea,select,.field input,.field textarea,.field select { border-radius
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after { scroll-behavior:auto!important; transition:none!important; animation:none!important; }
 }
+
+/* Central submission sign-in */
+.submission-auth { border:1px solid var(--line-hard); background:#eeede7; padding:18px 20px; margin:20px 0 24px; }
+.submission-auth form { display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap; }
+.submission-auth .field { flex:1 1 250px; margin:0; }
+.submission-auth .btn { flex:0 0 auto; }
+.submission-auth .helper { margin-bottom:0; }
+.submission-auth .helper.error { color:#9c2929; }
+.submission-auth #submission-signout { margin-top:12px; }
