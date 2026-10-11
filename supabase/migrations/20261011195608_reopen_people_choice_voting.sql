@@ -11,7 +11,6 @@ declare
   v_new_close constant text := '2026-10-14 23:59:59+08';
 begin
   foreach v_signature in array array[
-    'public.get_common_ground_event_state()',
     'public.get_people_choice_status(text)',
     'public.cast_people_choice_vote(uuid,text)',
     'public.get_people_choice_admin_status(text)',
@@ -46,6 +45,41 @@ begin
     execute v_definition;
   end loop;
 end $$;
+
+-- Keep the gallery open from its original schedule while using the new voting window.
+create or replace function public.get_common_ground_event_state()
+returns table (
+  current_at timestamptz,
+  submissions_closed boolean,
+  gallery_open boolean,
+  voting_open boolean
+)
+language plpgsql
+security definer
+set search_path to ''
+as $function$
+declare
+  v_now timestamptz := pg_catalog.clock_timestamp();
+  v_manual_open boolean;
+  v_paused boolean;
+begin
+  select s.submissions_open, coalesce(s.voting_paused, false)
+    into v_manual_open, v_paused
+  from public.people_choice_settings s
+  where s.event_id = 'common-ground-2026-10-11';
+
+  return query select
+    v_now,
+    case
+      when v_manual_open is null then v_now >= timestamptz '2026-10-11 16:08:02.945348+08'
+      else not v_manual_open
+    end,
+    v_now >= timestamptz '2026-10-11 15:15:00+08',
+    v_now >= timestamptz '2026-10-13 12:00:00+08'
+      and v_now < timestamptz '2026-10-14 23:59:59+08'
+      and not coalesce(v_paused, false);
+end;
+$function$;
 
 -- The gallery UI already supports unvoting; install its missing authenticated RPC.
 create or replace function public.remove_people_choice_vote(
