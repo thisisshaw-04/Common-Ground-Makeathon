@@ -28,11 +28,11 @@
         { time: '12:00', title: 'Lunch', detail: 'Take a break and meet other teams.' },
         { time: '13:00', title: 'Build session 02', detail: 'Test the idea, get feedback, and keep building.' },
         { time: '14:30', title: 'Final sprint', detail: 'Finish the essentials and prepare your demo.' },
-        { time: '15:15', title: 'Gallery opens · Final edit window', detail: 'Ready submissions appear in the public gallery. People’s Choice voting opens at 12:00 PM SGT on Tuesday, 13 October.' },
+        { time: '15:15', title: 'Gallery opens · Final edit window', detail: 'Ready submissions appear in the public gallery. People’s Choice voting opens at 12:00 PM SGT on Monday, 12 October.' },
         { time: '15:30', title: 'Submission window continues', detail: 'New entries and updates stay open until an organiser closes submissions.' },
         { time: '16:00', title: 'Demos + judging', detail: 'Present your build and what you learned.' },
         { time: '16:45', title: 'Wrap-up', detail: 'Share next steps and celebrate the work.' },
-        { time: '17:00', title: 'Event ends · People’s Choice voting later', detail: 'The makeathon ends. Voting runs from 12:00 PM Tuesday, 13 October to 11:59 PM Wednesday, 14 October SGT.' }
+        { time: '17:00', title: 'Event ends · People’s Choice voting later', detail: 'The makeathon ends. Voting runs from 12:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT.' }
       ],
       faq: [
         { q: 'Which email should I use?', a: 'Use the email on your event registration.' },
@@ -41,7 +41,7 @@
         { q: 'What can we make?', a: 'There is no fixed medium or outcome. Build a website, visual experiment, AI experience, speculative prototype or something else.' },
         { q: 'How do partner offers work?', a: 'Sign in and claim each offer. Claims are limited and first come, first served.' },
         { q: 'When do submissions close?', a: 'The public gallery and voting opened at 3:15 PM SGT on 11 October. Submissions remain open until an organiser closes them.' },
-        { q: 'How does People’s Choice work?', a: 'Sign in and vote for up to three projects from 12:00 PM Tuesday, 13 October to 11:59 PM Wednesday, 14 October SGT. You cannot vote for your own team.' },
+        { q: 'How does People’s Choice work?', a: 'Sign in and vote for up to three projects from 12:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT. You cannot vote for your own team.' },
         { q: 'Do I need source code?', a: 'Add a source link unless the project is no-code. Include a live demo or video.' }
       ]
     },
