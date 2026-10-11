@@ -26,15 +26,13 @@
   /* ---------------- render event content ---------------- */
   function renderEvent() {
     var e = data.event;
-    $('hero-edition').textContent = e.edition;
     $('hero-tagline').textContent = e.tagline;
     $('meta-dates').textContent = e.dates;
     $('meta-venue').textContent = e.venue;
     $('meta-hours').textContent = e.hours;
     $('meta-note').textContent = e.heroNote;
     $('foot-dates').textContent = e.dates;
-    $('top-caption').textContent = 'BUILDER PORTAL / ' + e.edition;
-    document.title = e.name + ' — Builder Portal';
+    document.title = e.name + ' — Makeathon';
 
     $('schedule').innerHTML = (e.schedule || []).map(function (row, index) {
       return '<div class="sched-row" data-schedule-index="' + index + '">' +
@@ -51,7 +49,7 @@
 
 
   /* ---------------- tab navigation ---------------- */
-  var panelNames = ['part-a', 'part-b', 'part-c'];
+  var panelNames = ['overview', 'access', 'schedule', 'faq', 'choice'];
   function activatePanel(name, updateHash) {
     if (panelNames.indexOf(name) === -1) return;
     document.querySelectorAll('[data-portal-panel]').forEach(function (panel) {
@@ -63,7 +61,10 @@
       tab.setAttribute('aria-selected', active ? 'true' : 'false');
       tab.tabIndex = active ? 0 : -1;
     });
-    if (updateHash) history.replaceState(null, '', '#' + name);
+    if (updateHash) {
+      history.replaceState(null, '', '#' + name);
+      window.scrollTo({top:0, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+    }
     document.dispatchEvent(new CustomEvent('cg-portal-tab-change', {detail:{panel:name}}));
   }
   document.addEventListener('click', function (event) {
@@ -83,8 +84,10 @@
       activatePanel(tabs[next].getAttribute('data-panel-select'), true);
     });
   });
-  var hashMatch = location.hash.match(/^#(?:part-|portal-tab-)([abc])$/i);
-  activatePanel(hashMatch ? 'part-' + hashMatch[1].toLowerCase() : 'part-a', false);
+  var namedHash = location.hash.match(/^#(overview|access|schedule|faq|choice)$/i);
+  var legacyHash = location.hash.match(/^#(?:part-|portal-tab-)([abc])$/i);
+  var legacyPanels = {a:'access', b:'schedule', c:'choice'};
+  activatePanel(namedHash ? namedHash[1].toLowerCase() : legacyHash ? legacyPanels[legacyHash[1].toLowerCase()] : 'overview', false);
 
   /* ---------------- live schedule and server cutoff ---------------- */
   var EVENT_START_AT = Date.parse('2026-10-11T09:00:00+08:00');
