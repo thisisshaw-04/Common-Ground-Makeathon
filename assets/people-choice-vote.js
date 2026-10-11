@@ -49,12 +49,12 @@
       setMessage('Use an approved event email to vote.', true);
     } else if (!eventStatus.voting_open) {
       var now = Date.parse(eventStatus.current_at || '');
-      var votingStart = Date.parse('2026-10-13T12:00:00+08:00');
+      var votingStart = Date.parse('2026-10-12T12:00:00+08:00');
       var votingEnd = Date.parse('2026-10-14T23:59:59+08:00');
       setMessage(Number.isFinite(now) && now >= votingEnd
         ? 'Voting closed at 11:59 PM SGT Wednesday, 14 October.'
         : Number.isFinite(now) && now < votingStart
-          ? 'Voting opens at 12:00 PM SGT Tuesday, 13 October and closes at 11:59 PM Wednesday, 14 October.'
+          ? 'Voting opens at 12:00 PM SGT Monday, 12 October and closes at 11:59 PM Wednesday, 14 October.'
           : 'Voting is paused by the organisers.');
     } else if (votesCast >= 3) {
       setMessage('You’ve used all three votes. Unvote a project to free a slot.');
