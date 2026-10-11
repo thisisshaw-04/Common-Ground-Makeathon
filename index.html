@@ -302,12 +302,15 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
       <p>Add your team details for your submission. You are included as the team contact.</p>
       <p id="team-contact" class="helper"></p>
       <div class="submission-auth" id="submission-auth">
-        <form id="submission-auth-form">
+        <form id="submission-auth-form" hidden>
           <label class="field"><span>BUILDER EMAIL</span><input id="submission-auth-email" type="email" autocomplete="email" required></label>
           <button class="btn" type="submit">Email me a sign-in link</button>
         </form>
+        <div id="submission-auth-identity" hidden>
+          <label class="field"><span>BUILDER EMAIL · SIGNED IN</span><input id="submission-auth-email-display" type="email" autocomplete="email" readonly aria-label="Signed-in builder email"></label>
+        </div>
         <button class="btn btn-sm" id="submission-signout" type="button" hidden>Sign out</button>
-        <p id="submission-auth-status" class="helper" role="status">Sign in with your registration email to submit centrally.</p>
+        <p id="submission-auth-status" class="helper" role="status">Checking sign-in…</p>
       </div>
       <form id="team-form">
         <label class="field"><span>TEAM NAME</span><input id="team-name" required maxlength="100" autocomplete="organization"></label>
@@ -405,6 +408,6 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/project-gallery.js?v=20261011-single-answer-v1"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261011-submission-form-v2"></script>
+<script src="./assets/submission-sync.js?v=20261011-submission-form-v3"></script>
 </body>
 </html>
