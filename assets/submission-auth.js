@@ -87,7 +87,7 @@
       if (!client) throw new Error('Submission sign-in is not configured yet.');
       var result = await client.auth.verifyOtp({
         email: String(email || '').trim().toLowerCase(),
-        token: String(token || '').replace(/\\D/g, ''),
+        token: String(token || '').replace(/\D/g, ''),
         type: 'email'
       });
       if (result.error) throw result.error;
