@@ -8,6 +8,7 @@
   var client = window.CGSubmission && window.CGSubmission.client;
   var lastUserId = null;
   var savedReflections = {designReflection:'',cultureReflection:''};
+  var PREVIEW_IMAGE_CUTOFF = Date.parse('2026-10-13T18:00:00+08:00');
 
   function participantEmail() {
     var participant = window.CGBuilderParticipant || {};
@@ -96,6 +97,7 @@
       made: '',
       experiment: '',
       next: '',
+      previewImage: $('project-preview-image').value.trim(),
       demo: $('project-demo').value.trim(),
       video: $('project-video').value.trim(),
       source: $('project-source').value.trim(),
@@ -119,6 +121,17 @@
     $('overview-count').textContent = overview + ' / 100 words';
     $('build-count').textContent = build + ' / 100 words';
     $('track-count').textContent = tracks.length + ' of 2 selected';
+  }
+  function updatePreviewImageAvailability() {
+    var input = $('project-preview-image');
+    var helper = $('project-image-edit-deadline');
+    if (!input || !helper) return;
+    var closed = Date.now() >= PREVIEW_IMAGE_CUTOFF;
+    input.readOnly = closed;
+    input.setAttribute('aria-readonly', closed ? 'true' : 'false');
+    helper.textContent = closed
+      ? 'Image updates closed at 6:00 PM SGT Tuesday, 13 October.'
+      : 'Paste a direct image URL. You can change it until 6:00 PM SGT Tuesday, 13 October.';
   }
   function validateReady(project, team) {
     if (!project.name || !project.overview || !project.build ||
@@ -165,6 +178,15 @@
     var teamResult = formTeam(email, existing && existing.team);
     var team = teamResult.team;
     var project = formProject();
+    if (project.previewImage) {
+      try {
+        if (!/^https?:$/.test(new URL(project.previewImage).protocol)) throw new Error();
+      } catch (_err) {
+        showStatus('Use a complete http:// or https:// image URL.', true);
+        $('submission-feedback').textContent = 'Use a complete http:// or https:// image URL.';
+        return false;
+      }
+    }
     if (status === 'ready') {
       if (teamResult.issue) {
         showStatus(teamResult.issue, true);
@@ -219,6 +241,7 @@
     };
     var values = {
       name: project.name || '',
+      previewImage: project.previewImage || project.preview_image_url || project.preview_image || '',
       overview: project.overview || [project.oneLiner, project.inspiration, project.solution, project.interesting].filter(Boolean).join('\n\n'),
       build: project.build || [project.technology, project.made, project.experiment, project.next].filter(Boolean).join('\n\n'),
       demo: project.demo || '',
@@ -238,6 +261,7 @@
     $('project-no-code').checked = !!project.noCode;
     document.querySelectorAll('input[name="project-track"]').forEach(function (input) { input.checked = Array.isArray(project.tracks) && project.tracks.indexOf(input.value) !== -1; });
     updateSubmissionGuidance();
+    updatePreviewImageAvailability();
     var team = record.team || {};
     if (team.name) {
       $('team-name').value = team.name;
@@ -333,7 +357,13 @@
     $(id).addEventListener('input', updateSubmissionGuidance);
   });
   updateSubmissionGuidance();
-  document.addEventListener('cg-project-draft-loaded', updateSubmissionGuidance);
+  updatePreviewImageAvailability();
+  document.addEventListener('cg-project-draft-loaded', function () {
+    updateSubmissionGuidance();
+    updatePreviewImageAvailability();
+  });
+  var previewImageDelay = PREVIEW_IMAGE_CUTOFF - Date.now();
+  if (previewImageDelay > 0) window.setTimeout(updatePreviewImageAvailability, previewImageDelay + 100);
 
   $('submission-auth-form').addEventListener('submit', async function (event) {
     event.preventDefault();
