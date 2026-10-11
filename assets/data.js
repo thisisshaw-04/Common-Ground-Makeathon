@@ -6,7 +6,7 @@
     eventRevision: '2026-10-11-v2',
     event: {
       name: 'Common Ground',
-      edition: 'EDITION 01 / 2026',
+      edition: 'MAKEATHON',
       tagline: 'A one-day makeathon. One idea. Built together.',
       dates: 'SUNDAY, 11 OCTOBER 2026',
       venue: 'SQ Collective',
@@ -15,7 +15,7 @@
       heroNote: 'Build it. Show how it works.',
       intro: [
         { title: 'What this is',
-          body: 'One Sunday. One thing worth making. Join us at SQ Collective on 11 October, from 9am to 5pm. Kick off together, find your team, build, and share what you made before the day is out.' },
+          body: 'One thing worth making. Join us at SQ Collective on 11 October, from 9am to 5pm. Kick off together, find your team, build, and share what you made before the day is out.' },
         { title: 'What you get',
           body: 'Verified attendees can claim limited partner offers from this page. Each code pool is first come, first served. You will also find food, a desk, power, and people who know things you do not.' },
         { title: 'What we ask',
