@@ -8,7 +8,7 @@
   var client = window.CGSubmission && window.CGSubmission.client;
   var lastUserId = null;
   var savedReflections = {designReflection:'',cultureReflection:''};
-  var PREVIEW_IMAGE_CUTOFF = Date.parse('2026-10-13T18:00:00+08:00');
+  var PREVIEW_IMAGE_CUTOFF = Date.parse('2026-10-12T18:00:00+08:00');
 
   function participantEmail() {
     var participant = window.CGBuilderParticipant || {};
@@ -130,8 +130,8 @@
     input.readOnly = closed;
     input.setAttribute('aria-readonly', closed ? 'true' : 'false');
     helper.textContent = closed
-      ? 'Image updates closed at 6:00 PM SGT Tuesday, 13 October.'
-      : 'Paste a direct image URL. You can change it until 6:00 PM SGT Tuesday, 13 October.';
+      ? 'Image updates closed at 6:00 PM SGT Monday, 12 October.'
+      : 'Paste a direct image URL. You can change it until 6:00 PM SGT Monday, 12 October.';
   }
   function validateReady(project, team) {
     if (!project.name || !project.overview || !project.build ||
