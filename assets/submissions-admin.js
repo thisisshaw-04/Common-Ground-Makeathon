@@ -5,6 +5,9 @@
   var allRows = [];
   var allScores = [];
   var currentJudgeId = '';
+  var currentJudgeEmail = '';
+  var currentJudgeName = '';
+  var xlsxPromise = null;
   var scoringReady = true;
   var finalistIds = [];
   var votingOpen = false;
@@ -115,12 +118,11 @@
     $('judging-message').classList.toggle('error', !!isError);
   }
   async function loadJudgeScores() {
-    var result = await client.from('submission_scores')
-      .select('submission_id,judge_id,concept,track_fit,execution,presentation,notes,updated_at');
+    var result = await client.rpc('get_common_ground_judging_export', {p_event_id:'common-ground-2026-10-11'});
     if (result.error) {
       scoringReady = false;
       allScores = [];
-      setJudgingMessage('Judging scores are not set up yet. Apply supabase/migrations/20261011000300_gallery_judging.sql first.', true);
+      setJudgingMessage('Could not load judge scores. Confirm the judging export migration is applied, then reload.', true);
       return;
     }
     scoringReady = true;
@@ -146,6 +148,8 @@
       var record = {
         submission_id: submissionId,
         judge_id: currentJudgeId,
+        judge_name: currentJudgeName,
+        judge_email: currentJudgeEmail,
         concept: values.concept,
         track_fit: values.track_fit,
         execution: values.execution,
@@ -291,6 +295,9 @@
   async function handleSession(session) {
     var user = session && session.user;
     currentJudgeId = user && user.id || '';
+    currentJudgeEmail = user && user.email || '';
+    var profile = user && user.user_metadata || {};
+    currentJudgeName = profile.full_name || profile.name || currentJudgeEmail;
     $('inbox-login').hidden = !!user;
     $('inbox-signout').hidden = !user;
     if (!user) {
@@ -330,12 +337,171 @@
   });
   $('inbox-refresh').addEventListener('click', function () { loadInbox().catch(function () { message('Could not refresh submissions.', true); }); });
   $('inbox-filter').addEventListener('change', render);
-  $('inbox-export').addEventListener('click', function () {
-    var blob = new Blob([JSON.stringify(allRows, null, 2)], {type:'application/json'});
-    var url = URL.createObjectURL(blob), link = document.createElement('a');
-    link.href = url; link.download = 'common-ground-submissions.json'; link.click();
-    URL.revokeObjectURL(url);
-  });
+  function loadSpreadsheetLibrary() {
+    if (window.XLSX) return Promise.resolve(window.XLSX);
+    if (xlsxPromise) return xlsxPromise;
+    xlsxPromise = new Promise(function (resolve, reject) {
+      var script = document.createElement('script');
+      script.src = 'https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js';
+      script.async = true;
+      script.onload = function () {
+        if (window.XLSX) resolve(window.XLSX);
+        else reject(new Error('Excel library did not load.'));
+      };
+      script.onerror = function () { reject(new Error('Excel library could not load.')); };
+      document.head.appendChild(script);
+    });
+    return xlsxPromise;
+  }
+  function buildJudgingWorkbook(XLSX) {
+    var core = [
+      ['Team name', function (row) { return row.team && row.team.name || ''; }],
+      ['Project name', function (row) { return row.project && row.project.name || ''; }],
+      ['Project description', function (row) {
+        var project = row.project || {};
+        return [
+          project.oneLiner,
+          project.inspiration ? 'Problem / inspiration: ' + project.inspiration : '',
+          project.solution ? 'Solution: ' + project.solution : '',
+          project.interesting ? 'What makes it interesting: ' + project.interesting : ''
+        ].filter(Boolean).join('\n\n');
+      }],
+      ['Live demo / site', function (row) { return row.project && row.project.demo || ''; }],
+      ['GitHub / source code', function (row) { return row.project && row.project.source || ''; }],
+      ['Demo video', function (row) { return row.project && row.project.video || ''; }],
+      ['Figma / prototype', function (row) { return row.project && row.project.prototype || ''; }],
+      ['Other supporting materials', function (row) { return row.project && row.project.supporting || ''; }],
+      ['Tracks', function (row) { return Array.isArray(row.project && row.project.tracks) ? row.project.tracks.join(', ') : ''; }],
+      ['Team members', function (row) {
+        var team = row.team || {}, members = [];
+        if (team.contact && team.contact.name) members.push(team.contact.name);
+        (Array.isArray(team.members) ? team.members : []).forEach(function (member) {
+          if (member && member.name && !members.some(function (name) { return name.toLowerCase() === String(member.name).toLowerCase(); })) {
+            members.push(member.name);
+          }
+        });
+        return members.join(', ');
+      }],
+      ['Technology used', function (row) { return row.project && row.project.technology || ''; }],
+      ['What works now', function (row) { return row.project && row.project.made || ''; }],
+      ['Experiments / learning', function (row) { return row.project && row.project.experiment || ''; }],
+      ['What they would do next', function (row) { return row.project && row.project.next || ''; }],
+      ['Design × Tech reflection', function (row) { return row.project && row.project.designReflection || ''; }],
+      ['Culture × Tech reflection', function (row) { return row.project && row.project.cultureReflection || ''; }],
+      ['Team & collaboration', function (row) { return row.project && row.project.collaboration || ''; }],
+      ['AI & tool attribution', function (row) { return row.project && row.project.attribution || ''; }],
+      ['Submission status', function (row) { return row.status || ''; }],
+      ['Last updated', function (row) { return row.updated_at || ''; }]
+    ];
+    var judgeMap = Object.create(null);
+    allScores.forEach(function (score) {
+      if (!score.judge_id) return;
+      var key = String(score.judge_id);
+      if (!judgeMap[key]) {
+        judgeMap[key] = {id:key, name:score.judge_name || score.judge_email || '', email:score.judge_email || ''};
+      }
+    });
+    var judges = Object.keys(judgeMap).map(function (key) { return judgeMap[key]; });
+    judges.sort(function (a, b) {
+      return String(a.name || a.email || a.id).localeCompare(String(b.name || b.email || b.id));
+    });
+    judges.forEach(function (judge, index) {
+      if (!judge.name && !judge.email) judge.name = 'Judge ' + (index + 1);
+      judge.label = judge.name && judge.email && judge.name.toLowerCase() !== judge.email.toLowerCase()
+        ? judge.name + ' (' + judge.email + ')' : judge.name || judge.email || ('Judge ' + (index + 1));
+    });
+
+    var top = core.map(function (column) { return column[0]; });
+    var sub = core.map(function () { return ''; });
+    var judgeFields = [
+      ['Concept','concept'], ['Track fit','track_fit'], ['Execution','execution'],
+      ['Presentation','presentation'], ['Total / 20','total'], ['Notes','notes']
+    ];
+    judges.forEach(function (judge) {
+      top.push(judge.label, '', '', '', '', '');
+      judgeFields.forEach(function (field) { sub.push(field[0]); });
+    });
+    var averageColumn = top.length;
+    top.push('Average judge score / 20');
+    sub.push('');
+    var dataRows = [top, sub];
+    allRows.forEach(function (row) {
+      var values = core.map(function (column) {
+        var value = column[1](row);
+        return value == null ? '' : value;
+      });
+      var rowScores = [];
+      judges.forEach(function (judge) {
+        var score = allScores.find(function (item) {
+          return item.submission_id === row.id && item.judge_id === judge.id;
+        });
+        if (!score) { values.push('', '', '', '', '', ''); return; }
+        var criteria = ['concept','track_fit','execution','presentation'].map(function (key) {
+          var value = Number(score[key]);
+          return Number.isFinite(value) ? value : '';
+        });
+        var complete = criteria.every(function (value) { return value !== ''; });
+        var total = complete ? criteria.reduce(function (sum, value) { return sum + value; }, 0) : '';
+        values.push(criteria[0], criteria[1], criteria[2], criteria[3], total, score.notes || '');
+        if (complete) rowScores.push(total);
+      });
+      values.push(rowScores.length
+        ? rowScores.reduce(function (sum, value) { return sum + value; }, 0) / rowScores.length : '');
+      dataRows.push(values);
+    });
+    var sheet = XLSX.utils.aoa_to_sheet(dataRows);
+    var merges = [];
+    for (var c = 0; c < core.length; c++) merges.push({s:{r:0,c:c},e:{r:1,c:c}});
+    for (var j = 0; j < judges.length; j++) {
+      var start = core.length + j * judgeFields.length;
+      merges.push({s:{r:0,c:start},e:{r:0,c:start + judgeFields.length - 1}});
+    }
+    merges.push({s:{r:0,c:averageColumn},e:{r:1,c:averageColumn}});
+    sheet['!merges'] = merges;
+    sheet['!autofilter'] = {ref:XLSX.utils.encode_range({
+      s:{r:1,c:0},e:{r:Math.max(1,dataRows.length - 1),c:averageColumn}
+    })};
+    var widths = [20,26,58,34,34,30,30,38,28,38,32,32,32,32,34,34,34,34,18,22];
+    sheet['!cols'] = core.map(function (_column, index) { return {wch:widths[index] || 26}; });
+    judges.forEach(function () {
+      sheet['!cols'].push({wch:12},{wch:12},{wch:12},{wch:14},{wch:14},{wch:36});
+    });
+    sheet['!cols'].push({wch:22});
+    sheet['!rows'] = [{hpt:30},{hpt:24}];
+    dataRows.slice(2).forEach(function (values) {
+      var maxLines = 1;
+      values.forEach(function (value) {
+        var text = String(value == null ? '' : value);
+        var lines = text.split('\n').reduce(function (sum, line) {
+          return sum + Math.max(1, Math.ceil(line.length / 58));
+        }, 0);
+        maxLines = Math.max(maxLines, lines);
+      });
+      sheet['!rows'].push({hpt:Math.min(240,Math.max(30,maxLines * 15))});
+    });
+    var workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, sheet, 'Submissions & scores');
+    workbook.Props = {
+      Title:'Common Ground Makeathon judging sheet',
+      Subject:'Project submissions and judge scores',
+      Author:'Common Ground Makeathon'
+    };
+    return workbook;
+  }
+  async function exportSpreadsheet(button) {
+    if (button.disabled) return;
+    button.disabled = true;
+    message('Preparing the Excel judging sheet…');
+    try {
+      var XLSX = await loadSpreadsheetLibrary();
+      var workbook = buildJudgingWorkbook(XLSX);
+      XLSX.writeFile(workbook, 'common-ground-judging-sheet-2026-10-11.xlsx', {compression:true});
+      message('Excel judging sheet downloaded.');
+    } catch (_error) {
+      message('Could not prepare the Excel file. Check your connection and try again.', true);
+    } finally { button.disabled = false; }
+  }
+  $('inbox-export').addEventListener('click', function () { exportSpreadsheet(this); });
   document.addEventListener('cg-submission-auth', function (event) { handleSession(event.detail && event.detail.session); });
   if (!client) { handleSession(null); return; }
   window.CGSubmission.ready.then(handleSession).catch(function () { message('Supabase could not start. Reload and try again.', true); });
