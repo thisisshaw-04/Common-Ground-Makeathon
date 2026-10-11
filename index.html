@@ -68,6 +68,13 @@
 #panel-access .gate{margin:28px 0}
 #panel-access .result{margin:24px 0}
 #panel-choice .team-section{margin:28px 0}
+#panel-choice #team-section,#panel-choice #submission-section{width:min(1840px,calc(100vw - 48px));margin-left:calc((100% - min(1840px,calc(100vw - 48px)))/2)}
+#submission-form .submission-masonry{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:start;gap:20px}
+#submission-form .submission-masonry-column{display:flex;flex-direction:column;gap:18px;min-width:0}
+#submission-form .submission-masonry-column>.field,#submission-form .submission-masonry-column>fieldset{margin:0}
+#submission-form .submission-masonry-column>fieldset{align-self:stretch}
+@media(max-width:1000px){#submission-form .submission-masonry{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){#panel-choice #team-section,#panel-choice #submission-section{width:calc(100vw - 32px);margin-left:calc((100% - (100vw - 32px))/2)}#submission-form .submission-masonry{grid-template-columns:1fr}}
 .submission-locked{margin:28px 0;padding:24px;border:1px solid var(--ink);background:#fff}
 .submission-locked h2{font-size:clamp(24px,3vw,36px);margin:10px 0}
 .submission-locked p{max-width:62ch;line-height:1.6;color:#55574e}
@@ -327,44 +334,48 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
       <p>Submit one entry per team. Choose up to two award tracks, then save drafts as you build. Only one teammate should submit for your team.</p>
       <p id="submission-team" class="helper"></p>
       <form id="submission-form" novalidate>
-        <label class="field"><span>PROJECT NAME *</span><input id="project-name" maxlength="150"></label>
-        <fieldset class="field track-picker">
-          <legend>AWARD TRACKS * <small>Choose up to two</small></legend>
-          <label><input type="checkbox" name="project-track" value="Design × Tech"> Design × Tech</label>
-          <label><input type="checkbox" name="project-track" value="Culture × Tech"> Culture × Tech</label>
-          <label><input type="checkbox" name="project-track" value="Best Use of Tech"> Best Use of Tech</label>
-          <label><input type="checkbox" name="project-track" value="Common Ground Award"> Common Ground Award</label>
-          <p id="track-count" class="helper" role="status">0 of 2 selected</p>
-          <p class="helper">Design × Tech and Culture × Tech are judged tracks. Best Use of Tech and Common Ground are cross-track awards. Teams nominated for both judged tracks may be considered by both panels. Judges score Concept, Track Fit, Execution, and Presentation equally (1–5 each); People’s Choice is separate.</p>
-        </fieldset>
-
-        <fieldset class="field">
-          <legend>PROJECT OVERVIEW <small>One response · 100 words maximum</small></legend>
-          <p class="helper">In one answer, cover: one-liner · problem or inspiration · your solution · what makes it interesting.</p>
-          <label class="field"><span>YOUR PROJECT OVERVIEW *</span><textarea id="project-overview" maxlength="1500"></textarea></label>
-          <p id="overview-count" class="helper" role="status">0 / 100 words</p>
-        </fieldset>
-
-        <fieldset class="field">
-          <legend>THE BUILD <small>One response · 100 words maximum</small></legend>
-          <p class="helper">In one answer, cover: technology used · what works now · what you experimented with · what you would do next.</p>
-          <label class="field"><span>YOUR BUILD *</span><textarea id="project-build" maxlength="1500" placeholder="What works now: prototype, interactive demo, or functioning MVP?"></textarea></label>
-          <p id="build-count" class="helper" role="status">0 / 100 words</p>
-        </fieldset>
-
-        <fieldset class="field">
-          <legend>PROJECT LINKS & DEMO</legend>
-          <p class="helper">Make links accessible to judges. Any demo video must be 2 minutes or less. Add setup instructions if needed.</p>
-          <label class="field"><span>LIVE DEMO / DEPLOYED PROJECT (OPTIONAL)</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
-          <label class="field"><span>DEMO VIDEO (OPTIONAL)</span><input id="project-video" type="url" placeholder="https://…" maxlength="2000"></label>
-          <label class="field"><span>GITHUB / SOURCE CODE (OPTIONAL)</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
-          <label class="field"><span>FIGMA / PROTOTYPE (OPTIONAL)</span><input id="project-prototype" type="url" placeholder="https://…" maxlength="2000"></label>
-          <label><input id="project-no-code" type="checkbox"> (OPTIONAL) This project is not based on code</label>
-          <label class="field"><span>OTHER SUPPORTING MATERIALS OR TRY-IT INSTRUCTIONS (OPTIONAL)</span><textarea id="project-supporting" maxlength="3000"></textarea></label>
-        </fieldset>
-
-        <label class="field"><span>TEAM & COLLABORATION *</span><textarea id="project-collaboration" maxlength="3000" placeholder="How did different skills, disciplines, or perspectives come together? What did you discover by working together?"></textarea></label>
-        <label class="field"><span>AI & TOOL ATTRIBUTION *</span><textarea id="project-attribution" maxlength="3000" placeholder="List AI tools, models, external resources, and third-party assets, datasets, or references—and what you used them for. Write “None” if not applicable."></textarea></label>
+        <div class="submission-masonry">
+          <div class="submission-masonry-column">
+            <label class="field"><span>PROJECT NAME *</span><input id="project-name" maxlength="150"></label>
+            <fieldset class="field track-picker">
+              <legend>AWARD TRACKS * <small>Choose up to two</small></legend>
+              <label><input type="checkbox" name="project-track" value="Design × Tech"> Design × Tech</label>
+              <label><input type="checkbox" name="project-track" value="Culture × Tech"> Culture × Tech</label>
+              <label><input type="checkbox" name="project-track" value="Best Use of Tech"> Best Use of Tech</label>
+              <label><input type="checkbox" name="project-track" value="Common Ground Award"> Common Ground Award</label>
+              <p id="track-count" class="helper" role="status">0 of 2 selected</p>
+              <p class="helper">Design × Tech and Culture × Tech are judged tracks. Best Use of Tech and Common Ground are cross-track awards. Teams nominated for both judged tracks may be considered by both panels. Judges score Concept, Track Fit, Execution, and Presentation equally (1–5 each); People’s Choice is separate.</p>
+            </fieldset>
+            <fieldset class="field">
+              <legend>PROJECT OVERVIEW <small>One response · 100 words maximum</small></legend>
+              <p class="helper">In one answer, cover: one-liner · problem or inspiration · your solution · what makes it interesting.</p>
+              <label class="field"><span>YOUR PROJECT OVERVIEW *</span><textarea id="project-overview" maxlength="1500"></textarea></label>
+              <p id="overview-count" class="helper" role="status">0 / 100 words</p>
+            </fieldset>
+          </div>
+          <div class="submission-masonry-column">
+            <fieldset class="field">
+              <legend>THE BUILD <small>One response · 100 words maximum</small></legend>
+              <p class="helper">In one answer, cover: technology used · what works now · what you experimented with · what you would do next.</p>
+              <label class="field"><span>YOUR BUILD *</span><textarea id="project-build" maxlength="1500" placeholder="What works now: prototype, interactive demo, or functioning MVP?"></textarea></label>
+              <p id="build-count" class="helper" role="status">0 / 100 words</p>
+            </fieldset>
+            <label class="field"><span>TEAM & COLLABORATION *</span><textarea id="project-collaboration" maxlength="3000" placeholder="How did different skills, disciplines, or perspectives come together? What did you discover by working together?"></textarea></label>
+            <label class="field"><span>AI & TOOL ATTRIBUTION *</span><textarea id="project-attribution" maxlength="3000" placeholder="List AI tools, models, external resources, and third-party assets, datasets, or references—and what you used them for. Write “None” if not applicable."></textarea></label>
+          </div>
+          <div class="submission-masonry-column">
+            <fieldset class="field">
+              <legend>PROJECT LINKS & DEMO</legend>
+              <p class="helper">Make links accessible to judges. Any demo video must be 2 minutes or less. Add setup instructions if needed.</p>
+              <label class="field"><span>LIVE DEMO / DEPLOYED PROJECT (OPTIONAL)</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
+              <label class="field"><span>DEMO VIDEO (OPTIONAL)</span><input id="project-video" type="url" placeholder="https://…" maxlength="2000"></label>
+              <label class="field"><span>GITHUB / SOURCE CODE (OPTIONAL)</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
+              <label class="field"><span>FIGMA / PROTOTYPE (OPTIONAL)</span><input id="project-prototype" type="url" placeholder="https://…" maxlength="2000"></label>
+              <label><input id="project-no-code" type="checkbox"> (OPTIONAL) This project is not based on code</label>
+              <label class="field"><span>OTHER SUPPORTING MATERIALS OR TRY-IT INSTRUCTIONS (OPTIONAL)</span><textarea id="project-supporting" maxlength="3000"></textarea></label>
+            </fieldset>
+          </div>
+        </div>
         <p class="helper">A thoughtful one-day prototype can score higher than a technically complex project. Focus on what you explored, built, and learned.</p>
         <div class="team-actions submission-actions"><button class="btn btn-primary" type="submit">Save project draft</button><button class="btn" type="button" id="project-download">Download draft</button><button class="btn btn-primary" type="button" id="project-ready">Submit final entry</button></div>
         <p class="helper">Save drafts as you build. Only one teammate should submit the team’s final entry by the submission deadline.</p>
