@@ -476,7 +476,12 @@
     }
   });
 
-  $('email').addEventListener('input', function () { clearError(); setGateStatus(''); });
+  function updateGateEventLink() {
+    var emailEntered = !!$('email').value.trim();
+    $('gate-luma').hidden = !emailEntered;
+  }
+  updateGateEventLink();
+  $('email').addEventListener('input', function () { clearError(); setGateStatus(''); updateGateEventLink(); });
   $('portal-signout').addEventListener('click', async function () {
     try { await window.CGSubmission.signOut(); }
     catch (_err) { showError('Could not sign out. Reload the page and try again.'); }

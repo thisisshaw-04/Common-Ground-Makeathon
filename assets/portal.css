@@ -337,6 +337,12 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media(max-width:360px){.topbar{padding:0 14px}.brand{font-size:13px}.top-link{font-size:9px}.portal-nav{gap:20px}.tool-labels{gap:4px}.tool-labels span{padding:3px 6px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
+.gate #portal-signout{margin:14px 0 0;background:transparent;color:#e2e6d6;border:1px solid #59604f;border-radius:7px;padding:9px 14px;font:11px var(--mono)}
+.gate #portal-signout:hover{background:#25291e;border-color:var(--acid);color:var(--acid)}
+.gate #portal-signout[hidden]{display:none!important}
+.gate-luma{margin-top:12px!important;font:10px/1.7 var(--mono)!important;color:#aab39b!important}
+.gate-luma a{color:var(--acid);text-underline-offset:3px}
+.gate-luma a:hover{color:#dcf63d}
 [hidden]{display:none!important}
 .release-notice{padding:20px 24px;margin:0;background:#edf1d9;border:1px solid var(--line);font-size:14px;line-height:1.7}
 .team-section{margin-top:32px;padding:32px;background:#fffefa;border:1px solid var(--line);border-radius:14px}
