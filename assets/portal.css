@@ -357,7 +357,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 
 /* Main navigation */
 body .topbar{position:sticky;top:0;z-index:30;height:auto;min-height:82px;display:flex;align-items:center;justify-content:space-between;gap:36px;background:var(--paper);border-bottom:1px solid var(--line)}
-#main-nav.portal-nav{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:clamp(16px,2.4vw,36px);border:0;padding:0;font-size:15px}
+#main-nav.portal-nav{flex:1;min-width:0;display:flex;align-items:center;justify-content:flex-end;gap:clamp(20px,3vw,44px);border:0;padding:0;font-size:15px}
 #main-nav .portal-tab{appearance:none;display:inline-flex;align-items:center;justify-content:flex-start;gap:0;min-height:44px;padding:6px 0;border:0;background:transparent;color:var(--ink);font:400 clamp(13px,1.25vw,17px) var(--display);text-align:left;white-space:nowrap;cursor:pointer}
 #main-nav .portal-tab:hover,#main-nav .portal-tab.active{background:transparent;border-color:transparent;color:var(--ink)}
 #main-nav .portal-tab[aria-selected="true"]{font-weight:700}
