@@ -69,3 +69,10 @@
   .project-modal-header{padding:12px 14px}
   .project-modal-body{padding:20px 16px}
 }
+
+
+.project-modal-title-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,auto);align-items:start;gap:24px}
+.project-modal-title-row h2{min-width:0}
+.project-modal-title-row .project-gallery-links{justify-content:flex-end;align-self:start;gap:8px 16px;max-width:100%}
+.project-modal-title-row .project-gallery-links a{font:600 13px/1.4 var(--mono,monospace);text-align:right;text-underline-offset:4px;white-space:nowrap}
+@media(max-width:620px){.project-modal-title-row{grid-template-columns:minmax(0,1fr);gap:12px}.project-modal-title-row .project-gallery-links{justify-content:flex-start}.project-modal-title-row .project-gallery-links a{text-align:left}}
