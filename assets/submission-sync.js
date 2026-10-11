@@ -244,9 +244,9 @@
     }
     try {
       await window.CGSubmission.signIn(email);
-      showStatus('Check your email for a one-time sign-in link. Return here after opening it.');
+      showStatus('Check your inbox and spam folder. Open the newest link in this browser to return to your project.');
     } catch (_err) {
-      showStatus('Could not send the sign-in link. Check the email and try again.', true);
+      showStatus(window.CGSubmission.signInErrorMessage(_err), true);
     }
   });
   $('submission-signout').addEventListener('click', async function () {
