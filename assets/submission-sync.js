@@ -53,17 +53,22 @@
     return Array.prototype.slice.call(document.querySelectorAll('input[name="project-track"]:checked')).map(function (input) { return input.value; });
   }
   function formProject() {
+    var overview = $('project-overview').value.trim();
+    var build = $('project-build').value.trim();
     return {
       name: $('project-name').value.trim(),
       tracks: selectedTracks(),
-      oneLiner: $('project-one-liner').value.trim(),
-      inspiration: $('project-inspiration').value.trim(),
-      solution: $('project-solution').value.trim(),
-      interesting: $('project-interesting').value.trim(),
-      technology: $('project-technology').value.trim(),
-      made: $('project-made').value.trim(),
-      experiment: $('project-experiment').value.trim(),
-      next: $('project-next').value.trim(),
+      overview: overview,
+      build: build,
+      /* Keep the original gallery RPC compatible until older projects age out. */
+      oneLiner: overview,
+      inspiration: overview,
+      solution: '',
+      interesting: '',
+      technology: build,
+      made: '',
+      experiment: '',
+      next: '',
       demo: $('project-demo').value.trim(),
       video: $('project-video').value.trim(),
       source: $('project-source').value.trim(),
@@ -81,8 +86,8 @@
     return text ? text.split(/\s+/).length : 0;
   }
   function updateSubmissionGuidance() {
-    var overview = wordCount(['project-one-liner','project-inspiration','project-solution','project-interesting'].map(function (id) { return $(id).value.trim(); }));
-    var build = wordCount(['project-technology','project-made','project-experiment','project-next'].map(function (id) { return $(id).value.trim(); }));
+    var overview = wordCount([$('project-overview').value.trim()]);
+    var build = wordCount([$('project-build').value.trim()]);
     var tracks = selectedTracks();
     $('overview-count').textContent = overview + ' / 100 words';
     $('build-count').textContent = build + ' / 100 words';
@@ -91,12 +96,11 @@
     $('culture-reflection-field').hidden = tracks.indexOf('Culture × Tech') === -1;
   }
   function validateReady(project, team) {
-    if (!project.name || !project.oneLiner || !project.inspiration || !project.solution || !project.interesting ||
-        !project.technology || !project.made || !project.experiment || !project.next ||
+    if (!project.name || !project.overview || !project.build ||
         !project.collaboration || !project.attribution || !team || !team.name) return 'Complete the required project and team fields before submitting.';
     if (!project.tracks.length || project.tracks.length > 2) return 'Choose one or two award tracks.';
-    if (wordCount([project.oneLiner, project.inspiration, project.solution, project.interesting]) > 100) return 'Keep the Project Overview within 100 words total.';
-    if (wordCount([project.technology, project.made, project.experiment, project.next]) > 100) return 'Keep The Build within 100 words total.';
+    if (wordCount([project.overview]) > 100) return 'Keep the Project Overview within 100 words.';
+    if (wordCount([project.build]) > 100) return 'Keep The Build within 100 words.';
     var links = [project.demo, project.video, project.source, project.prototype].filter(Boolean);
     for (var i = 0; i < links.length; i++) {
       try { if (!/^https?:$/.test(new URL(links[i]).protocol)) throw new Error(); }
@@ -167,9 +171,23 @@
   }
   function fillRemote(record) {
     var project = record.project || {};
-    ['name','oneLiner','inspiration','solution','interesting','technology','made','experiment','next','demo','video','source','prototype','supporting','designReflection','cultureReflection','collaboration','attribution'].forEach(function (key) {
+    var values = {
+      name: project.name || '',
+      overview: project.overview || [project.oneLiner, project.inspiration, project.solution, project.interesting].filter(Boolean).join('\n\n'),
+      build: project.build || [project.technology, project.made, project.experiment, project.next].filter(Boolean).join('\n\n'),
+      demo: project.demo || '',
+      video: project.video || '',
+      source: project.source || '',
+      prototype: project.prototype || '',
+      supporting: project.supporting || '',
+      designReflection: project.designReflection || '',
+      cultureReflection: project.cultureReflection || '',
+      collaboration: project.collaboration || '',
+      attribution: project.attribution || ''
+    };
+    Object.keys(values).forEach(function (key) {
       var input = $('project-' + key.replace(/[A-Z]/g, function (letter) { return '-' + letter.toLowerCase(); }));
-      if (input) input.value = project[key] || '';
+      if (input) input.value = values[key];
     });
     $('project-no-code').checked = !!project.noCode;
     document.querySelectorAll('input[name="project-track"]').forEach(function (input) { input.checked = Array.isArray(project.tracks) && project.tracks.indexOf(input.value) !== -1; });

@@ -46,7 +46,7 @@
 .project-gallery-card .gallery-team{font:11px var(--mono);color:var(--muted);text-transform:uppercase}
 .project-gallery-tracks,.project-gallery-links{display:flex;gap:8px;flex-wrap:wrap}
 .project-gallery-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--ink);border-radius:999px;background:var(--acid)}
-.project-gallery-one-liner{margin:0}
+.project-gallery-one-liner{margin:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
 .project-gallery-toggle{display:flex;justify-content:space-between;align-items:center;margin-top:4px;padding-top:12px;border-top:1px solid var(--line);font:10px var(--mono);text-transform:uppercase;letter-spacing:.04em}
 .project-gallery-toggle>span:last-child{font-size:16px;transition:transform .18s ease}
 .project-gallery-details[open] .project-gallery-toggle>span:last-child{transform:rotate(180deg)}
@@ -335,20 +335,16 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
         </fieldset>
 
         <fieldset class="field">
-          <legend>PROJECT OVERVIEW <small>100 words maximum across these four fields</small></legend>
-          <label class="field"><span>ONE-LINER *</span><input id="project-one-liner" maxlength="300"></label>
-          <label class="field"><span>PROBLEM OR INSPIRATION *</span><textarea id="project-inspiration" maxlength="1500"></textarea></label>
-          <label class="field"><span>THE SOLUTION *</span><textarea id="project-solution" maxlength="1500"></textarea></label>
-          <label class="field"><span>WHAT MAKES IT INTERESTING? *</span><textarea id="project-interesting" maxlength="1500"></textarea></label>
+          <legend>PROJECT OVERVIEW <small>One response · 100 words maximum</small></legend>
+          <p class="helper">In one answer, cover: one-liner · problem or inspiration · your solution · what makes it interesting.</p>
+          <label class="field"><span>YOUR PROJECT OVERVIEW *</span><textarea id="project-overview" maxlength="1500"></textarea></label>
           <p id="overview-count" class="helper" role="status">0 / 100 words</p>
         </fieldset>
 
         <fieldset class="field">
-          <legend>THE BUILD <small>100 words maximum across these four fields</small></legend>
-          <label class="field"><span>TECHNOLOGY USED *</span><textarea id="project-technology" maxlength="1500"></textarea></label>
-          <label class="field"><span>WHAT DID YOU MAKE? *</span><textarea id="project-made" maxlength="1500" placeholder="What works now: prototype, interactive demo, or functioning MVP?"></textarea></label>
-          <label class="field"><span>WHAT DID YOU EXPERIMENT WITH? *</span><textarea id="project-experiment" maxlength="1500"></textarea></label>
-          <label class="field"><span>WHAT WOULD YOU DO NEXT? *</span><textarea id="project-next" maxlength="1500"></textarea></label>
+          <legend>THE BUILD <small>One response · 100 words maximum</small></legend>
+          <p class="helper">In one answer, cover: technology used · what works now · what you experimented with · what you would do next.</p>
+          <label class="field"><span>YOUR BUILD *</span><textarea id="project-build" maxlength="1500" placeholder="What works now: prototype, interactive demo, or functioning MVP?"></textarea></label>
           <p id="build-count" class="helper" role="status">0 / 100 words</p>
         </fieldset>
 
@@ -409,11 +405,11 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-email-code"></script>
 <script src="./assets/data.js?v=20261011-main-navigation"></script>
-<script src="./assets/portal.js?v=20261011-email-code-8digit"></script>
+<script src="./assets/portal.js?v=20261011-single-answer-v1"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
-<script src="./assets/project-gallery.js?v=20261011-project-modal"></script>
+<script src="./assets/project-gallery.js?v=20261011-single-answer-v1"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261011-submit-action"></script>
+<script src="./assets/submission-sync.js?v=20261011-single-answer-v1"></script>
 </body>
 </html>

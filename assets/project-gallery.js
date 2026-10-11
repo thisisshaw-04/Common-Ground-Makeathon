@@ -59,6 +59,16 @@
     if (!value) return '';
     return '<div class="submission-detail"><strong>' + escape(label) + '</strong><p>' + escape(value) + '</p></div>';
   }
+  function projectOverview(row) {
+    var value = row.project_overview || '';
+    var legacyCombined = row.one_liner ? 'Inspiration: ' + row.one_liner : '';
+    return value === legacyCombined ? row.one_liner : (value || row.one_liner || '');
+  }
+  function projectBuild(row) {
+    var text = String(row.build_summary || '');
+    var isCombinedAnswer = row.one_liner && row.project_overview === 'Inspiration: ' + row.one_liner;
+    return isCombinedAnswer && text.indexOf('Technology: ') === 0 ? text.slice('Technology: '.length) : text;
+  }
   function link(label, value) {
     var href = safeHref(value);
     return href ? '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + escape(label) + ' ↗</a>' : '';
@@ -86,6 +96,8 @@
       var name = row.project_name || 'Untitled project';
       var team = row.team_name || 'Team';
       var oneLiner = row.one_liner || '';
+      var overview = projectOverview(row);
+      var build = projectBuild(row);
       var tracks = Array.isArray(row.tracks) ? row.tracks : [];
       var members = Array.isArray(row.team_members) ? row.team_members.filter(Boolean) : [];
       var links = [
@@ -95,8 +107,8 @@
         link('Prototype', row.prototype_url)
       ].filter(Boolean).join('');
       var expanded = detail('Team members', members.join(', ')) +
-        detail('Project overview', row.project_overview) +
-        detail('What the team built', row.build_summary) +
+        detail('Project overview', overview) +
+        detail('The build', build) +
         detail('Design × Tech reflection', row.design_reflection) +
         detail('Culture × Tech reflection', row.culture_reflection) +
         detail('Team & collaboration', row.team_collaboration) +
@@ -109,7 +121,7 @@
         (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
           return '<span>' + escape(track) + '</span>';
         }).join('') + '</div>' : '') +
-        (oneLiner ? '<p class="project-modal-one-liner">' + escape(oneLiner) + '</p>' : '') +
+        (oneLiner && oneLiner !== overview ? '<p class="project-modal-one-liner">' + escape(oneLiner) + '</p>' : '') +
         '<div class="project-modal-details">' + (expanded || '<p class="helper">No additional details were shared.</p>') + '</div>' +
         '</div>';
       return '<article class="project-gallery-card" id="project-' + escape(row.submission_id) + '" data-project-modal-card data-submission-id="' + escape(row.submission_id) +
