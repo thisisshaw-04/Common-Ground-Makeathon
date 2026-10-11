@@ -154,10 +154,10 @@
         detail('Culture × Tech reflection', row.culture_reflection) +
         detail('Team & collaboration', row.team_collaboration) +
         detail('AI & tool attribution', row.ai_attribution) +
-        detail('Supporting materials', row.supporting_materials) +
-        (links ? '<div class="project-gallery-links">' + links + '</div>' : '');
+        detail('Supporting materials', row.supporting_materials);
       var modalContent = '<div class="project-modal-project">' +
-        '<h2>' + escape(name) + '</h2>' +
+        '<div class="project-modal-title-row"><h2>' + escape(name) + '</h2>' +
+        (links ? '<div class="project-gallery-links">' + links + '</div>' : '') + '</div>' +
         '<p class="project-modal-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</p>' +
         awardMarkup(row) +
         (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
