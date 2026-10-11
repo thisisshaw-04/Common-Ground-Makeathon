@@ -13,12 +13,52 @@
   var votingOpen = false;
   var voteCount = 0;
   var votingStatusTimer = null;
+  var claimRefreshTimer = null;
   var $ = function (id) { return document.getElementById(id); };
   var escape = function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   function safeHref(value) { try { var url = new URL(value); return /^https?:$/.test(url.protocol) ? escape(url.href) : ''; } catch (_err) { return ''; } }
   function message(text, error) {
     $('inbox-message').textContent = text;
     $('inbox-message').classList.toggle('error', !!error);
+  }
+  var claimToolLabels = {openai:'OpenAI',figma:'Figma Make',mobbin:'Mobbin Pro'};
+  function toolClaimsMessage(text, isError) {
+    $('tool-claims-message').textContent = text || '';
+    $('tool-claims-message').classList.toggle('error', !!isError);
+  }
+  async function loadToolClaims() {
+    try {
+      var result = await client.rpc('get_tool_code_claims_admin');
+      if (result.error) throw result.error;
+      var summary = Object.create(null);
+      var claims = [];
+      (result.data || []).forEach(function (row) {
+        if (!claimToolLabels[row.tool]) return;
+        if (!summary[row.tool]) summary[row.tool] = {
+          total:Number(row.total_codes) || 0,
+          claimed:Number(row.claimed_count) || 0,
+          remaining:Number(row.remaining_count) || 0
+        };
+        if (row.claimant_email) claims.push(row);
+      });
+      var toolOrder = ['openai','figma','mobbin'];
+      $('tool-claims-summary').innerHTML = toolOrder.map(function (tool) {
+        var counts = summary[tool] || {total:0,claimed:0,remaining:0};
+        return '<div class="tool-claim-stat"><span class="eyebrow">' + escape(claimToolLabels[tool]) +
+          '</span><strong>' + escape(counts.claimed) + ' / ' + escape(counts.total) + ' claimed</strong>' +
+          '<small>' + escape(counts.remaining) + ' remaining</small></div>';
+      }).join('');
+      $('tool-claims-rows').innerHTML = claims.length ? claims.map(function (row) {
+        var timestamp = row.claimed_at ? new Date(row.claimed_at).toLocaleString() : '—';
+        return '<tr><td>' + escape(claimToolLabels[row.tool]) + '</td><td>' +
+          escape(row.claimant_email) + '</td><td>' + escape(timestamp) + '</td></tr>';
+      }).join('') : '<tr><td colspan="3">No promo codes have been claimed yet.</td></tr>';
+      toolClaimsMessage('Updated just now. This list refreshes automatically every 30 seconds.');
+    } catch (_error) {
+      $('tool-claims-summary').innerHTML = '';
+      $('tool-claims-rows').innerHTML = '<tr><td colspan="3">Could not load claim records.</td></tr>';
+      toolClaimsMessage('Could not load claims. Check the database setup and try again.', true);
+    }
   }
   function render() {
     var status = $('inbox-filter').value;
@@ -235,6 +275,11 @@
     $('people-choice-results-button').hidden = votingOpen;
   }
 
+  $('tool-claims-refresh').addEventListener('click', async function () {
+    this.disabled = true;
+    await loadToolClaims();
+    this.disabled = false;
+  });
   $('judging-shortlist').addEventListener('click', autoSelectShortlist);
   $('people-choice-pause').addEventListener('click', async function () {
     this.disabled = true;
@@ -285,6 +330,10 @@
     $('inbox-list').hidden = false;
     render();
     await refreshPeopleChoice();
+    await loadToolClaims();
+    if (!claimRefreshTimer) claimRefreshTimer = window.setInterval(function () {
+      loadToolClaims();
+    }, 30000);
     if (!votingStatusTimer) votingStatusTimer = window.setInterval(function () {
       refreshPeopleChoice().catch(function () { /* Keep the last known status visible. */ });
     }, 15000);
