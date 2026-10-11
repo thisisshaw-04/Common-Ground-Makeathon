@@ -64,9 +64,10 @@
     var legacyCombined = row.one_liner ? 'Inspiration: ' + row.one_liner : '';
     return value === legacyCombined ? row.one_liner : (value || row.one_liner || '');
   }
-  function projectBuild(value) {
-    var text = String(value || '');
-    return text.indexOf('Technology: ') === 0 && text.indexOf('\n\n') === -1 ? text.slice('Technology: '.length) : text;
+  function projectBuild(row) {
+    var text = String(row.build_summary || '');
+    var isCombinedAnswer = row.one_liner && row.project_overview === 'Inspiration: ' + row.one_liner;
+    return isCombinedAnswer && text.indexOf('Technology: ') === 0 ? text.slice('Technology: '.length) : text;
   }
   function link(label, value) {
     var href = safeHref(value);
@@ -96,7 +97,7 @@
       var team = row.team_name || 'Team';
       var oneLiner = row.one_liner || '';
       var overview = projectOverview(row);
-      var build = projectBuild(row.build_summary);
+      var build = projectBuild(row);
       var tracks = Array.isArray(row.tracks) ? row.tracks : [];
       var members = Array.isArray(row.team_members) ? row.team_members.filter(Boolean) : [];
       var links = [
