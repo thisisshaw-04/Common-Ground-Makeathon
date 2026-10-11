@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="./assets/portal.css?v=20261011-main-navigation">
+<link rel="stylesheet" href="./assets/portal.css?v=20261011-submit-action">
 <link rel="stylesheet" href="./assets/identity.css?v=20261011-deck-style">
 <style>
 #submission-form fieldset{border:1px solid var(--ink);border-radius:14px;padding:18px;margin:22px 0;min-width:0}
@@ -75,6 +75,12 @@
 
 \n.project-gallery-card .submission-detail{margin-top:14px;padding-top:12px}\n.project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}\n.project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}\n
 
+/* Make the final submit action easy to find and confirm. */
+#project-ready{min-width:220px;min-height:54px;padding:14px 24px;background:var(--acid);border-color:var(--ink);color:var(--ink);font-weight:700;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
+#project-ready:hover:not(:disabled){background:#ffe36d;transform:translateY(-2px);box-shadow:0 4px 0 var(--ink)}
+#project-ready:active:not(:disabled){transform:translateY(0);box-shadow:0 1px 0 var(--ink)}
+#project-ready:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+#project-ready:disabled{opacity:.65;cursor:wait;transform:none;box-shadow:none}
 /* Make the primary submission tab easy to spot. */
 #main-nav #nav-choice{min-height:52px;padding:10px 24px;border:1px solid var(--ink);border-radius:999px;background:var(--acid);color:var(--ink);font-size:clamp(15px,1.4vw,19px);font-weight:700}
 #main-nav #nav-choice:hover,#main-nav #nav-choice[aria-selected="true"]{background:var(--acid);border-color:var(--ink)}
@@ -339,7 +345,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
         <label class="field"><span>TEAM & COLLABORATION *</span><textarea id="project-collaboration" maxlength="3000" placeholder="How did different skills, disciplines, or perspectives come together? What did you discover by working together?"></textarea></label>
         <label class="field"><span>AI & TOOL ATTRIBUTION *</span><textarea id="project-attribution" maxlength="3000" placeholder="List AI tools, models, external resources, and third-party assets, datasets, or references—and what you used them for. Write “None” if not applicable."></textarea></label>
         <p class="helper">A thoughtful one-day prototype can score higher than a technically complex project. Focus on what you explored, built, and learned.</p>
-        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Submit final entry</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
+        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn btn-primary" type="button" id="project-ready">Submit final entry</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
         <p class="helper">Save drafts as you build. Only one teammate should submit the team’s final entry by the submission deadline.</p>
         <p id="submission-feedback" class="helper" role="status"></p>
       </form>
@@ -380,6 +386,6 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/project-gallery.js?v=20261011-public-gallery"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261011-auth-return"></script>
+<script src="./assets/submission-sync.js?v=20261011-submit-action"></script>
 </body>
 </html>
