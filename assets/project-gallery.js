@@ -35,6 +35,17 @@
       return /^[\w-]{6,}$/.test(id) ? 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg' : '';
     } catch (_err) { return ''; }
   }
+  function driveThumbnail(value) {
+    try {
+      var url = new URL(value);
+      if (url.hostname.toLowerCase().replace(/^www\\./, '') !== 'drive.google.com') return '';
+      var match = url.pathname.match(/^\\/file\\/d\\/([A-Za-z0-9_-]+)/);
+      var id = match ? match[1] : (url.pathname === '/uc' ? url.searchParams.get('id') : '');
+      return id && /^[A-Za-z0-9_-]+$/.test(id)
+        ? 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w1200'
+        : '';
+    } catch (_err) { return ''; }
+  }
   function previewImage(row) {
     var direct = row.preview_image_url || row.preview_image || row.previewImage;
     var image = safeHref(direct);
@@ -42,9 +53,22 @@
     var candidates = [row.demo_url, row.video_url];
     for (var i = 0; i < candidates.length; i++) {
       var candidate = safeHref(candidates[i]);
-      if (candidate && /\.(?:png|jpe?g|gif|webp|avif)(?:$|[?#])/i.test(candidate)) return candidate;
+      if (candidate && /\\.(?:png|jpe?g|gif|webp|avif)(?:$|[?#])/i.test(candidate)) return candidate;
     }
-    return youtubeThumbnail(row.video_url || '');
+    var videoSources = [row.video_url, row.demo_url, row.prototype_url];
+    for (var j = 0; j < videoSources.length; j++) {
+      var youtube = youtubeThumbnail(videoSources[j] || '');
+      if (youtube) return youtube;
+    }
+    for (var k = 0; k < videoSources.length; k++) {
+      var drive = driveThumbnail(videoSources[k] || '');
+      if (drive) return drive;
+    }
+    // Use the submitted still itself, not the ad-heavy Postimages share page.
+    if (row.video_url === 'https://postimg.cc/T5dgFgYY') {
+      return 'https://i.postimg.cc/cxkbbDTD/Whats-App-Image-2026-10-11-at-15-35-37.jpg';
+    }
+    return '';
   }
   function previewMarkup(row, name, oneLiner) {
     var image = previewImage(row);
