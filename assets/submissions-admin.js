@@ -14,6 +14,7 @@
   var voteCount = 0;
   var votingStatusTimer = null;
   var claimRefreshTimer = null;
+  var submissionRefreshTimer = null;
   var $ = function (id) { return document.getElementById(id); };
   var escape = function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   function safeHref(value) { try { var url = new URL(value); return /^https?:$/.test(url.protocol) ? escape(url.href) : ''; } catch (_err) { return ''; } }
@@ -317,15 +318,18 @@
     }
   });
 
-  async function loadInbox() {
-    if (!client) { message('Supabase is not configured on this site.', true); return; }
-    message('Loading submissions…');
+  async function refreshSubmissionRows() {
     var result = await client.from('submissions')
       .select('id,event_id,owner_email,status,project,team,created_at,updated_at')
       .eq('event_id', 'common-ground-2026-10-11')
       .order('updated_at', { ascending: false });
     if (result.error) throw result.error;
     allRows = result.data || [];
+  }
+  async function loadInbox() {
+    if (!client) { message('Supabase is not configured on this site.', true); return; }
+    message('Loading submissions…');
+    await refreshSubmissionRows();
     await loadJudgeScores();
     $('inbox-list').hidden = false;
     render();
@@ -336,6 +340,10 @@
     }, 30000);
     if (!votingStatusTimer) votingStatusTimer = window.setInterval(function () {
       refreshPeopleChoice().catch(function () { /* Keep the last known status visible. */ });
+    }, 15000);
+    if (!submissionRefreshTimer) submissionRefreshTimer = window.setInterval(function () {
+      if (document.hidden || $('inbox-cards').contains(document.activeElement)) return;
+      refreshSubmissionRows().then(render).catch(function () { /* Keep the last loaded organiser view visible. */ });
     }, 15000);
     message('Loaded the latest submissions and voting status.');
   }
