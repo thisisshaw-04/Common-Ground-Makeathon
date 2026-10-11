@@ -23,12 +23,12 @@ begin
       raise exception 'Expected voting function is missing: %', v_signature;
     end if;
     select pg_catalog.pg_get_functiondef(v_function) into v_definition;
-    if pg_catalog.position(v_old_open in v_definition) = 0
-       and pg_catalog.position(v_new_open in v_definition) = 0 then
+    if pg_catalog.strpos(v_definition, v_old_open) = 0
+       and pg_catalog.strpos(v_definition, v_new_open) = 0 then
       raise exception 'Unexpected voting start time in %', v_signature;
     end if;
-    if pg_catalog.position(v_old_close in v_definition) = 0
-       and pg_catalog.position(v_new_close in v_definition) = 0 then
+    if pg_catalog.strpos(v_definition, v_old_close) = 0
+       and pg_catalog.strpos(v_definition, v_new_close) = 0 then
       raise exception 'Unexpected voting end time in %', v_signature;
     end if;
     v_definition := pg_catalog.replace(v_definition, v_old_open, v_new_open);
