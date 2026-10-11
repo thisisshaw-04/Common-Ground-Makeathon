@@ -293,7 +293,7 @@
   $('inbox-code-form').addEventListener('submit', async function (event) {
     event.preventDefault();
     var email = $('inbox-email').value.trim().toLowerCase();
-    var token = $('inbox-code').value.replace(/\\D/g, '');
+    var token = $('inbox-code').value.replace(/\D/g, '');
     var submit = $('inbox-code-form').querySelector('button[type="submit"]');
     submit.disabled = true;
     message('Verifying your code…');
