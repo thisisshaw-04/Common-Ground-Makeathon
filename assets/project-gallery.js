@@ -87,14 +87,23 @@
     '42d8f39b-0c16-4fd5-8493-c37afeb808fc': 'Best Use of Tech',
     'f690e28f-9605-4047-952d-c3ce5c49a619': 'Best Common Ground'
   };
+  var FINALIST_BY_PROJECT = {
+    'common heritage': true,
+    'saami': true,
+    'preReads: search. plan. read.'.toLowerCase(): true,
+    'you & ai': true
+  };
 
   function awardMarkup(row) {
     var award = AWARD_BY_SUBMISSION[String(row.submission_id || '')];
-    if (!award) return '';
-    return '<div class="project-award-badge" aria-label="Final award winner: ' + escape(award) + '">' +
-      '<span class="project-award-kicker">FINAL AWARD WINNER</span>' +
-      '<strong>' + escape(award) + '</strong>' +
-      '</div>';
+    if (award) {
+      return '<div class="project-award-badge" aria-label="' + escape(award) + '">' +
+        '<strong>' + escape(award) + '</strong>' +
+        '</div>';
+    }
+    var projectName = String(row.project_name || '').trim().toLowerCase();
+    if (!FINALIST_BY_PROJECT[projectName]) return '';
+    return '<div class="project-award-badge" aria-label="Finalist"><strong>Finalist</strong></div>';
   }
   function detail(label, value) {
     if (!value) return '';
