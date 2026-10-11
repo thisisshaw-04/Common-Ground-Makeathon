@@ -239,6 +239,7 @@
   function setGateStatus(message) {
     $('gate-status').textContent = message || '';
   }
+  var pendingCodeEmail = '';
 
   function clearBuilderAccess() {
     current = null;
@@ -472,10 +473,60 @@
     }
     try {
       await auth.signIn(value);
-      setGateStatus('If this is your approved email, check your inbox and spam folder. Open the newest link in this browser; your access will appear here.');
+      pendingCodeEmail = value;
+      $('email').readOnly = true;
+      $('gate-form').hidden = true;
+      $('gate-code-form').hidden = false;
+      $('gate-change-email').hidden = false;
+      $('email-code').value = '';
+      setGateStatus('Check your inbox and spam folder for the sign-in code. Enter the newest six-digit code below.');
+      $('email-code').focus();
     } catch (_err) {
       showError(window.CGSubmission.signInErrorMessage(_err));
     }
+  });
+
+  $('gate-code-form').addEventListener('submit', async function (ev) {
+    ev.preventDefault();
+    clearError();
+    var code = $('email-code').value.trim().replace(/\\D/g, '');
+    if (!pendingCodeEmail) {
+      showError('Request a sign-in code first, then enter the newest six-digit code.');
+      return;
+    }
+    if (!/^\\d{6}$/.test(code)) {
+      showError('Enter the six-digit code from your newest email.');
+      return;
+    }
+    var button = $('gate-code-form').querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      var verified = await window.CGSubmission.verifyEmailCode(pendingCodeEmail, code);
+      $('gate-code-form').hidden = true;
+      $('gate-change-email').hidden = true;
+      setGateStatus('Code verified. Checking your event access…');
+      await handlePortalSession(verified.session || window.CGSubmission.getSession());
+    } catch (_err) {
+      $('email-code').value = '';
+      showError('That code is invalid, expired, or already used. Request a fresh code and enter the newest one.');
+    } finally {
+      button.disabled = false;
+    }
+  });
+  $('email-code').addEventListener('input', function () {
+    this.value = this.value.replace(/\\D/g, '').slice(0, 6);
+    clearError();
+  });
+  $('gate-change-email').addEventListener('click', function () {
+    pendingCodeEmail = '';
+    $('email').readOnly = false;
+    $('gate-form').hidden = false;
+    $('gate-code-form').hidden = true;
+    $('gate-change-email').hidden = true;
+    $('email-code').value = '';
+    clearError();
+    setGateStatus('');
+    $('email').focus();
   });
 
   function updateGateEventLink() {
