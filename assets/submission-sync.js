@@ -107,8 +107,6 @@
       try { if (!/^https?:$/.test(new URL(links[i]).protocol)) throw new Error(); }
       catch (_err) { return 'Use complete http:// or https:// URLs for project links.'; }
     }
-    if (!(project.demo || project.video)) return 'Add a live demo or a demo video so judges can experience the project.';
-    if (!project.noCode && !project.source) return 'Add a GitHub/source code link, or mark that the project is not based on code.';
     return '';
   }
   async function checkEligibility(user) {
