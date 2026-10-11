@@ -25,7 +25,7 @@ begin
     inventory_summary.total_codes,
     inventory_summary.claimed_count,
     inventory_summary.total_codes - inventory_summary.claimed_count,
-    user_record.email::text,
+    user_record.email,
     tool_claim.claimed_at
   from (
     select
