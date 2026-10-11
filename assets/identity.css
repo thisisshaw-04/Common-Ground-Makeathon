@@ -57,6 +57,14 @@ footer { padding-inline:clamp(20px,5vw,76px); color:#555; border-color:var(--ink
 .section-head .eyebrow { display:inline-flex; align-items:center; min-height:30px; padding:5px 13px; border:1px solid var(--ink); border-radius:999px; color:var(--ink); }
 .intro-grid,.perks { background:transparent; border:0; gap:14px; }
 .tool-claim-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; align-items:stretch; }
+.tool-claim-grid .perk { padding:clamp(24px,2.5vw,34px); }
+.tool-claim-grid .perk-head { align-items:flex-start; gap:16px; }
+.tool-claim-grid .perk-head h3 { line-height:1.15; }
+.tool-claim-grid .perk-kind { margin-top:10px; line-height:1.6; }
+.tool-claim-grid .perk > p:first-of-type { min-height:3.5em; margin-top:22px; line-height:1.75; }
+.tool-claim-grid .perk > button[data-tool-claim] { width:100%; margin-top:20px; align-self:stretch; }
+.tool-claim-grid .perk > .helper:empty { display:none; }
+.tool-claim-grid .perk > .helper:not(:empty) { margin-top:12px; }
 .intro-card,.perk { background:#fff; border:1px solid var(--ink); border-radius:14px; padding:clamp(22px,3vw,34px); }
 .intro-card .idx,.sched-row time { color:#111; }
 .intro-card .idx { display:inline-flex; border:1px solid var(--ink); border-radius:999px; padding:4px 9px; }
@@ -129,6 +137,7 @@ body.admin-page .finalist-option { border-color:var(--ink); border-radius:10px; 
 body.admin-page .finalist-option input { accent-color:var(--acid); }
 body.admin-page .judge-score-grid select,body.admin-page .judge-score-block textarea { border-color:var(--ink); border-radius:10px; }
 @media(max-width:760px) {
+  .tool-claim-grid .perk > p:first-of-type { min-height:0; }
   .tool-claim-grid { grid-template-columns:1fr; }
   .topbar { height:64px; }
   .hero { grid-template-columns:1fr; min-height:calc(100svh - 120px); padding-block:58px; }
