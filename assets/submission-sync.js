@@ -24,6 +24,31 @@
     try { return JSON.parse(localStorage.getItem('cg-project-draft-v1:' + email) || 'null'); }
     catch (_err) { return null; }
   }
+  function formTeam(email) {
+    var participant = window.CGBuilderParticipant || {};
+    var members = [];
+    var seen = [email];
+    var issue = '';
+    document.querySelectorAll('.team-member').forEach(function (row) {
+      var name = row.querySelector('.member-name').value.trim();
+      var memberEmail = row.querySelector('.member-email').value.trim().toLowerCase();
+      if (!name && !memberEmail) return;
+      if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(memberEmail)) {
+        issue = 'Enter a name and valid email for each teammate.';
+        return;
+      }
+      if (seen.indexOf(memberEmail) !== -1) {
+        issue = 'Each email must be unique. You are already included as the team contact.';
+        return;
+      }
+      seen.push(memberEmail);
+      members.push({name:name,email:memberEmail});
+    });
+    return {
+      team:{name:$('team-name').value.trim(),contact:{name:participant.name || '',email:email},members:members},
+      issue:issue
+    };
+  }
   function selectedTracks() {
     return Array.prototype.slice.call(document.querySelectorAll('input[name="project-track"]:checked')).map(function (input) { return input.value; });
   }
@@ -105,16 +130,22 @@
       showStatus('This email is not on the builder list enabled for submissions. Contact an organiser.', true);
       return false;
     }
-    var savedTeam = readTeam(email);
-    var team = savedTeam || { name: $('team-name').value.trim(), members: [] };
+    var teamResult = formTeam(email);
+    var team = teamResult.team;
     var project = formProject();
-    if (status === 'ready' && !savedTeam) {
-      showStatus('Save your team draft before marking the project ready.', true);
-      return false;
-    }
     if (status === 'ready') {
+      if (teamResult.issue) {
+        showStatus(teamResult.issue, true);
+        $('submission-feedback').textContent = teamResult.issue;
+        return false;
+      }
       var issue = validateReady(project, team);
-      if (issue) { showStatus(issue, true); return false; }
+      if (issue) {
+        showStatus(issue, true);
+        $('submission-feedback').textContent = issue;
+        return false;
+      }
+      try { localStorage.setItem('cg-team-draft-v1:' + email, JSON.stringify(team)); } catch (_err) { /* The central submission remains authoritative. */ }
     }
     var result = await client.from('submissions').upsert({
       event_id: EVENT_ID,
@@ -130,8 +161,8 @@
       return false;
     }
     if (result.error) throw result.error;
-    showStatus(status === 'ready' ? 'Submission marked ready and saved for the organisers.' : 'Draft saved centrally for the organisers.');
-    $('submission-feedback').textContent = status === 'ready' ? 'Submission saved centrally and marked ready.' : 'Draft saved centrally. You can return to edit it.';
+    showStatus(status === 'ready' ? 'Submitted. Organisers can see your entry now; it appears in the public gallery when submissions close at 3:15 PM SGT.' : 'Draft saved centrally for the organisers.');
+    $('submission-feedback').textContent = status === 'ready' ? 'Your final entry is saved for the organisers.' : 'Draft saved centrally. You can return to edit it.';
     return true;
   }
   function fillRemote(record) {
@@ -260,8 +291,26 @@
   $('submission-form').addEventListener('submit', function () {
     window.setTimeout(function () { syncDraft('draft').catch(function () { showStatus('Could not save centrally. Check the Supabase setup and try again.', true); }); }, 0);
   });
-  $('project-ready').addEventListener('click', function () {
-    window.setTimeout(function () { syncDraft('ready').catch(function () { showStatus('Could not mark ready centrally. Check the Supabase setup and try again.', true); }); }, 0);
+  var readyButton = $('project-ready');
+  var readyBusy = false;
+  readyButton.addEventListener('click', async function () {
+    if (readyBusy) return;
+    readyBusy = true;
+    readyButton.disabled = true;
+    readyButton.setAttribute('aria-busy', 'true');
+    readyButton.textContent = 'Submitting…';
+    $('submission-feedback').textContent = 'Sending your final entry to the organisers…';
+    try {
+      await syncDraft('ready');
+    } catch (_err) {
+      showStatus('Could not submit right now. Your draft remains saved on this device. Please try again.', true);
+      $('submission-feedback').textContent = 'Could not submit. Your draft remains saved on this device; try again.';
+    } finally {
+      readyBusy = false;
+      readyButton.disabled = false;
+      readyButton.removeAttribute('aria-busy');
+      readyButton.textContent = 'Submit final entry';
+    }
   });
 
   document.addEventListener('cg-submission-auth', function (event) { syncAuth(event.detail && event.detail.session); });
