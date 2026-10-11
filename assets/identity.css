@@ -74,7 +74,8 @@ footer { padding-inline:clamp(20px,5vw,76px); color:#555; border-color:var(--ink
 .sched-row span { color:#333; }
 
 /* The schedule gets a full yellow panel, like the deck’s day map. */
-#weekend { background:var(--acid); padding:clamp(32px,5vw,64px); margin-inline:calc(clamp(20px,5vw,76px) * -1); border-block:1px solid var(--ink); }
+#weekend { position:relative; isolation:isolate; background:transparent; padding:clamp(32px,5vw,64px); margin-inline:calc(clamp(20px,5vw,76px) * -1); border:0; }
+#weekend::before { content:""; position:absolute; z-index:-1; inset:0 calc(50% - 50vw); background:var(--acid); border-block:1px solid var(--ink); pointer-events:none; }
 #weekend .section-head .eyebrow { background:#fff; }
 #weekend .schedule { border-color:var(--ink); }
 #weekend .sched-row { border-color:var(--ink); }
