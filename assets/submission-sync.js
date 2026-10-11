@@ -100,6 +100,7 @@
     if (!project.name || !project.overview || !project.build ||
         !project.collaboration || !project.attribution || !team || !team.name) return 'Complete the required project and team fields before submitting.';
     if (!project.tracks.length || project.tracks.length > 2) return 'Choose one or two award tracks.';
+    if (!project.video) return 'Add a demo video link (2 minutes or less) before submitting.';
     if (wordCount([project.overview]) > 100) return 'Keep the Project Overview within 100 words.';
     if (wordCount([project.build]) > 100) return 'Keep The Build within 100 words.';
     var links = [project.demo, project.video, project.source, project.prototype].filter(Boolean);
