@@ -148,8 +148,6 @@
       var record = {
         submission_id: submissionId,
         judge_id: currentJudgeId,
-        judge_name: currentJudgeName,
-        judge_email: currentJudgeEmail,
         concept: values.concept,
         track_fit: values.track_fit,
         execution: values.execution,
@@ -162,7 +160,7 @@
       allScores = allScores.filter(function (score) {
         return !(score.submission_id === submissionId && score.judge_id === currentJudgeId);
       });
-      allScores.push(record);
+      allScores.push(Object.assign({}, record, {judge_name:currentJudgeName, judge_email:currentJudgeEmail}));
       setJudgingMessage('Your scores are saved. ' + (averageScore(submissionId).toFixed(1)) + ' / 20 average across all judges.');
       render();
     } catch (error) {
