@@ -347,3 +347,28 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .team-member legend{font-size:13px;padding:0 8px}
 .team-actions{margin-top:24px}
 @media(max-width:700px){.team-section{padding:22px}.team-section h2{font-size:25px}.team-member{padding:14px}}
+
+
+/* Main navigation */
+.topbar{position:sticky;top:0;z-index:30;height:auto;min-height:82px;display:flex;align-items:center;justify-content:space-between;gap:36px;background:var(--paper);border-bottom:1px solid var(--line)}
+#main-nav.portal-nav{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:clamp(16px,2.4vw,36px);border:0;padding:0;font-size:15px}
+#main-nav .portal-tab{appearance:none;display:inline-flex;align-items:center;justify-content:flex-start;gap:0;min-height:44px;padding:6px 0;border:0;background:transparent;color:var(--ink);font:400 clamp(13px,1.25vw,17px) var(--display);text-align:left;white-space:nowrap;cursor:pointer}
+#main-nav .portal-tab:hover,#main-nav .portal-tab.active{background:transparent;border-color:transparent;color:var(--ink)}
+#main-nav .portal-tab[aria-selected="true"]{font-weight:700}
+#main-nav .portal-tab[data-panel-select="access"] span{margin-left:8px;color:#b51e18;font:700 21px/1 var(--display);transition:transform .2s ease}
+#main-nav .portal-tab[data-panel-select="access"][aria-selected="true"] span{transform:translate(2px,-2px)}
+#main-nav .portal-tab:focus-visible{outline:2px solid #b51e18;outline-offset:6px}
+.portal-panel[hidden]{display:none!important}
+@media(max-width:850px){
+  .topbar{display:grid;grid-template-columns:1fr;gap:8px;padding:12px 24px 0}
+  #main-nav.portal-nav{width:100%;justify-content:flex-start;gap:clamp(20px,5vw,38px);overflow-x:auto;padding:0 0 11px;scrollbar-width:none}
+  #main-nav.portal-nav::-webkit-scrollbar{display:none}
+}
+@media(max-width:700px){
+  .topbar{min-height:0;padding:13px 20px 0;gap:7px}
+  #main-nav.portal-nav{gap:24px;padding-bottom:10px}
+  #main-nav .portal-tab{min-height:38px;font-size:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  #main-nav .portal-tab[data-panel-select="access"] span{transition:none}
+}
