@@ -71,7 +71,19 @@
 .gallery-refresh{margin:0 0 18px}
 @media(max-width:700px){.portal-tabs{grid-template-columns:1fr;position:static}.portal-tab{min-height:46px}.event-countdown{text-align:left}.timeline-labels span{font-size:8px}.event-timeline{padding-left:0;padding-right:0}}
 @media(prefers-reduced-motion:reduce){.timeline-fill,.timeline-cursor{transition:none}}
-\n.project-gallery-card .submission-detail{margin-top:14px;padding-top:12px}\n.project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}\n.project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}\n</style>
+\n.project-gallery-card .submission-detail{margin-top:14px;padding-top:12px}\n.project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}\n.project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}\n
+/* Full-bleed cover; keep the home footer in the first desktop view. */
+body.builder-page{overflow-x:clip}
+body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw)}
+@media(min-width:981px){
+  body.builder-page{min-height:100svh;display:flex;flex-direction:column}
+  body.builder-page>.topbar{flex:0 0 auto}
+  body.builder-page>#main-content{width:100%;flex:1 1 auto;display:flex;flex-direction:column;min-height:0}
+  body.builder-page #panel-overview{display:flex;flex:1 1 auto;flex-direction:column;min-height:0}
+  body.builder-page #panel-overview .hero{flex:1 1 auto;min-height:0;padding-block:clamp(30px,4vh,52px)}
+  body.builder-page>footer{flex:0 0 auto;width:100%;margin:0 auto;padding-block:clamp(12px,1.8vh,20px)}
+}
+</style>
 </head>
 <body class="builder-page">
 <a class="skip-link" href="#main-content">Skip to content</a>
