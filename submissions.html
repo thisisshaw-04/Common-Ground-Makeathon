@@ -98,7 +98,15 @@
     <div class="inbox-auth" id="inbox-auth">
       <form id="inbox-login">
         <label class="field"><span>ORGANISER EMAIL</span><input id="inbox-email" type="email" autocomplete="email" required></label>
-        <button class="btn btn-primary" type="submit">Email me a sign-in link</button>
+        <button class="btn btn-primary" type="submit">Email me an 8-digit code</button>
+      </form>
+      <form id="inbox-code-form" hidden>
+        <label class="field"><span>8-DIGIT EMAIL CODE</span><input id="inbox-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" maxlength="8" minlength="8" placeholder="00000000" required></label>
+        <button class="btn btn-primary" type="submit">Verify code</button>
+        <div class="people-choice-actions">
+          <button class="btn btn-sm" id="inbox-resend" type="button">Send a new code</button>
+          <button class="btn btn-sm" id="inbox-change-email" type="button">Use another email</button>
+        </div>
       </form>
       <p id="inbox-message" class="helper" role="status">Only emails listed in the Supabase organisers table can see submissions.</p>
       <button class="btn btn-sm" id="inbox-signout" type="button" hidden>Sign out</button>
@@ -154,6 +162,6 @@
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-auth-return"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
-<script src="./assets/submissions-admin.js?v=20261011-project-modal"></script>
+<script src="./assets/submissions-admin.js?v=20261012-organiser-otp"></script>
 </body>
 </html>
