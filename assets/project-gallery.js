@@ -68,9 +68,11 @@
     if (!projectId) return;
     var card = document.getElementById('project-' + projectId);
     if (!card) return;
-    var details = card.querySelector('details');
-    if (details) details.open = true;
-    window.setTimeout(function () { card.scrollIntoView({behavior:'smooth',block:'center'}); }, 100);
+    var trigger = card.querySelector('[data-project-modal-open]');
+    window.setTimeout(function () {
+      card.scrollIntoView({behavior:'smooth',block:'center'});
+      if (trigger) trigger.click();
+    }, 100);
   }
   function render(rows) {
     if (!rows.length) {
@@ -101,9 +103,18 @@
         detail('AI & tool attribution', row.ai_attribution) +
         detail('Supporting materials', row.supporting_materials) +
         (links ? '<div class="project-gallery-links">' + links + '</div>' : '');
-      return '<article class="project-gallery-card" id="project-' + escape(row.submission_id) + '" data-submission-id="' + escape(row.submission_id) +
+      var modalContent = '<div class="project-modal-project">' +
+        '<h2>' + escape(name) + '</h2>' +
+        '<p class="project-modal-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</p>' +
+        (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
+          return '<span>' + escape(track) + '</span>';
+        }).join('') + '</div>' : '') +
+        (oneLiner ? '<p class="project-modal-one-liner">' + escape(oneLiner) + '</p>' : '') +
+        '<div class="project-modal-details">' + (expanded || '<p class="helper">No additional details were shared.</p>') + '</div>' +
+        '</div>';
+      return '<article class="project-gallery-card" id="project-' + escape(row.submission_id) + '" data-project-modal-card data-submission-id="' + escape(row.submission_id) +
         '" data-is-my-team="' + (row.is_my_team ? 'true' : 'false') + '">' +
-        '<details class="project-gallery-details"><summary>' +
+        '<button class="project-modal-trigger project-gallery-trigger" type="button" data-project-modal-open aria-haspopup="dialog">' +
         previewMarkup(row, name, oneLiner) +
         '<div class="project-gallery-copy">' +
         '<span class="gallery-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</span>' +
@@ -112,10 +123,9 @@
           return '<span>' + escape(track) + '</span>';
         }).join('') + '</div>' : '') +
         (oneLiner ? '<p class="project-gallery-one-liner">' + escape(oneLiner) + '</p>' : '') +
-        '<span class="project-gallery-toggle"><span>View project details</span><span aria-hidden="true">↘</span></span>' +
-        '</div></summary><div class="project-gallery-expanded">' +
-        (expanded || '<p class="helper">No additional details were shared.</p>') +
-        '</div></details></article>';
+        '<span class="project-gallery-toggle"><span>View project details</span><span aria-hidden="true">↗</span></span>' +
+        '</div></button>' +
+        '<template data-project-modal-content>' + modalContent + '</template></article>';
     }).join('');
     focusRequestedProject();
     document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:rows}}));
