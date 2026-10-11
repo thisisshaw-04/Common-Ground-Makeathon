@@ -78,9 +78,7 @@
     var image = previewImage(row);
     return '<div class="project-gallery-preview' + (image ? ' has-image' : '') + '">' +
       (image ? '<img src="' + image + '" alt="' + escape(name) + ' project preview" loading="lazy" referrerpolicy="no-referrer">' : '') +
-      '<span class="preview-kicker">COMMON GROUND / PROJECT</span>' +
       (!image ? '<strong>' + escape(name) + '</strong>' : '') +
-      '<span class="preview-caption">' + escape(image ? 'A look inside the project' : (oneLiner || 'Open the project details to see what the team made.')) + '</span>' +
       '</div>';
   }
   var AWARD_BY_SUBMISSION = {
