@@ -134,12 +134,12 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
     <div class="gate-inner">
       <span class="eyebrow">YOUR ACCESS</span>
       <h2 id="gate-title">Sign in for your partner offers.</h2>
-      <p>Use the email you registered with. We’ll send a one-time sign-in code to that inbox. Any email provider works.</p>
+      <p>Use the email you registered with. We’ll send a one-time sign-in email to that inbox. Any email provider works.</p>
       <form class="gate-form" id="gate-form" novalidate>
         <label for="email">Your registration email</label>
         <input type="email" id="email" name="email" placeholder="you@example.com"
                autocomplete="email" inputmode="email" spellcheck="false" aria-describedby="gate-hint gate-error" required>
-        <button type="submit">Email me a sign-in code <span aria-hidden="true">→</span></button>
+        <button type="submit">Send sign-in email <span aria-hidden="true">→</span></button>
       </form>
       <form class="gate-form" id="gate-code-form" hidden novalidate><label for="email-code">Six-digit sign-in code</label><input type="text" id="email-code" name="token" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" aria-describedby="gate-code-hint" required><button type="submit">Verify code <span aria-hidden="true">→</span></button><p class="gate-hint" id="gate-code-hint">Enter the six-digit code from your email. Keep this page open.</p></form><button class="text-link" id="gate-change-email" type="button" hidden>Use a different email</button><p class="gate-hint" id="gate-hint">After sign-in, claim partner offers and save your team’s project submission.</p>
       <p class="gate-luma" id="gate-luma" hidden>Event details: <a href="https://luma.com/yjffwqr2" target="_blank" rel="noopener noreferrer">Common Ground on Luma ↗</a></p>
