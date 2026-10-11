@@ -59,6 +59,21 @@
 .judge-score-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
 .judge-score-summary{font:11px var(--mono);color:var(--muted)}
 #judging-message.error{color:#a22222}
+.tool-claims-admin{border:1px solid var(--ink);border-radius:16px;padding:20px;margin:24px 0;background:#fff}
+.tool-claims-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.tool-claims-admin h2{font-size:23px;letter-spacing:-.04em;margin:8px 0}
+.tool-claims-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:18px 0}
+.tool-claim-stat{display:grid;gap:6px;border:1px solid var(--line-hard);border-radius:12px;padding:14px;background:var(--paper)}
+.tool-claim-stat strong{font-size:18px;letter-spacing:-.03em}
+.tool-claim-stat small{font:11px var(--mono);color:var(--muted)}
+.tool-claims-table-wrap{overflow-x:auto;border:1px solid var(--line-hard);border-radius:12px}
+.tool-claims-table{width:100%;min-width:520px;border-collapse:collapse;text-align:left}
+.tool-claims-table th,.tool-claims-table td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.tool-claims-table th{font:10px var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.tool-claims-table td{font-size:13px;overflow-wrap:anywhere}
+.tool-claims-table tbody tr:last-child td{border-bottom:0}
+#tool-claims-message.error{color:#a22222}
+@media(max-width:620px){.tool-claims-admin{padding:16px}.tool-claims-summary{grid-template-columns:1fr}.tool-claims-heading{align-items:flex-start}}
 </style>
 </head>
 <body class="admin-page">
@@ -93,6 +108,24 @@
         <button class="btn" id="inbox-refresh" type="button">Refresh</button>
         <button class="btn" id="inbox-export" type="button">Download Excel</button>
       </div>
+      <section class="tool-claims-admin" aria-labelledby="tool-claims-title">
+        <div class="tool-claims-heading">
+          <div>
+            <span class="eyebrow">PARTNER ACCESS</span>
+            <h2 id="tool-claims-title">Promo code claims</h2>
+          </div>
+          <button class="btn" id="tool-claims-refresh" type="button">Refresh claims</button>
+        </div>
+        <p id="tool-claims-message" class="helper" role="status">Loading claim records…</p>
+        <div class="tool-claims-summary" id="tool-claims-summary" aria-label="Claim totals"></div>
+        <div class="tool-claims-table-wrap">
+          <table class="tool-claims-table">
+            <thead><tr><th scope="col">Offer</th><th scope="col">Claimed by</th><th scope="col">Claimed at</th></tr></thead>
+            <tbody id="tool-claims-rows"><tr><td colspan="3">Loading claim records…</td></tr></tbody>
+          </table>
+        </div>
+        <p class="helper">Attendees appear here only after selecting “Claim / retrieve” on an offer. Promo codes are never shown in this list.</p>
+      </section>
       <section class="judging-admin" aria-labelledby="judging-title">
         <span class="eyebrow">JUDGING / RUBRIC</span>
         <h2 id="judging-title">Judge submissions.</h2>
@@ -124,6 +157,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-root-redirect"></script>
-<script src="./assets/submissions-admin.js?v=20261011-excel-export"></script>
+<script src="./assets/submissions-admin.js?v=20261011-claims-dashboard"></script>
 </body>
 </html>
