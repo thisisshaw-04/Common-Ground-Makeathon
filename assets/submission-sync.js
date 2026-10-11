@@ -12,7 +12,7 @@
   function participantEmail() {
     var participant = window.CGBuilderParticipant || {};
     var detailEmail = ($('p-detail').textContent.split('·')[0] || '').trim().toLowerCase();
-    return String(participant.email || (/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(detailEmail) ? detailEmail : '')).trim().toLowerCase();
+    return String(participant.email || (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(detailEmail) ? detailEmail : '')).trim().toLowerCase();
   }
   function showStatus(message, isError) {
     var status = $('submission-auth-status');
