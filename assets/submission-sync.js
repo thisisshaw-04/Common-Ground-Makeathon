@@ -27,10 +27,13 @@
     try { return JSON.parse(localStorage.getItem('cg-project-draft-v1:' + email) || 'null'); }
     catch (_err) { return null; }
   }
-  function formTeam(email) {
+  function formTeam(email, existingTeam) {
     var participant = window.CGBuilderParticipant || {};
+    var existingContact = existingTeam && existingTeam.contact || {};
+    var contactEmail = String(existingContact.email || email).trim().toLowerCase();
+    var contactName = String(existingContact.name || participant.name || '').trim();
     var members = [];
-    var seen = [email];
+    var seen = [];
     var issue = '';
     document.querySelectorAll('.team-member').forEach(function (row) {
       var name = row.querySelector('.member-name').value.trim();
@@ -40,6 +43,7 @@
         issue = 'Enter a name and valid email for each teammate.';
         return;
       }
+      if (memberEmail === contactEmail) return;
       if (seen.indexOf(memberEmail) !== -1) {
         issue = 'Each email must be unique. You are already included as the team contact.';
         return;
@@ -48,9 +52,29 @@
       members.push({name:name,email:memberEmail});
     });
     return {
-      team:{name:$('team-name').value.trim(),contact:{name:participant.name || '',email:email},members:members},
+      team:{name:$('team-name').value.trim(),contact:{name:contactName,email:contactEmail},members:members},
       issue:issue
     };
+  }
+  function teamIncludesEmail(team, email) {
+    var wanted = String(email || '').trim().toLowerCase();
+    if (!wanted || !team) return false;
+    var contact = team.contact || {};
+    if (String(contact.email || '').trim().toLowerCase() === wanted) return true;
+    return Array.isArray(team.members) && team.members.some(function (member) {
+      return String(member && member.email || '').trim().toLowerCase() === wanted;
+    });
+  }
+  async function findSubmissionForUser(user, email) {
+    var result = await client.from('submissions')
+      .select('id,event_id,user_id,owner_email,project,team,status')
+      .eq('event_id', EVENT_ID);
+    if (result.error) throw result.error;
+    var rows = result.data || [];
+    var owned = rows.find(function (record) { return record.user_id === user.id; });
+    if (owned) return {record:owned,ambiguous:false};
+    var matches = rows.filter(function (record) { return teamIncludesEmail(record.team, email); });
+    return {record:matches.length === 1 ? matches[0] : null,ambiguous:matches.length > 1};
   }
   function selectedTracks() {
     return Array.prototype.slice.call(document.querySelectorAll('input[name="project-track"]:checked')).map(function (input) { return input.value; });
@@ -132,7 +156,13 @@
       showStatus('This email is not on the builder list enabled for submissions. Contact an organiser.', true);
       return false;
     }
-    var teamResult = formTeam(email);
+    var lookup = await findSubmissionForUser(user, email);
+    if (lookup.ambiguous) {
+      showStatus('This email appears on more than one team entry. Ask an organiser to correct the team list.', true);
+      return false;
+    }
+    var existing = lookup.record;
+    var teamResult = formTeam(email, existing && existing.team);
     var team = teamResult.team;
     var project = formProject();
     if (status === 'ready') {
@@ -149,17 +179,31 @@
       }
       try { localStorage.setItem('cg-team-draft-v1:' + email, JSON.stringify(team)); } catch (_err) { /* The central submission remains authoritative. */ }
     }
-    var result = await client.from('submissions').upsert({
-      event_id: EVENT_ID,
-      user_id: user.id,
-      owner_email: email,
-      status: status,
-      project: project,
-      team: team,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'event_id,user_id' });
+    var result;
+    if (existing) {
+      result = await client.from('submissions').update({
+        status: status,
+        project: project,
+        team: team,
+        updated_at: new Date().toISOString()
+      }).eq('id', existing.id).select('id').maybeSingle();
+      if (!result.error && !result.data) {
+        showStatus('The saved team entry was not available to update. Reload the page and try again.', true);
+        return false;
+      }
+    } else {
+      result = await client.from('submissions').upsert({
+        event_id: EVENT_ID,
+        user_id: user.id,
+        owner_email: email,
+        status: status,
+        project: project,
+        team: team,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'event_id,user_id' });
+    }
     if (result.error && result.error.code === '23505') {
-      showStatus('A submission for this team name already exists. Ask that teammate to update it instead of creating another entry.', true);
+      showStatus('A project with this team name already exists. Sign in with an email listed on that team entry to update it.', true);
       return false;
     }
     if (result.error) throw result.error;
@@ -261,9 +305,12 @@
       showStatus('Signed in as ' + signedInEmail + '. Save your draft or submit before 3:15 PM SGT.');
       if (lastUserId !== user.id) {
         lastUserId = user.id;
-        var result = await client.from('submissions').select('project,team,status').eq('event_id', EVENT_ID).eq('user_id', user.id).maybeSingle();
-        if (result.error) throw result.error;
-        if (result.data) fillRemote(result.data);
+        var lookup = await findSubmissionForUser(user, signedInEmail);
+        if (lookup.ambiguous) {
+          showStatus('This email appears on more than one team entry. Ask an organiser to correct the team list.', true);
+          return;
+        }
+        if (lookup.record) fillRemote(lookup.record);
         else {
           var local = readProject(wanted);
           var team = readTeam(wanted);
@@ -307,12 +354,22 @@
     catch (_err) { showStatus('Could not sign out. Reload the page and try again.', true); }
   });
 
-  $('team-form').addEventListener('submit', function () {
-    window.setTimeout(function () { syncDraft('draft').catch(function () { showStatus('Could not save centrally. Check the Supabase setup and try again.', true); }); }, 0);
-  });
-  $('submission-form').addEventListener('submit', function () {
-    window.setTimeout(function () { syncDraft('draft').catch(function () { showStatus('Could not save centrally. Check the Supabase setup and try again.', true); }); }, 0);
-  });
+  var draftBusy = false;
+  async function handleDraftSubmit(event) {
+    event.preventDefault();
+    if (draftBusy) return;
+    draftBusy = true;
+    var button = event.submitter;
+    if (button) button.disabled = true;
+    try { await syncDraft('draft'); }
+    catch (_err) { showStatus('Could not save centrally. Check your sign-in and try again.', true); }
+    finally {
+      draftBusy = false;
+      if (button) button.disabled = false;
+    }
+  }
+  $('team-form').addEventListener('submit', handleDraftSubmit);
+  $('submission-form').addEventListener('submit', handleDraftSubmit);
   var readyButton = $('project-ready');
   var readyBusy = false;
   readyButton.addEventListener('click', async function () {
