@@ -313,7 +313,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
         <p id="submission-auth-status" class="helper" role="status">Checking sign-in…</p>
       </div>
       <form id="team-form">
-        <label class="field"><span>TEAM NAME</span><input id="team-name" required maxlength="100" autocomplete="organization"></label>
+        <label class="field"><span>TEAM NAME *</span><input id="team-name" required maxlength="100" autocomplete="organization"></label>
         <div id="team-members"></div>
         <button class="btn" id="add-teammate" type="button">+ Add teammate</button>
         <div class="team-actions"><button class="btn btn-primary" type="submit">Save team draft</button></div>
@@ -355,12 +355,12 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
         <fieldset class="field">
           <legend>PROJECT LINKS & DEMO</legend>
           <p class="helper">Make links accessible to judges. Any demo video must be 2 minutes or less. Add setup instructions if needed.</p>
-          <label class="field"><span>LIVE DEMO / DEPLOYED PROJECT</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
-          <label class="field"><span>DEMO VIDEO</span><input id="project-video" type="url" placeholder="https://…" maxlength="2000"></label>
-          <label class="field"><span>GITHUB / SOURCE CODE</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
+          <label class="field"><span>LIVE DEMO / DEPLOYED PROJECT (OPTIONAL)</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
+          <label class="field"><span>DEMO VIDEO (OPTIONAL)</span><input id="project-video" type="url" placeholder="https://…" maxlength="2000"></label>
+          <label class="field"><span>GITHUB / SOURCE CODE (OPTIONAL)</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
           <label class="field"><span>FIGMA / PROTOTYPE (OPTIONAL)</span><input id="project-prototype" type="url" placeholder="https://…" maxlength="2000"></label>
-          <label><input id="project-no-code" type="checkbox"> This project is not based on code</label>
-          <label class="field"><span>OTHER SUPPORTING MATERIALS OR TRY-IT INSTRUCTIONS</span><textarea id="project-supporting" maxlength="3000"></textarea></label>
+          <label><input id="project-no-code" type="checkbox"> (OPTIONAL) This project is not based on code</label>
+          <label class="field"><span>OTHER SUPPORTING MATERIALS OR TRY-IT INSTRUCTIONS (OPTIONAL)</span><textarea id="project-supporting" maxlength="3000"></textarea></label>
         </fieldset>
 
         <label class="field"><span>TEAM & COLLABORATION *</span><textarea id="project-collaboration" maxlength="3000" placeholder="How did different skills, disciplines, or perspectives come together? What did you discover by working together?"></textarea></label>
@@ -408,6 +408,6 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/project-gallery.js?v=20261011-single-answer-v1"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261011-submission-form-v3"></script>
+<script src="./assets/submission-sync.js?v=20261011-submission-optional-links-v4"></script>
 </body>
 </html>
