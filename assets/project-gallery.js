@@ -22,6 +22,39 @@
       return /^https?:$/.test(url.protocol) ? escape(url.href) : '';
     } catch (_err) { return ''; }
   }
+  function youtubeThumbnail(value) {
+    try {
+      var url = new URL(value);
+      var host = url.hostname.toLowerCase().replace(/^www\./, '');
+      var id = '';
+      if (host === 'youtu.be') id = url.pathname.split('/').filter(Boolean)[0] || '';
+      else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtube-nocookie.com') {
+        id = url.searchParams.get('v') || '';
+        if (!id) id = (url.pathname.match(/\/(?:embed|shorts|live)\/([\w-]{6,})/) || [])[1] || '';
+      }
+      return /^[\w-]{6,}$/.test(id) ? 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg' : '';
+    } catch (_err) { return ''; }
+  }
+  function previewImage(row) {
+    var direct = row.preview_image_url || row.preview_image || row.previewImage;
+    var image = safeHref(direct);
+    if (image) return image;
+    var candidates = [row.demo_url, row.video_url];
+    for (var i = 0; i < candidates.length; i++) {
+      var candidate = safeHref(candidates[i]);
+      if (candidate && /\.(?:png|jpe?g|gif|webp|avif)(?:$|[?#])/i.test(candidate)) return candidate;
+    }
+    return youtubeThumbnail(row.video_url || '');
+  }
+  function previewMarkup(row, name, oneLiner) {
+    var image = previewImage(row);
+    return '<div class="project-gallery-preview' + (image ? ' has-image' : '') + '">' +
+      (image ? '<img src="' + image + '" alt="' + escape(name) + ' project preview" loading="lazy" referrerpolicy="no-referrer">' : '') +
+      '<span class="preview-kicker">COMMON GROUND / PROJECT</span>' +
+      (!image ? '<strong>' + escape(name) + '</strong>' : '') +
+      '<span class="preview-caption">' + escape(image ? 'A look inside the project' : (oneLiner || 'Open the project details to see what the team made.')) + '</span>' +
+      '</div>';
+  }
   function detail(label, value) {
     if (!value) return '';
     return '<div class="submission-detail"><strong>' + escape(label) + '</strong><p>' + escape(value) + '</p></div>';
@@ -39,6 +72,9 @@
     }
     message.textContent = rows.length + (rows.length === 1 ? ' project' : ' projects');
     cards.innerHTML = rows.map(function (row) {
+      var name = row.project_name || 'Untitled project';
+      var team = row.team_name || 'Team';
+      var oneLiner = row.one_liner || '';
       var tracks = Array.isArray(row.tracks) ? row.tracks : [];
       var members = Array.isArray(row.team_members) ? row.team_members.filter(Boolean) : [];
       var links = [
@@ -47,25 +83,30 @@
         link('Source code', row.source_url),
         link('Prototype', row.prototype_url)
       ].filter(Boolean).join('');
-      return '<article class="project-gallery-card" data-submission-id="' + escape(row.submission_id) +
-        '" data-is-my-team="' + (row.is_my_team ? 'true' : 'false') + '">' +
-        '<span class="gallery-team">' + escape(row.team_name || 'Team') +
-        (members.length ? ' · ' + escape(members.join(', ')) : '') +
-        (row.is_my_team ? ' · Your team' : '') + '</span>' +
-        '<h3>' + escape(row.project_name || 'Untitled project') + '</h3>' +
-        (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
-          return '<span>' + escape(track) + '</span>';
-        }).join('') + '</div>' : '') +
-        (row.one_liner ? '<p><strong>' + escape(row.one_liner) + '</strong></p>' : '') +
-        (row.project_overview ? '<p>' + escape(row.project_overview) + '</p>' : '') +
-        (row.build_summary ? '<p>' + escape(row.build_summary) + '</p>' : '') +
+      var expanded = detail('Team members', members.join(', ')) +
+        detail('Project overview', row.project_overview) +
+        detail('What the team built', row.build_summary) +
         detail('Design × Tech reflection', row.design_reflection) +
         detail('Culture × Tech reflection', row.culture_reflection) +
         detail('Team & collaboration', row.team_collaboration) +
         detail('AI & tool attribution', row.ai_attribution) +
         detail('Supporting materials', row.supporting_materials) +
-        (links ? '<div class="project-gallery-links">' + links + '</div>' : '') +
-        '</article>';
+        (links ? '<div class="project-gallery-links">' + links + '</div>' : '');
+      return '<article class="project-gallery-card" data-submission-id="' + escape(row.submission_id) +
+        '" data-is-my-team="' + (row.is_my_team ? 'true' : 'false') + '">' +
+        '<details class="project-gallery-details"><summary>' +
+        previewMarkup(row, name, oneLiner) +
+        '<div class="project-gallery-copy">' +
+        '<span class="gallery-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</span>' +
+        '<h3>' + escape(name) + '</h3>' +
+        (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
+          return '<span>' + escape(track) + '</span>';
+        }).join('') + '</div>' : '') +
+        (oneLiner ? '<p class="project-gallery-one-liner">' + escape(oneLiner) + '</p>' : '') +
+        '<span class="project-gallery-toggle"><span>View project details</span><span aria-hidden="true">↘</span></span>' +
+        '</div></summary><div class="project-gallery-expanded">' +
+        (expanded || '<p class="helper">No additional details were shared.</p>') +
+        '</div></details></article>';
     }).join('');
     document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:rows}}));
   }

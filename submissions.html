@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="./assets/portal.css?v=20261002-team">
+<link rel="stylesheet" href="./assets/portal.css?v=20261011-live-gallery">
 <link rel="stylesheet" href="./assets/identity.css?v=20261011-deck-style">
 <style>
 .inbox-hero{padding:56px 0 38px;border-bottom:1px solid var(--line)}
@@ -19,12 +19,32 @@
 .inbox-auth,.inbox-list{border:1px solid var(--ink);border-radius:16px;padding:clamp(20px,4vw,36px);background:#fff}
 .inbox-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:22px 0}
 .inbox-toolbar select{padding:10px 12px;border:1px solid var(--ink);border-radius:10px;background:var(--paper);font:12px var(--mono)}
-.inbox-grid{display:grid;gap:14px}
-.submission-card{border:1px solid var(--ink);border-radius:14px;padding:20px;display:grid;gap:8px;background:#fff}
-.submission-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
-.submission-card h2{font-size:21px;letter-spacing:-.04em}
+.inbox-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:16px;align-items:start}
+.submission-card{border:1px solid var(--ink);border-radius:14px;background:#fff;overflow:hidden}
+.submission-card-details>summary{list-style:none;cursor:pointer}
+.submission-card-details>summary::-webkit-details-marker{display:none}
+.submission-card-details>summary:focus-visible{outline:3px solid var(--hot);outline-offset:-4px}
+.submission-preview{position:relative;display:flex;min-height:180px;aspect-ratio:16/10;flex-direction:column;justify-content:space-between;gap:12px;padding:18px;overflow:hidden;background:linear-gradient(135deg,#ffd11a 0%,#ffe77d 58%,#fff7d6 100%);color:var(--ink)}
+.submission-preview:before,.submission-preview:after{position:absolute;content:"";pointer-events:none}
+.submission-preview:before{width:200px;height:200px;right:-55px;top:-105px;border:1px solid rgba(20,20,20,.32);border-radius:50%;box-shadow:0 0 0 18px rgba(20,20,20,.06),0 0 0 38px rgba(20,20,20,.04)}
+.submission-preview:after{content:"✳";right:20px;bottom:8px;color:#bd3025;font-size:54px;line-height:1}
+.submission-preview.has-image{background:#e9e8e2}
+.submission-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.submission-preview.has-image:after{color:#fff;text-shadow:0 1px 6px #000}
+.preview-kicker,.preview-caption,.submission-preview>strong{position:relative;z-index:1;max-width:82%}
+.preview-kicker{font:10px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.submission-preview>strong{font-size:clamp(22px,3vw,34px);line-height:1.05;letter-spacing:-.05em}
+.preview-caption{font:11px var(--mono);line-height:1.5;color:#3c3c36}
+.submission-preview.has-image .preview-kicker,.submission-preview.has-image .preview-caption{color:#fff;text-shadow:0 1px 5px #000}
+.submission-card-copy{display:grid;gap:10px;padding:18px 20px 20px}
+.submission-card-copy header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.submission-card h2{font-size:21px;letter-spacing:-.04em;margin:5px 0 0}
 .submission-card p{margin:0;line-height:1.6;color:#55574e;white-space:pre-wrap;overflow-wrap:anywhere}
-.submission-meta{font:11px var(--mono);color:var(--muted)}
+.submission-one-liner{font-size:14px}
+.submission-card-toggle{display:flex;justify-content:space-between;align-items:center;margin-top:4px;padding-top:12px;border-top:1px solid var(--line);font:10px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+.submission-card-toggle>span:last-child{font-size:16px;transition:transform .18s ease}
+.submission-card-details[open] .submission-card-toggle>span:last-child{transform:rotate(180deg)}
+.submission-card-expanded{display:grid;gap:12px;padding:0 20px 20px}
 .submission-badge{font:10px var(--mono);border:1px solid currentColor;border-radius:999px;padding:4px 8px;text-transform:uppercase}
 .submission-badge.ready{color:var(--ink);background:var(--acid);border-color:var(--ink)}
 .submission-links{display:flex;gap:16px;flex-wrap:wrap;font:12px var(--mono)}
@@ -34,10 +54,6 @@
 .people-choice-admin{border:1px solid var(--ink);border-radius:16px;padding:20px;margin:24px 0;background:#e6e6e6}
 .people-choice-admin h2{font-size:23px;letter-spacing:-.04em}
 .people-choice-admin p{line-height:1.55}
-.finalist-options{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:8px;margin:16px 0}
-.finalist-option{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--ink);border-radius:10px;background:#fff;line-height:1.4}
-.finalist-option input{margin-top:3px;accent-color:var(--acid)}
-.finalist-option small{display:block;color:var(--muted);font:10px var(--mono);margin-top:4px}
 .people-choice-actions{display:flex;gap:10px;flex-wrap:wrap}
 #people-choice-message.error{color:#a22222}
 .people-choice-results{margin-top:16px;border-top:1px solid var(--line);padding-top:10px}
@@ -47,18 +63,6 @@
 .submission-detail p{margin-top:5px}
 .submission-tracks{display:flex;gap:8px;flex-wrap:wrap}
 .submission-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--line-hard);border-radius:999px}
-.judging-admin{border:1px solid var(--ink);border-radius:16px;padding:20px;margin:24px 0;background:#e6e6e6}
-.judging-admin h2{font-size:23px;letter-spacing:-.04em}
-.judging-admin p{line-height:1.55}
-.judge-score-block{border-top:1px solid var(--line);margin-top:14px;padding-top:14px}
-.judge-score-block h3{font-size:16px}
-.judge-score-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.judge-score-grid .field{margin:0}
-.judge-score-grid select,.judge-score-block textarea{width:100%;padding:9px;border:1px solid var(--ink);border-radius:10px;background:#fff;font:12px var(--mono)}
-.judge-score-block textarea{min-height:72px;margin-top:6px}
-.judge-score-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
-.judge-score-summary{font:11px var(--mono);color:var(--muted)}
-#judging-message.error{color:#a22222}
 .tool-claims-admin{border:1px solid var(--ink);border-radius:16px;padding:20px;margin:24px 0;background:#fff}
 .tool-claims-heading{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 .tool-claims-admin h2{font-size:23px;letter-spacing:-.04em;margin:8px 0}
@@ -100,13 +104,14 @@
     </div>
     <div class="inbox-list" id="inbox-list" hidden>
       <div class="section-head">
-        <h2>Builder submissions</h2>
+        <h2>Live project gallery</h2>
         <span class="eyebrow" id="inbox-count">0 SUBMISSIONS</span>
       </div>
+      <p class="helper">Private organiser view: drafts and ready entries refresh automatically every 15 seconds.</p>
       <div class="inbox-toolbar">
         <label class="field"><span>STATUS</span><select id="inbox-filter"><option value="">All submissions</option><option value="draft">Draft</option><option value="ready">Ready</option></select></label>
         <button class="btn" id="inbox-refresh" type="button">Refresh</button>
-        <button class="btn" id="inbox-export" type="button">Download Excel</button>
+        <button class="btn" id="inbox-export" type="button">Download Excel judging sheet</button>
       </div>
       <section class="tool-claims-admin" aria-labelledby="tool-claims-title">
         <div class="tool-claims-heading">
@@ -126,17 +131,7 @@
         </div>
         <p class="helper">Attendees appear here only after selecting “Claim / retrieve” on an offer. Promo codes are never shown in this list.</p>
       </section>
-      <section class="judging-admin" aria-labelledby="judging-title">
-        <span class="eyebrow">JUDGING / RUBRIC</span>
-        <h2 id="judging-title">Judge submissions.</h2>
-        <p class="helper">Organisers score each ready project from 1–5 for Concept, Track Fit, Execution, and Presentation. Each is worth 25% (20 points total). Scores and notes are visible only to organisers.</p>
-        <p id="judging-message" class="helper" role="status">Loading judge scores…</p>
-        <div class="people-choice-actions">
-          <button class="btn" id="judging-shortlist" type="button">Select top 4 from each judged track</button>
-        </div>
-        <p class="helper">Show the top four scoring projects from each judged track. This shortlist is for judging only; it does not limit audience voting.</p>
-        <div id="judging-shortlist-results" class="people-choice-results" aria-live="polite"></div>
-      </section>
+      <p class="helper">Judge scoring is done in the Excel judging sheet; the website does not store scores. The download includes ready entries with a row for each of three judges.</p>
       <section class="people-choice-admin" aria-labelledby="people-choice-admin-title">
         <span class="eyebrow">AUDIENCE AWARD</span>
         <h2 id="people-choice-admin-title">People’s Choice voting</h2>
@@ -157,6 +152,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-auth-return"></script>
-<script src="./assets/submissions-admin.js?v=20261011-auth-return"></script>
+<script src="./assets/submissions-admin.js?v=20261011-excel-gallery-cards"></script>
 </body>
 </html>

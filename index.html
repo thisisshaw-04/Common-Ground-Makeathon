@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="./assets/portal.css?v=20261011-main-navigation">
+<link rel="stylesheet" href="./assets/portal.css?v=20261011-submit-action">
 <link rel="stylesheet" href="./assets/identity.css?v=20261011-deck-style">
 <style>
 #submission-form fieldset{border:1px solid var(--ink);border-radius:14px;padding:18px;margin:22px 0;min-width:0}
@@ -20,15 +20,41 @@
 #submission-form .track-picker label{display:inline-flex;align-items:center;gap:7px;margin:10px 18px 4px 0;font-size:14px}
 #submission-form input[type=checkbox]{accent-color:var(--acid);width:16px;height:16px;vertical-align:middle}
 #submission-form [hidden]{display:none!important}
+
 .project-gallery[hidden]{display:none!important}
-.project-gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
-.project-gallery-card{border:1px solid var(--ink);border-radius:14px;padding:22px;background:#fff;display:grid;align-content:start;gap:12px}
-.project-gallery-card h3{font-size:clamp(21px,3vw,29px);letter-spacing:-.04em}
+.project-gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px;align-items:start}
+.project-gallery-card{border:1px solid var(--ink);border-radius:14px;background:#fff;overflow:hidden}
+.project-gallery-details>summary{list-style:none;cursor:pointer}
+.project-gallery-details>summary::-webkit-details-marker{display:none}
+.project-gallery-details>summary:focus-visible{outline:3px solid var(--hot);outline-offset:-4px}
+.project-gallery-preview{position:relative;display:flex;min-height:190px;aspect-ratio:16/10;flex-direction:column;justify-content:space-between;gap:12px;padding:18px;overflow:hidden;background:linear-gradient(135deg,#ffd11a 0%,#ffe77d 58%,#fff7d6 100%);color:var(--ink)}
+.project-gallery-preview:before,.project-gallery-preview:after{position:absolute;content:"";pointer-events:none}
+.project-gallery-preview:before{width:210px;height:210px;right:-55px;top:-100px;border:1px solid rgba(20,20,20,.32);border-radius:50%;box-shadow:0 0 0 18px rgba(20,20,20,.06),0 0 0 38px rgba(20,20,20,.04)}
+.project-gallery-preview:after{content:"✳";right:20px;bottom:8px;color:#bd3025;font-size:58px;line-height:1}
+.project-gallery-preview.has-image{background:#e9e8e2}
+.project-gallery-preview img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.project-gallery-preview.has-image:after{color:#fff;text-shadow:0 1px 6px #000}
+.preview-kicker,.preview-caption,.project-gallery-preview>strong{position:relative;z-index:1;max-width:82%}
+.preview-kicker{font:10px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+.project-gallery-preview>strong{font-size:clamp(22px,3vw,34px);line-height:1.05;letter-spacing:-.05em}
+.preview-caption{font:11px var(--mono);line-height:1.5;color:#3c3c36}
+.project-gallery-preview.has-image .preview-kicker,.project-gallery-preview.has-image .preview-caption{color:#fff;text-shadow:0 1px 5px #000}
+.project-gallery-copy{display:grid;align-content:start;gap:9px;padding:18px 20px 20px}
+.project-gallery-card h3{font-size:clamp(21px,3vw,29px);letter-spacing:-.04em;margin:0}
 .project-gallery-card p{line-height:1.6;color:#333;white-space:pre-wrap;overflow-wrap:anywhere}
 .project-gallery-card .gallery-team{font:11px var(--mono);color:var(--muted);text-transform:uppercase}
 .project-gallery-tracks,.project-gallery-links{display:flex;gap:8px;flex-wrap:wrap}
 .project-gallery-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--ink);border-radius:999px;background:var(--acid)}
+.project-gallery-one-liner{margin:0}
+.project-gallery-toggle{display:flex;justify-content:space-between;align-items:center;margin-top:4px;padding-top:12px;border-top:1px solid var(--line);font:10px var(--mono);text-transform:uppercase;letter-spacing:.04em}
+.project-gallery-toggle>span:last-child{font-size:16px;transition:transform .18s ease}
+.project-gallery-details[open] .project-gallery-toggle>span:last-child{transform:rotate(180deg)}
+.project-gallery-expanded{display:grid;gap:12px;padding:0 20px 20px}
+.project-gallery-card .submission-detail{margin-top:0;padding-top:12px;border-top:1px solid var(--line)}
+.project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
+.project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}
 .project-gallery-links a{font:11px var(--mono);text-decoration:underline;text-underline-offset:3px}
+
 
 .portal-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--ink);background:#fff;margin:22px 0 0;position:sticky;top:0;z-index:10}
 .portal-tab{display:flex;align-items:center;justify-content:flex-start;gap:10px;min-height:54px;padding:10px 14px;border:1px solid var(--line-hard);background:var(--paper);color:var(--ink);font:500 14px var(--display);text-align:left}
@@ -73,8 +99,14 @@
 @media(prefers-reduced-motion:reduce){.timeline-fill,.timeline-cursor{transition:none}}
 #gate-code-form[hidden],#gate-change-email[hidden]{display:none!important}
 
-\n.project-gallery-card .submission-detail{margin-top:14px;padding-top:12px}\n.project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}\n.project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}\n
 
+
+/* Make the final submit action easy to find and confirm. */
+#project-ready{min-width:220px;min-height:54px;padding:14px 24px;background:var(--acid);border-color:var(--ink);color:var(--ink);font-weight:700;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
+#project-ready:hover:not(:disabled){background:#ffe36d;transform:translateY(-2px);box-shadow:0 4px 0 var(--ink)}
+#project-ready:active:not(:disabled){transform:translateY(0);box-shadow:0 1px 0 var(--ink)}
+#project-ready:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+#project-ready:disabled{opacity:.65;cursor:wait;transform:none;box-shadow:none}
 /* Make the primary submission tab easy to spot. */
 #main-nav #nav-choice{min-height:52px;padding:10px 24px;border:1px solid var(--ink);border-radius:999px;background:var(--acid);color:var(--ink);font-size:clamp(15px,1.4vw,19px);font-weight:700}
 #main-nav #nav-choice:hover,#main-nav #nav-choice[aria-selected="true"]{background:var(--acid);border-color:var(--ink)}
@@ -185,7 +217,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
       <div class="tool-claim-grid">
         <article class="perk">
           <div class="perk-head"><div><h3>OpenAI</h3><div class="perk-kind">2500 CREDITS</div></div><span class="perk-value">100 codes</span></div>
-          <p>One code per approved account. Limited to the first 100 claims.</p>
+          <p>Use the 8-digit code sent to your email to sign in, then claim an OpenAI link for 2,500 credits. Limited to the first 100 claims.</p>
           <button class="btn btn-primary" data-tool-claim="openai" type="button" hidden>Claim / retrieve code</button>
           <p id="tool-claim-status-openai" class="helper" role="status"></p>
           <div class="team-actions" id="tool-claim-output-openai" hidden><a id="tool-claim-link-openai" class="btn" target="_blank" rel="noopener noreferrer" hidden>Open OpenAI link</a><code id="tool-claim-value-openai" hidden></code><button class="btn btn-sm" data-tool-copy="openai" type="button">Copy</button></div>
@@ -321,7 +353,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 
         <fieldset class="field">
           <legend>PROJECT LINKS & DEMO</legend>
-          <p class="helper">Make links accessible to judges. Include a demo or video; add setup instructions if needed.</p>
+          <p class="helper">Make links accessible to judges. Any demo video must be 2 minutes or less. Add setup instructions if needed.</p>
           <label class="field"><span>LIVE DEMO / DEPLOYED PROJECT</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
           <label class="field"><span>DEMO VIDEO</span><input id="project-video" type="url" placeholder="https://…" maxlength="2000"></label>
           <label class="field"><span>GITHUB / SOURCE CODE</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
@@ -339,7 +371,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
         <label class="field"><span>TEAM & COLLABORATION *</span><textarea id="project-collaboration" maxlength="3000" placeholder="How did different skills, disciplines, or perspectives come together? What did you discover by working together?"></textarea></label>
         <label class="field"><span>AI & TOOL ATTRIBUTION *</span><textarea id="project-attribution" maxlength="3000" placeholder="List AI tools, models, external resources, and third-party assets, datasets, or references—and what you used them for. Write “None” if not applicable."></textarea></label>
         <p class="helper">A thoughtful one-day prototype can score higher than a technically complex project. Focus on what you explored, built, and learned.</p>
-        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn" type="button" id="project-ready">Submit final entry</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
+        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn btn-primary" type="button" id="project-ready">Submit final entry</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
         <p class="helper">Save drafts as you build. Only one teammate should submit the team’s final entry by the submission deadline.</p>
         <p id="submission-feedback" class="helper" role="status"></p>
       </form>
@@ -377,9 +409,9 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/submission-auth.js?v=20261011-email-code"></script>
 <script src="./assets/data.js?v=20261011-main-navigation"></script>
 <script src="./assets/portal.js?v=20261011-email-code-8digit"></script>
-<script src="./assets/project-gallery.js?v=20261011-public-gallery"></script>
+<script src="./assets/project-gallery.js?v=20261011-project-cards"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261011-auth-return"></script>
+<script src="./assets/submission-sync.js?v=20261011-submit-action"></script>
 </body>
 </html>
