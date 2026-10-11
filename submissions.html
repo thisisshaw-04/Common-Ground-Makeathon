@@ -111,7 +111,7 @@
       <div class="inbox-toolbar">
         <label class="field"><span>STATUS</span><select id="inbox-filter"><option value="">All submissions</option><option value="draft">Draft</option><option value="ready">Ready</option></select></label>
         <button class="btn" id="inbox-refresh" type="button">Refresh</button>
-        <button class="btn" id="inbox-export" type="button">Download Excel judging sheet</button>
+        <button class="btn" id="inbox-export" type="button">Download Excel judging workbook</button>
       </div>
       <section class="tool-claims-admin" aria-labelledby="tool-claims-title">
         <div class="tool-claims-heading">
@@ -131,7 +131,7 @@
         </div>
         <p class="helper">Attendees appear here only after selecting “Claim / retrieve” on an offer. Promo codes are never shown in this list.</p>
       </section>
-      <p class="helper">Judge scoring is done in the Excel judging sheet; the website does not store scores. The download includes ready entries with a row for each of three judges.</p>
+      <p class="helper">Score offline in the workbook. It has separate Design × Tech and Culture × Tech tabs, three judge rows per project, four criteria, and a direct link to each project in the public gallery.</p>
       <section class="people-choice-admin" aria-labelledby="people-choice-admin-title">
         <span class="eyebrow">AUDIENCE AWARD</span>
         <h2 id="people-choice-admin-title">People’s Choice voting</h2>
@@ -152,6 +152,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-auth-return"></script>
-<script src="./assets/submissions-admin.js?v=20261011-excel-gallery-cards"></script>
+<script src="./assets/submissions-admin.js?v=20261011-track-judging-deep-links"></script>
 </body>
 </html>
