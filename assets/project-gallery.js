@@ -1,4 +1,4 @@
-/* Public project gallery. The database opens it only after the submission deadline. */
+/* Public project gallery opens at 3:15 PM; final submissions remain open until 3:30 PM. */
 (function () {
   'use strict';
   var EVENT_ID = 'common-ground-2026-10-11';
@@ -86,7 +86,7 @@
   }
   function render(rows) {
     if (!rows.length) {
-      message.textContent = 'No ready submissions were received by 3:15 PM.';
+      message.textContent = 'No ready submissions yet. Teams can still submit or update until 3:30 PM SGT.';
       cards.innerHTML = '';
       document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:[]}}));
       return;
