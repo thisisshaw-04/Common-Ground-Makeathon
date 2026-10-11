@@ -489,12 +489,12 @@
   $('gate-code-form').addEventListener('submit', async function (ev) {
     ev.preventDefault();
     clearError();
-    var code = $('email-code').value.trim().replace(/\\D/g, '');
+    var code = $('email-code').value.trim().replace(/\D/g, '');
     if (!pendingCodeEmail) {
       showError('Request a sign-in code first, then enter the newest six-digit code.');
       return;
     }
-    if (!/^\\d{6}$/.test(code)) {
+    if (!/^\d{6}$/.test(code)) {
       showError('Enter the six-digit code from your newest email.');
       return;
     }
@@ -514,7 +514,7 @@
     }
   });
   $('email-code').addEventListener('input', function () {
-    this.value = this.value.replace(/\\D/g, '').slice(0, 6);
+    this.value = this.value.replace(/\D/g, '').slice(0, 6);
     clearError();
   });
   $('gate-change-email').addEventListener('click', function () {
