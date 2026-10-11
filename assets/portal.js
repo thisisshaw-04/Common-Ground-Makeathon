@@ -479,7 +479,7 @@
       $('gate-code-form').hidden = false;
       $('gate-change-email').hidden = false;
       $('email-code').value = '';
-      setGateStatus('Check your inbox and spam folder. Open the newest sign-in link in this browser, or enter its six-digit code below if the email includes one.');
+      setGateStatus('Check your inbox and spam folder. Open the newest sign-in link in this browser, or enter its eight-digit code below if the email includes one.');
       $('email-code').focus();
     } catch (_err) {
       showError(window.CGSubmission.signInErrorMessage(_err));
@@ -491,11 +491,11 @@
     clearError();
     var code = $('email-code').value.trim().replace(/\D/g, '');
     if (!pendingCodeEmail) {
-      showError('Request a sign-in code first, then enter the newest six-digit code.');
+      showError('Request a sign-in code first, then enter the newest eight-digit code.');
       return;
     }
-    if (!/^\d{6}$/.test(code)) {
-      showError('Enter the six-digit code from your newest email.');
+    if (!/^\d{8}$/.test(code)) {
+      showError('Enter the eight-digit code from your newest email.');
       return;
     }
     var button = $('gate-code-form').querySelector('button[type="submit"]');
@@ -514,7 +514,7 @@
     }
   });
   $('email-code').addEventListener('input', function () {
-    this.value = this.value.replace(/\D/g, '').slice(0, 6);
+    this.value = this.value.replace(/\D/g, '').slice(0, 8);
     clearError();
   });
   $('gate-change-email').addEventListener('click', function () {
