@@ -199,8 +199,20 @@
       var result = await client.rpc('get_ready_project_gallery', {p_event_id: EVENT_ID});
       if (current !== request) return;
       if (result.error) throw result.error;
+      var imageResult = await client.rpc('get_project_gallery_preview_images', {p_event_id: EVENT_ID});
+      if (current !== request) return;
+      var imageById = Object.create(null);
+      if (!imageResult.error) {
+        (imageResult.data || []).forEach(function (image) {
+          if (image.preview_image_url) imageById[image.submission_id] = image.preview_image_url;
+        });
+      }
+      var rows = result.data || [];
+      rows.forEach(function (row) {
+        if (imageById[row.submission_id]) row.preview_image_url = imageById[row.submission_id];
+      });
       loaded = true;
-      render(result.data || []);
+      render(rows);
     } catch (_err) {
       if (current !== request) return;
       cards.innerHTML = '';
