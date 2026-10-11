@@ -102,12 +102,13 @@
 
 
 
-/* Make the final submit action easy to find and confirm. */
-#project-ready{min-width:220px;min-height:54px;padding:14px 24px;background:var(--acid);border-color:var(--ink);color:var(--ink);font-weight:700;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
-#project-ready:hover:not(:disabled){background:#ffe36d;transform:translateY(-2px);box-shadow:0 4px 0 var(--ink)}
-#project-ready:active:not(:disabled){transform:translateY(0);box-shadow:0 1px 0 var(--ink)}
-#project-ready:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
-#project-ready:disabled{opacity:.65;cursor:wait;transform:none;box-shadow:none}
+/* Keep the final submit action at the right end of the draft controls. */
+.submission-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.submission-actions #project-ready{margin-left:auto;min-width:220px;min-height:54px;padding:14px 24px;border:1px solid var(--ink);border-radius:5px;background:var(--ink);color:var(--paper);font-weight:700;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease,background .16s ease}
+.submission-actions #project-ready:hover:not(:disabled){background:#242424;transform:translateY(-2px);box-shadow:0 4px 0 var(--hot)}
+.submission-actions #project-ready:active:not(:disabled){transform:translateY(0);box-shadow:0 1px 0 var(--hot)}
+.submission-actions #project-ready:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+.submission-actions #project-ready:disabled{opacity:.65;cursor:wait;transform:none;box-shadow:none}
 /* Make the primary submission tab easy to spot. */
 #main-nav #nav-choice{min-height:52px;padding:10px 24px;border:1px solid var(--ink);border-radius:999px;background:var(--acid);color:var(--ink);font-size:clamp(15px,1.4vw,19px);font-weight:700}
 #main-nav #nav-choice:hover,#main-nav #nav-choice[aria-selected="true"]{background:var(--acid);border-color:var(--ink)}
@@ -359,16 +360,10 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
           <label class="field"><span>OTHER SUPPORTING MATERIALS OR TRY-IT INSTRUCTIONS</span><textarea id="project-supporting" maxlength="3000"></textarea></label>
         </fieldset>
 
-        <fieldset class="field">
-          <legend>TRACK-SPECIFIC REFLECTION</legend>
-          <label class="field" id="design-reflection-field" hidden><span>DESIGN × TECH: How does your project push interaction, interfaces, or the relationship between people and technology in a new direction?</span><textarea id="project-design-reflection" maxlength="3000"></textarea></label>
-          <label class="field" id="culture-reflection-field" hidden><span>CULTURE × TECH: How does your project meaningfully engage with, reinterpret, or preserve the cultural subject it explores?</span><textarea id="project-culture-reflection" maxlength="3000"></textarea></label>
-        </fieldset>
-
         <label class="field"><span>TEAM & COLLABORATION *</span><textarea id="project-collaboration" maxlength="3000" placeholder="How did different skills, disciplines, or perspectives come together? What did you discover by working together?"></textarea></label>
         <label class="field"><span>AI & TOOL ATTRIBUTION *</span><textarea id="project-attribution" maxlength="3000" placeholder="List AI tools, models, external resources, and third-party assets, datasets, or references—and what you used them for. Write “None” if not applicable."></textarea></label>
         <p class="helper">A thoughtful one-day prototype can score higher than a technically complex project. Focus on what you explored, built, and learned.</p>
-        <div class="team-actions"><button class="btn btn-primary" type="submit">Save project draft</button> <button class="btn btn-primary" type="button" id="project-ready">Submit final entry</button> <button class="btn" type="button" id="project-download">Download draft</button></div>
+        <div class="team-actions submission-actions"><button class="btn btn-primary" type="submit">Save project draft</button><button class="btn" type="button" id="project-download">Download draft</button><button class="btn btn-primary" type="button" id="project-ready">Submit final entry</button></div>
         <p class="helper">Save drafts as you build. Only one teammate should submit the team’s final entry by the submission deadline.</p>
         <p id="submission-feedback" class="helper" role="status"></p>
       </form>
@@ -405,11 +400,11 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-email-code"></script>
 <script src="./assets/data.js?v=20261011-main-navigation"></script>
-<script src="./assets/portal.js?v=20261011-single-answer-v1"></script>
+<script src="./assets/portal.js?v=20261011-submission-form-v2"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261011-single-answer-v1"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261011-single-answer-v1"></script>
+<script src="./assets/submission-sync.js?v=20261011-submission-form-v2"></script>
 </body>
 </html>
