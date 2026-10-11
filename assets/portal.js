@@ -399,9 +399,7 @@
     save: function (p, record) { localStorage.setItem(this.key(p), JSON.stringify(record)); }
   };
   var projectFieldIds = {
-    name:'project-name', oneLiner:'project-one-liner', inspiration:'project-inspiration',
-    solution:'project-solution', interesting:'project-interesting', technology:'project-technology',
-    made:'project-made', experiment:'project-experiment', next:'project-next',
+    name:'project-name', overview:'project-overview', build:'project-build',
     demo:'project-demo', video:'project-video', source:'project-source', prototype:'project-prototype',
     supporting:'project-supporting', designReflection:'project-design-reflection',
     cultureReflection:'project-culture-reflection', collaboration:'project-collaboration', attribution:'project-attribution'
@@ -416,7 +414,12 @@
     var saved = null;
     try { saved = projectStore.load(p); } catch (err) { /* An unreadable draft remains untouched until saved. */ }
     var project = saved && saved.project || {};
-    if (!project.solution && project.description) project.solution = project.description;
+    if (!project.overview) {
+      project.overview = [project.oneLiner, project.inspiration, project.solution || project.description, project.interesting].filter(Boolean).join('\n\n');
+    }
+    if (!project.build) {
+      project.build = [project.technology, project.made, project.experiment, project.next].filter(Boolean).join('\n\n');
+    }
     Object.keys(projectFieldIds).forEach(function (key) {
       $(projectFieldIds[key]).value = project[key] || '';
     });
