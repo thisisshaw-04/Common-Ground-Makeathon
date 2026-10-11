@@ -130,14 +130,21 @@
         '<div class="submission-meta">' + escape(members.length + 1) + ' team member(s) · Updated ' + escape(new Date(row.updated_at).toLocaleString()) + '</div>' +
         (fields ? '<div class="submission-fields">' + fields + '</div>' : '<p>No project details yet.</p>') +
         (links ? '<div class="submission-links">' + links + '</div>' : '');
-      return '<article class="submission-card"><details class="submission-card-details"><summary>' +
+      var modalContent = '<div class="project-modal-project">' +
+        '<h2>' + escape(name) + '</h2>' +
+        '<p class="project-modal-team">' + escape(team.name || 'No team') + '</p>' +
+        '<p class="project-modal-status"><span class="submission-badge ' + (row.status === 'ready' ? 'ready' : '') + '">' + escape(row.status) + '</span></p>' +
+        '<div class="project-modal-details">' + expanded + '</div>' +
+        '</div>';
+      return '<article class="submission-card" data-project-modal-card>' +
+        '<button class="project-modal-trigger submission-card-trigger" type="button" data-project-modal-open aria-haspopup="dialog">' +
         previewMarkup(project, name) +
         '<div class="submission-card-copy"><header><div><span class="submission-meta">' + escape(team.name || 'No team') +
         '</span><h2>' + escape(name) + '</h2></div><span class="submission-badge ' + (row.status === 'ready' ? 'ready' : '') +
         '">' + escape(row.status) + '</span></header>' +
         (project.oneLiner ? '<p class="submission-one-liner">' + escape(project.oneLiner) + '</p>' : '') +
-        '<span class="submission-card-toggle"><span>View project details</span><span aria-hidden="true">↘</span></span>' +
-        '</div></summary><div class="submission-card-expanded">' + expanded + '</div></details></article>';
+        '<span class="submission-card-toggle"><span>View project details</span><span aria-hidden="true">↗</span></span>' +
+        '</div></button><template data-project-modal-content>' + modalContent + '</template></article>';
     }).join('');
   }
   function peopleChoiceMessage(text, isError) {
@@ -295,110 +302,81 @@
     return xlsxPromise;
   }
   function buildJudgingWorkbook(XLSX) {
-    var core = [
-      ['Team name', function (row) { return row.team && row.team.name || ''; }],
-      ['Project name', function (row) { return row.project && row.project.name || ''; }],
-      ['Project description', function (row) {
-        var project = row.project || {};
-        return [
-          project.oneLiner,
-          project.inspiration ? 'Problem / inspiration: ' + project.inspiration : '',
-          project.solution ? 'Solution: ' + project.solution : '',
-          project.interesting ? 'What makes it interesting: ' + project.interesting : ''
-        ].filter(Boolean).join('\\n\\n');
-      }],
-      ['Live demo / site', function (row) { return row.project && row.project.demo || ''; }],
-      ['GitHub / source code', function (row) { return row.project && row.project.source || ''; }],
-      ['Demo video', function (row) { return row.project && row.project.video || ''; }],
-      ['Figma / prototype', function (row) { return row.project && row.project.prototype || ''; }],
-      ['Other supporting materials', function (row) { return row.project && row.project.supporting || ''; }],
-      ['Tracks', function (row) { return Array.isArray(row.project && row.project.tracks) ? row.project.tracks.join(', ') : ''; }],
-      ['Team members', function (row) {
-        var team = row.team || {}, members = [];
-        if (team.contact && team.contact.name) members.push(team.contact.name);
-        (Array.isArray(team.members) ? team.members : []).forEach(function (member) {
-          if (member && member.name && !members.some(function (name) { return name.toLowerCase() === String(member.name).toLowerCase(); })) {
-            members.push(member.name);
-          }
-        });
-        return members.join(', ');
-      }],
-      ['Technology used', function (row) { return row.project && row.project.technology || ''; }],
-      ['What works now', function (row) { return row.project && row.project.made || ''; }],
-      ['Experiments / learning', function (row) { return row.project && row.project.experiment || ''; }],
-      ['What they would do next', function (row) { return row.project && row.project.next || ''; }],
-      ['Design × Tech reflection', function (row) { return row.project && row.project.designReflection || ''; }],
-      ['Culture × Tech reflection', function (row) { return row.project && row.project.cultureReflection || ''; }],
-      ['Team & collaboration', function (row) { return row.project && row.project.collaboration || ''; }],
-      ['AI & tool attribution', function (row) { return row.project && row.project.attribution || ''; }],
-      ['Submission status', function (row) { return row.status || ''; }],
-      ['Last updated', function (row) { return row.updated_at || ''; }]
+    var tracks = [
+      {sheetName:'Design × Tech', track:'Design × Tech'},
+      {sheetName:'Culture × Tech', track:'Culture × Tech'}
     ];
-    var scoreHeaders = ['Judge', 'Concept', 'Track fit', 'Execution', 'Presentation', 'Final marks / 20'];
-    var header = core.map(function (column) { return column[0]; }).concat(scoreHeaders);
-    var dataRows = [header];
     var readyRows = allRows.filter(function (row) { return row.status === 'ready'; });
-    readyRows.forEach(function (row) {
-      var projectData = core.map(function (column) {
-        var value = column[1](row);
-        return value == null ? '' : value;
-      });
-      [1, 2, 3].forEach(function (judgeNumber) {
-        dataRows.push(projectData.concat(['Judge ' + judgeNumber, '', '', '', '', '']));
-      });
-    });
-    var sheet = XLSX.utils.aoa_to_sheet(dataRows);
-    var criterionStart = core.length + 1;
-    dataRows.slice(1).forEach(function (_values, index) {
-      var rowIndex = index + 1;
-      var firstCriterion = XLSX.utils.encode_cell({r:rowIndex,c:criterionStart});
-      var lastCriterion = XLSX.utils.encode_cell({r:rowIndex,c:criterionStart + 3});
-      var totalCell = XLSX.utils.encode_cell({r:rowIndex,c:core.length + 5});
-      sheet[totalCell] = {
-        t:'n',
-        f:'IF(COUNT(' + firstCriterion + ':' + lastCriterion + ')=4,SUM(' + firstCriterion + ':' + lastCriterion + '),"")'
-      };
-    });
-    sheet['!autofilter'] = {ref:XLSX.utils.encode_range({
-      s:{r:0,c:0},e:{r:Math.max(0,dataRows.length - 1),c:core.length + 5}
-    })};
-    var widths = [20,26,58,34,34,30,30,38,28,38,32,32,32,32,34,34,34,34,18,22];
-    sheet['!cols'] = core.map(function (_column, index) { return {wch:widths[index] || 26}; })
-      .concat([{wch:14},{wch:13},{wch:13},{wch:13},{wch:15},{wch:18}]);
-    sheet['!rows'] = [{hpt:32}];
-    dataRows.slice(1).forEach(function (values) {
-      var maxLines = 1;
-      values.forEach(function (value) {
-        var text = String(value == null ? '' : value);
-        var lines = text.split('\\n').reduce(function (sum, line) {
-          return sum + Math.max(1, Math.ceil(line.length / 58));
-        }, 0);
-        maxLines = Math.max(maxLines, lines);
-      });
-      sheet['!rows'].push({hpt:Math.min(240,Math.max(30,maxLines * 15))});
-    });
-
-    var guide = XLSX.utils.aoa_to_sheet([
-      ['COMMON GROUND — SCORING GUIDE'],
-      ['Score', 'Meaning'],
-      [1, 'Weak'],
-      [2, 'Below Expectations'],
-      [3, 'Meets Expectations'],
-      [4, 'Strong'],
-      [5, 'Exceptional'],
-      [],
-      ['Criteria', 'Concept · Track fit · Execution · Presentation'],
-      ['Scoring', 'Enter one score from 1–5 for each criterion in the Judging Sheet.'],
-      ['Per judge', 'Maximum 20 marks across four criteria.'],
-      ['Project total', 'Three judges; maximum 60 marks.']
-    ]);
-    guide['!cols'] = [{wch:24},{wch:76}];
     var workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, sheet, 'Judging Sheet');
-    XLSX.utils.book_append_sheet(workbook, guide, 'Scoring Guide');
+    var galleryBase = new URL('./', window.location.href);
+
+    function buildTrackSheet(definition) {
+      var dataRows = [
+        ['COMMON GROUND — ' + definition.track.toUpperCase() + ' JUDGING'],
+        ['Score each criterion 1–5: 1 Weak · 2 Below expectations · 3 Meets expectations · 4 Strong · 5 Exceptional. Each judge can award 20 marks; project total is out of 60.'],
+        ['TEAM NAME', 'PROJECT NAME', 'PROJECT GALLERY', 'JUDGE', 'CONCEPT', 'TRACK FIT', 'EXECUTION', 'PRESENTATION', 'FINAL MARKS / 60']
+      ];
+      var groups = readyRows.filter(function (row) {
+        var selected = row.project && Array.isArray(row.project.tracks) ? row.project.tracks : [];
+        return selected.indexOf(definition.track) !== -1;
+      });
+      var groupRows = [];
+      groups.forEach(function (row) {
+        var firstRow = dataRows.length;
+        dataRows.push([row.team && row.team.name || '', row.project && row.project.name || '', 'Open project in gallery ↗', 'Judge 1', '', '', '', '', '']);
+        dataRows.push(['', '', '', 'Judge 2', '', '', '', '', '']);
+        dataRows.push(['', '', '', 'Judge 3', '', '', '', '', '']);
+        groupRows.push({row:row,start:firstRow});
+      });
+      if (!groups.length) dataRows.push(['No ready submissions for this track yet.']);
+
+      var sheet = XLSX.utils.aoa_to_sheet(dataRows);
+      var merges = [
+        {s:{r:0,c:0},e:{r:0,c:8}},
+        {s:{r:1,c:0},e:{r:1,c:8}}
+      ];
+      if (!groups.length) merges.push({s:{r:3,c:0},e:{r:3,c:8}});
+      groupRows.forEach(function (group) {
+        var row = group.row;
+        var start = group.start;
+        var end = start + 2;
+        [0,1,2,8].forEach(function (column) {
+          merges.push({s:{r:start,c:column},e:{r:end,c:column}});
+        });
+        var projectId = row.id || row.submission_id || '';
+        var galleryUrl = new URL(galleryBase.toString());
+        if (projectId) galleryUrl.searchParams.set('project', projectId);
+        galleryUrl.hash = 'project-gallery';
+        var galleryCell = XLSX.utils.encode_cell({r:start,c:2});
+        sheet[galleryCell] = {
+          t:'s',
+          v:'Open project in gallery ↗',
+          l:{Target:galleryUrl.toString(),Tooltip:'Open this project in the public gallery'}
+        };
+        var firstExcelRow = start + 1;
+        var lastExcelRow = end + 1;
+        var totalCell = XLSX.utils.encode_cell({r:start,c:8});
+        sheet[totalCell] = {
+          t:'n',
+          f:'IF(COUNT(E' + firstExcelRow + ':H' + lastExcelRow + ')=12,SUM(E' + firstExcelRow + ':H' + lastExcelRow + '),"")'
+        };
+      });
+      sheet['!merges'] = merges;
+      sheet['!cols'] = [
+        {wch:24},{wch:30},{wch:25},{wch:14},
+        {wch:18},{wch:18},{wch:18},{wch:18},{wch:19}
+      ];
+      sheet['!rows'] = [{hpt:30},{hpt:36},{hpt:26}];
+      for (var rowIndex=3; rowIndex<dataRows.length; rowIndex++) sheet['!rows'].push({hpt:25});
+      return sheet;
+    }
+
+    tracks.forEach(function (definition) {
+      XLSX.utils.book_append_sheet(workbook, buildTrackSheet(definition), definition.sheetName);
+    });
     workbook.Props = {
-      Title:'Common Ground Makeathon judging sheet',
-      Subject:'Project submissions and offline judge scoring',
+      Title:'Common Ground Makeathon judging sheets',
+      Subject:'Two track sheets with three judges and four scoring criteria per project',
       Author:'Common Ground Makeathon'
     };
     if (workbook.Workbook) workbook.Workbook.CalcPr = {fullCalcOnLoad:true,forceFullCalc:true};

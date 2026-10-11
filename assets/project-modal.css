@@ -1,0 +1,71 @@
+.project-modal{
+  width:min(820px,calc(100vw - 28px));
+  max-width:min(820px,calc(100vw - 28px));
+  max-height:calc(100dvh - 28px);
+  padding:0;
+  border:0;
+  overflow:visible;
+  background:transparent;
+  color:var(--ink,#171717);
+}
+.project-modal::backdrop{background:rgba(10,10,8,.68);backdrop-filter:blur(3px)}
+.project-modal-shell{
+  display:flex;
+  flex-direction:column;
+  max-height:calc(100dvh - 28px);
+  overflow:hidden;
+  border:1px solid var(--ink,#171717);
+  border-radius:18px;
+  background:var(--paper,#fff);
+  box-shadow:0 20px 80px rgba(0,0,0,.32);
+}
+.project-modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:15px 20px;
+  border-bottom:1px solid var(--line,#deded7);
+}
+.project-modal-overline{font:10px var(--mono,monospace);letter-spacing:.09em;text-transform:uppercase;color:var(--muted,#74746d)}
+.project-modal-close{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border:1px solid var(--ink,#171717);
+  border-radius:999px;
+  padding:8px 13px;
+  background:transparent;
+  color:inherit;
+  font:11px var(--mono,monospace);
+  cursor:pointer;
+}
+.project-modal-close:hover{background:var(--acid,#ffd11a)}
+.project-modal-close:focus-visible{outline:3px solid var(--hot,#c7352b);outline-offset:3px}
+.project-modal-body{overflow:auto;padding:clamp(20px,4vw,36px)}
+.project-modal-project{display:grid;gap:16px}
+.project-modal-project h2{margin:0;font-size:clamp(28px,5vw,46px);letter-spacing:-.055em;line-height:1.05}
+.project-modal-team{margin:0;font:11px var(--mono,monospace);color:var(--muted,#74746d);text-transform:uppercase}
+.project-modal-status{margin:0}
+.project-modal-one-liner{margin:0;font-size:18px;line-height:1.45}
+.project-modal-details{display:grid;gap:14px}
+.project-modal-trigger{
+  display:block;
+  width:100%;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+  text-align:left;
+  cursor:pointer;
+}
+.project-modal-trigger:focus-visible{outline:3px solid var(--hot,#c7352b);outline-offset:-4px}
+.project-modal-trigger:hover .project-gallery-toggle>span:last-child,
+.project-modal-trigger:hover .submission-card-toggle>span:last-child{transform:translate(3px,3px)}
+@media(max-width:520px){
+  .project-modal{width:calc(100vw - 16px);max-width:calc(100vw - 16px);max-height:calc(100dvh - 16px)}
+  .project-modal-shell{max-height:calc(100dvh - 16px);border-radius:14px}
+  .project-modal-header{padding:12px 14px}
+  .project-modal-body{padding:20px 16px}
+}
