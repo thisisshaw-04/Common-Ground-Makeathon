@@ -94,7 +94,7 @@
   var GALLERY_OPEN_AT = Date.parse('2026-10-11T15:15:00+08:00');
   var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-11T16:08:02.945+08:00');
   var EVENT_END_AT = Date.parse('2026-10-11T17:00:00+08:00');
-  var VOTING_START_AT = Date.parse('2026-10-13T12:00:00+08:00');
+  var VOTING_START_AT = Date.parse('2026-10-12T12:00:00+08:00');
   var VOTING_END_AT = Date.parse('2026-10-14T23:59:59+08:00');
   var serverClockOffset = 0;
   var eventStatus = {
