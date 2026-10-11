@@ -24,8 +24,7 @@
     }
     var portalUrl = new URL('./', currentUrl.href);
     portalUrl.search = '';
-    var panel = currentUrl.hash.match(/^#(overview|access|schedule|faq|choice)$/i);
-    portalUrl.hash = panel ? panel[1].toLowerCase() : 'access';
+    portalUrl.hash = 'access';
     return portalUrl.href;
   }
 
