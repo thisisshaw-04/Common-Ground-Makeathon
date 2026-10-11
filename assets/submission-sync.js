@@ -142,7 +142,7 @@
   }
   async function syncDraft(status) {
     if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
-      showStatus('Submissions and final edits closed at 3:30 PM SGT. The gallery remains open in Part C.', true);
+      showStatus('Submissions are closed by the event schedule or an organiser. The public gallery remains open.', true);
       return false;
     }
     var user = window.CGSubmission && window.CGSubmission.getUser();
@@ -299,10 +299,10 @@
         return;
       }
       if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
-        showStatus('Submissions closed at 3:15 PM SGT. The gallery is open in Part C.');
+        showStatus('Submissions are closed by the event schedule or an organiser. The public gallery remains open.');
         return;
       }
-      showStatus('Signed in as ' + signedInEmail + '. Save your draft or submit before 3:15 PM SGT.');
+      showStatus('Signed in as ' + signedInEmail + '. Save a draft or submit while submissions are open.');
       if (lastUserId !== user.id) {
         lastUserId = user.id;
         var lookup = await findSubmissionForUser(user, signedInEmail);

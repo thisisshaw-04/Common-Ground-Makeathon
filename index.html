@@ -301,7 +301,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
   <div class="submission-locked" id="submission-locked">
     <span class="eyebrow">PROJECT SUBMISSION</span>
     <h2>Submit one entry per team.</h2>
-    <p>Sign in with your approved event email under Your access. Submissions and final edits close at 3:30 PM SGT.</p>
+    <p>Sign in with your approved event email under Your access. Submissions remain open until an organiser closes them.</p>
     <a class="btn btn-primary" href="#nav-access" data-panel-select="access">Go to sign in</a>
   </div>
 <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
@@ -332,7 +332,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
       <span class="eyebrow">PROJECT DETAILS</span>
       <h2 id="submission-title">Show us what you made.</h2>
-      <p>One entry per team. Any approved teammate listed on the saved entry can edit or submit it until 3:30 PM SGT.</p>
+      <p>One entry per team. Any approved teammate listed on the saved entry can edit or submit it until an organiser closes submissions.</p>
       <p id="submission-team" class="helper"></p>
       <form id="submission-form" novalidate>
         <div class="submission-masonry">
@@ -389,7 +389,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
       <h2 id="project-gallery-title">Project gallery</h2>
       <span class="eyebrow">PUBLIC AFTER 3:15 PM SGT</span>
     </div>
-    <p id="project-gallery-message" class="helper" role="status">The public gallery opens at 3:15 PM SGT. Final edits and new submissions remain open until 3:30 PM. Refresh projects to see updates.</p>
+    <p id="project-gallery-message" class="helper" role="status">The public gallery is open. Final edits and new submissions remain available until an organiser closes submissions. Refresh projects to see updates.</p>
     <section class="gallery-voting" id="people-choice-area" aria-labelledby="people-choice-title" hidden>
       <span class="eyebrow">PEOPLE’S CHOICE</span><h3 id="people-choice-title">Vote for up to three projects.</h3>
       <p class="helper" id="people-choice-message" role="status">Sign in with your approved event email to vote.</p>
@@ -414,12 +414,12 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-email-code"></script>
-<script src="./assets/data.js?v=20261011-gallery-open-315-submit-until-330"></script>
-<script src="./assets/portal.js?v=20261011-gallery-open-315-submit-until-330"></script>
+<script src="./assets/data.js?v=20261012-manual-submissions"></script>
+<script src="./assets/portal.js?v=20261012-manual-submissions"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261011-gallery-refresh-v2"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes-unvote"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261011-cutoff-330-v7"></script>
+<script src="./assets/submission-sync.js?v=20261012-manual-submissions"></script>
 </body>
 </html>

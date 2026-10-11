@@ -5,10 +5,12 @@
   var allRows = [];
   var xlsxPromise = null;
   var votingOpen = false;
+  var submissionsOpen = false;
   var voteCount = 0;
   var votingStatusTimer = null;
   var claimRefreshTimer = null;
   var submissionRefreshTimer = null;
+  var submissionAccessTimer = null;
   var $ = function (id) { return document.getElementById(id); };
   var escape = function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   function safeHref(value) { try { var url = new URL(value); return /^https?:$/.test(url.protocol) ? escape(url.href) : ''; } catch (_err) { return ''; } }
@@ -156,6 +158,26 @@
     $('people-choice-message').classList.toggle('error', !!isError);
   }
 
+  function submissionAccessMessage(text, isError) {
+    $('submission-access-message').textContent = text || '';
+    $('submission-access-message').classList.toggle('error', !!isError);
+  }
+
+  async function refreshSubmissionAccess() {
+    var result = await client.rpc('get_common_ground_event_state');
+    if (result.error) throw result.error;
+    var status = Array.isArray(result.data) ? result.data[0] : result.data || {};
+    if (typeof status.submissions_closed !== 'boolean') throw new Error('Missing submission access status.');
+    submissionsOpen = !status.submissions_closed;
+    $('submission-access-toggle').disabled = false;
+    $('submission-access-toggle').textContent = submissionsOpen ? 'Close submissions' : 'Open submissions';
+    submissionAccessMessage(
+      submissionsOpen
+        ? 'Submissions are open. Builders can save drafts, update projects, and submit final entries until you close them.'
+        : 'Submissions are closed. Open them to accept new drafts, updates, and final entries.'
+    );
+  }
+
   async function refreshPeopleChoice() {
     var statusResult = await client.rpc('get_people_choice_admin_status', {p_event_id:'common-ground-2026-10-11'});
     if (statusResult.error) throw statusResult.error;
@@ -208,6 +230,21 @@
       peopleChoiceMessage(error && error.message ? error.message : 'Could not resume voting.', true);
     } finally { this.disabled = false; }
   });
+  $('submission-access-toggle').addEventListener('click', async function () {
+    this.disabled = true;
+    try {
+      var result = await client.rpc('set_common_ground_submissions_open', {
+        p_open: !submissionsOpen,
+        p_event_id: 'common-ground-2026-10-11'
+      });
+      if (result.error) throw result.error;
+      await refreshSubmissionAccess();
+      await refreshSubmissionRows();
+      render();
+    } catch (error) {
+      submissionAccessMessage(error && error.message ? error.message : 'Could not update submission access.', true);
+    } finally { this.disabled = false; }
+  });
   $('people-choice-results-button').addEventListener('click', async function () {
     try {
       var result = await client.rpc('get_people_choice_results', {p_event_id:'common-ground-2026-10-11'});
@@ -238,6 +275,11 @@
     await refreshSubmissionRows();
     $('inbox-list').hidden = false;
     render();
+    try { await refreshSubmissionAccess(); }
+    catch (error) {
+      $('submission-access-toggle').disabled = true;
+      submissionAccessMessage(error && error.message ? error.message : 'Could not load submission access.', true);
+    }
     await refreshPeopleChoice();
     await loadToolClaims();
     if (!claimRefreshTimer) claimRefreshTimer = window.setInterval(function () {
@@ -249,6 +291,10 @@
     if (!submissionRefreshTimer) submissionRefreshTimer = window.setInterval(function () {
       if (document.hidden || $('inbox-cards').contains(document.activeElement)) return;
       refreshSubmissionRows().then(render).catch(function () { /* Keep the last loaded organiser view visible. */ });
+    }, 15000);
+    if (!submissionAccessTimer) submissionAccessTimer = window.setInterval(function () {
+      if (document.hidden) return;
+      refreshSubmissionAccess().catch(function () { /* Keep the last known organiser control state visible. */ });
     }, 15000);
     message('Loaded the latest submissions and voting status.');
   }

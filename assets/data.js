@@ -28,8 +28,8 @@
         { time: '12:00', title: 'Lunch', detail: 'Take a break and meet other teams.' },
         { time: '13:00', title: 'Build session 02', detail: 'Test the idea, get feedback, and keep building.' },
         { time: '14:30', title: 'Final sprint', detail: 'Finish the essentials and prepare your demo.' },
-        { time: '15:15', title: 'Gallery opens · Final edit window', detail: 'Ready submissions appear in the public gallery and voting opens. Teams can still submit or update entries until 3:30 PM.' },
-        { time: '15:30', title: 'Final submissions close', detail: 'Updates and new entries close. Demos + judging begin at 4:00 PM.' },
+        { time: '15:15', title: 'Gallery opens · Final edit window', detail: 'Ready submissions appear in the public gallery and voting opens. Entries remain open until organisers close submissions.' },
+        { time: '15:30', title: 'Submission window continues', detail: 'New entries and updates stay open until an organiser closes submissions.' },
         { time: '16:00', title: 'Demos + judging', detail: 'Present your build and what you learned.' },
         { time: '16:45', title: 'Wrap-up', detail: 'Share next steps and celebrate the work.' },
         { time: '17:00', title: 'Event ends · Voting closes', detail: 'People’s Choice voting closes automatically.' }
@@ -40,7 +40,7 @@
         { q: 'Do I need to know how to code?', a: 'No. All backgrounds and skill levels are welcome. Bring what you know unusually well.' },
         { q: 'What can we make?', a: 'There is no fixed medium or outcome. Build a website, visual experiment, AI experience, speculative prototype or something else.' },
         { q: 'How do partner offers work?', a: 'Sign in and claim each offer. Claims are limited and first come, first served.' },
-        { q: 'When do submissions close?', a: 'The public gallery and voting open at 3:15 PM SGT on 11 October. You can still submit or update your team’s entry until 3:30 PM SGT.' },
+        { q: 'When do submissions close?', a: 'The public gallery and voting opened at 3:15 PM SGT on 11 October. Submissions remain open until an organiser closes them.' },
         { q: 'How does People’s Choice work?', a: 'Sign in and vote for up to three projects from 3:15 to 5:00 PM SGT. You cannot vote for your own team.' },
         { q: 'Do I need source code?', a: 'Add a source link unless the project is no-code. Include a live demo or video.' }
       ]

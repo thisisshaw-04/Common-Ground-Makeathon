@@ -92,7 +92,7 @@
   /* ---------------- live schedule and server cutoff ---------------- */
   var EVENT_START_AT = Date.parse('2026-10-11T09:00:00+08:00');
   var GALLERY_OPEN_AT = Date.parse('2026-10-11T15:15:00+08:00');
-  var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-11T15:30:00+08:00');
+  var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-11T16:08:02.945+08:00');
   var EVENT_END_AT = Date.parse('2026-10-11T17:00:00+08:00');
   var serverClockOffset = 0;
   var eventStatus = {
@@ -161,9 +161,14 @@
         phase.textContent = 'Now: ' + (rows[activeIndex] ? rows[activeIndex].title : 'Makeathon');
       }
     }
-    if (now < SUBMISSION_CUTOFF_AT) {
-      if (label) label.textContent = now < GALLERY_OPEN_AT ? 'FINAL SUBMISSIONS CLOSE IN' : 'FINAL EDITS CLOSE IN';
-      if (countdown) countdown.textContent = formatCountdown(SUBMISSION_CUTOFF_AT - now);
+    if (!eventStatus.submissions_closed) {
+      if (now < SUBMISSION_CUTOFF_AT) {
+        if (label) label.textContent = now < GALLERY_OPEN_AT ? 'FINAL SUBMISSIONS CLOSE IN' : 'FINAL EDITS CLOSE IN';
+        if (countdown) countdown.textContent = formatCountdown(SUBMISSION_CUTOFF_AT - now);
+      } else {
+        if (label) label.textContent = 'SUBMISSIONS OPEN';
+        if (countdown) countdown.textContent = 'Until organiser closes';
+      }
     } else if (now < EVENT_END_AT) {
       if (label) label.textContent = 'VOTING CLOSES IN';
       if (countdown) countdown.textContent = formatCountdown(EVENT_END_AT - now);
