@@ -366,9 +366,9 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
           <div class="submission-masonry-column">
             <fieldset class="field">
               <legend>PROJECT LINKS & DEMO</legend>
-              <p class="helper">Make links accessible to judges. Any demo video must be 2 minutes or less. Add setup instructions if needed.</p>
+              <p class="helper">Make links accessible to judges. Add a demo video link (2 minutes maximum). Include setup instructions if needed.</p>
               <label class="field"><span>LIVE DEMO / DEPLOYED PROJECT (OPTIONAL)</span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
-              <label class="field"><span>DEMO VIDEO (OPTIONAL)</span><input id="project-video" type="url" placeholder="https://…" maxlength="2000"></label>
+              <label class="field"><span>DEMO VIDEO *</span><input id="project-video" type="url" placeholder="https://…" maxlength="2000" required></label>
               <label class="field"><span>GITHUB / SOURCE CODE (OPTIONAL)</span><input id="project-source" type="url" placeholder="https://github.com/…" maxlength="2000"></label>
               <label class="field"><span>FIGMA / PROTOTYPE (OPTIONAL)</span><input id="project-prototype" type="url" placeholder="https://…" maxlength="2000"></label>
               <label><input id="project-no-code" type="checkbox"> (OPTIONAL) This project is not based on code</label>
@@ -419,6 +419,6 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/project-gallery.js?v=20261011-single-answer-v1"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261011-submission-optional-links-v4"></script>
+<script src="./assets/submission-sync.js?v=20261011-submission-required-demo-video-v5"></script>
 </body>
 </html>
