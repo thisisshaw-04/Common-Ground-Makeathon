@@ -15,14 +15,14 @@
   function youtubeThumbnail(value) {
     try {
       var url = new URL(value);
-      var host = url.hostname.toLowerCase().replace(/^www\\./, '');
+      var host = url.hostname.toLowerCase().replace(/^www\./, '');
       var id = '';
       if (host === 'youtu.be') id = url.pathname.split('/').filter(Boolean)[0] || '';
       else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtube-nocookie.com') {
         id = url.searchParams.get('v') || '';
-        if (!id) id = (url.pathname.match(/\\/(?:embed|shorts|live)\\/([\\w-]{6,})/) || [])[1] || '';
+        if (!id) id = (url.pathname.match(/\/(?:embed|shorts|live)\/([\w-]{6,})/) || [])[1] || '';
       }
-      return /^[\\w-]{6,}$/.test(id) ? 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg' : '';
+      return /^[\w-]{6,}$/.test(id) ? 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg' : '';
     } catch (_err) { return ''; }
   }
   function previewImage(project) {
@@ -31,7 +31,7 @@
     var candidates = [project.demo, project.video];
     for (var i = 0; i < candidates.length; i++) {
       var candidate = safeHref(candidates[i]);
-      if (candidate && /\\.(?:png|jpe?g|gif|webp|avif)(?:$|[?#])/i.test(candidate)) return candidate;
+      if (candidate && /\.(?:png|jpe?g|gif|webp|avif)(?:$|[?#])/i.test(candidate)) return candidate;
     }
     return youtubeThumbnail(project.video || '');
   }
