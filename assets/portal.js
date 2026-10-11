@@ -401,9 +401,9 @@
   var projectFieldIds = {
     name:'project-name', overview:'project-overview', build:'project-build',
     demo:'project-demo', video:'project-video', source:'project-source', prototype:'project-prototype',
-    supporting:'project-supporting', designReflection:'project-design-reflection',
-    cultureReflection:'project-culture-reflection', collaboration:'project-collaboration', attribution:'project-attribution'
+    supporting:'project-supporting', collaboration:'project-collaboration', attribution:'project-attribution'
   };
+  var savedReflections = {designReflection:'',cultureReflection:''};
   function updateProjectTeam() {
     var team = null;
     try { team = JSON.parse(localStorage.getItem(teamKey(current))); } catch (err) { /* No saved team. */ }
@@ -420,6 +420,10 @@
     if (!project.build) {
       project.build = [project.technology, project.made, project.experiment, project.next].filter(Boolean).join('\n\n');
     }
+    savedReflections = {
+      designReflection: project.designReflection || '',
+      cultureReflection: project.cultureReflection || ''
+    };
     Object.keys(projectFieldIds).forEach(function (key) {
       $(projectFieldIds[key]).value = project[key] || '';
     });
@@ -435,6 +439,8 @@
     if (!current || $('submission-section').hidden || !CGData.codesOpen(data.event) || eventStatus.submissions_closed) return null;
     var project = {};
     Object.keys(projectFieldIds).forEach(function (key) { project[key] = $(projectFieldIds[key]).value.trim(); });
+    project.designReflection = savedReflections.designReflection;
+    project.cultureReflection = savedReflections.cultureReflection;
     project.tracks = Array.prototype.slice.call(document.querySelectorAll('input[name="project-track"]:checked')).map(function (input) { return input.value; });
     project.noCode = $('project-no-code').checked;
     var team = updateProjectTeam() || {};
