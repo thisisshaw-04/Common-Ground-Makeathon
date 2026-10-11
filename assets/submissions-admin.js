@@ -371,8 +371,8 @@
     var email = $('inbox-email').value.trim().toLowerCase();
     try {
       await window.CGSubmission.signIn(email);
-      message('Check your email for a one-time sign-in link, then return here.');
-    } catch (_err) { message('Could not send the sign-in link. Check the email and try again.', true); }
+      message('Check your inbox and spam folder. Open the newest link in this browser to view the inbox.');
+    } catch (_err) { message(window.CGSubmission.signInErrorMessage(_err), true); }
   });
   $('inbox-cards').addEventListener('click', function (event) {
     var button = event.target.closest('[data-score-save]');
