@@ -308,7 +308,6 @@
   function buildJudgingWorkbook(XLSX) {
     var tracks = [
       {sheetName:'Design × Tech', track:'Design × Tech', judges:['Clement Zheng','Phil Hedayatnia','Lucian Grey']},
-      
       {sheetName:'Culture × Tech', track:'Culture × Tech', judges:['Yee Chia','Ilke Senturk','Yaziz Hassan']}
     ];
     var readyRows = allRows.filter(function (row) { return row.status === 'ready'; });
