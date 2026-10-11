@@ -11,6 +11,37 @@
     session = result.data.session;
     return session;
   }) : Promise.resolve(null);
+  var pendingSignIns = Object.create(null);
+  var lastSignInRequest = Object.create(null);
+  var signInCooldownMs = 60000;
+
+  function signInRedirectUrl() {
+    var currentUrl = new URL(window.location.href);
+    if (/\/submissions\.html$/i.test(currentUrl.pathname)) {
+      currentUrl.search = '';
+      currentUrl.hash = '';
+      return currentUrl.href;
+    }
+    var portalUrl = new URL('./', currentUrl.href);
+    portalUrl.search = '';
+    var panel = currentUrl.hash.match(/^#(overview|access|schedule|faq|choice)$/i);
+    portalUrl.hash = panel ? panel[1].toLowerCase() : 'access';
+    return portalUrl.href;
+  }
+
+  function signInErrorMessage(error) {
+    if (error && error.code === 'cg_sign_in_cooldown') return error.message;
+    var code = String(error && error.code || '').toLowerCase();
+    var message = String(error && error.message || '').toLowerCase();
+    var status = Number(error && error.status || 0);
+    if (status === 429 || code.indexOf('rate') !== -1 || message.indexOf('rate limit') !== -1 || message.indexOf('too many') !== -1) {
+      return 'Too many sign-in emails were requested. Wait at least a minute, then use the newest link. Each link works only once.';
+    }
+    if (status >= 500) {
+      return 'The sign-in email service is busy. Wait a minute before requesting one link again, then use the newest email.';
+    }
+    return 'Could not send the sign-in link. Check the address. If this keeps happening, tell an organiser.';
+  }
 
   if (client) {
     client.auth.onAuthStateChange(function (_event, nextSession) {
@@ -26,14 +57,32 @@
     ready: ready,
     getSession: function () { return session; },
     getUser: function () { return session && session.user || null; },
+    signInErrorMessage: signInErrorMessage,
     signIn: async function (email) {
       if (!client) throw new Error('Submission sign-in is not configured yet.');
-      var result = await client.auth.signInWithOtp({
+      email = String(email || '').trim().toLowerCase();
+      if (pendingSignIns[email]) return pendingSignIns[email];
+      var lastRequest = lastSignInRequest[email] || 0;
+      var waitMs = signInCooldownMs - (Date.now() - lastRequest);
+      if (waitMs > 0) {
+        var cooldownError = new Error('A sign-in email was just requested. Wait ' + Math.ceil(waitMs / 1000) + ' seconds, then use the newest link.');
+        cooldownError.code = 'cg_sign_in_cooldown';
+        throw cooldownError;
+      }
+      lastSignInRequest[email] = Date.now();
+      var request = client.auth.signInWithOtp({
         email: email,
-        options: { emailRedirectTo: new URL('./', window.location.href).href }
+        options: { emailRedirectTo: signInRedirectUrl() }
+      }).then(function (result) {
+        if (result.error) throw result.error;
+        return result;
       });
-      if (result.error) throw result.error;
-      return result;
+      pendingSignIns[email] = request;
+      try {
+        return await request;
+      } finally {
+        delete pendingSignIns[email];
+      }
     },
     signOut: async function () {
       if (!client) return;

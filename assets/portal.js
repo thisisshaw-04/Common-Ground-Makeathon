@@ -287,6 +287,8 @@
       }
       clearError();
       setGateStatus('Signed in and verified. Your claims and team draft are tied to this email.');
+      var returnPanel = location.hash.match(/^#(access|schedule|faq|choice)$/i);
+      if (!returnPanel) activatePanel('access', true);
       renderResult({
         email: email,
         name: user.user_metadata && (user.user_metadata.full_name || user.user_metadata.name) || email,
@@ -470,9 +472,9 @@
     }
     try {
       await auth.signIn(value);
-      setGateStatus('If this is your registered email, a one-time link is on its way. Open it on this device to continue.');
+      setGateStatus('If this is your approved email, check your inbox and spam folder. Open the newest link in this browser; your access will appear here.');
     } catch (_err) {
-      showError('Could not send the sign-in link. Check the address and try again in a minute.');
+      showError(window.CGSubmission.signInErrorMessage(_err));
     }
   });
 
@@ -540,13 +542,19 @@
 
   renderEvent();
   refreshEventStatus();
-  if (new URLSearchParams(location.search).has('email')) {
-    history.replaceState(null, '', location.pathname + location.hash);
+  function cleanAuthEmailParam() {
+    var url = new URL(location.href);
+    if (!url.searchParams.has('email')) return;
+    url.searchParams.delete('email');
+    history.replaceState(null, '', url.pathname + url.search + url.hash);
   }
   if (!window.CGSubmission) {
     showError('Supabase sign-in is not configured yet. Contact an organiser.');
   } else {
-    window.CGSubmission.ready.then(handlePortalSession).catch(function () {
+    window.CGSubmission.ready.then(function (session) {
+      cleanAuthEmailParam();
+      return handlePortalSession(session);
+    }).catch(function () {
       showError('Supabase could not start. Reload the page and try again.');
     });
   }

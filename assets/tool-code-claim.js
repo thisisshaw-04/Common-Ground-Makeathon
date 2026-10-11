@@ -87,9 +87,9 @@
     }
     try {
       await window.CGSubmission.signIn(email);
-      $('tool-claim-auth-status').textContent = 'Check your email for the sign-in link, then return here to claim your codes.';
+      $('tool-claim-auth-status').textContent = 'Check your inbox and spam folder. Open the newest link in this browser to return and claim your codes.';
     } catch (_err) {
-      $('tool-claim-auth-status').textContent = 'Could not send a sign-in link. Check the email and try again.';
+      $('tool-claim-auth-status').textContent = window.CGSubmission.signInErrorMessage(_err);
     }
   });
   document.addEventListener('click', async function (event) {
