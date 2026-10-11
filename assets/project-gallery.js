@@ -38,9 +38,13 @@
   function driveThumbnail(value) {
     try {
       var url = new URL(value);
-      if (url.hostname.toLowerCase().replace(/^www\\./, '') !== 'drive.google.com') return '';
-      var match = url.pathname.match(/^\\/file\\/d\\/([A-Za-z0-9_-]+)/);
-      var id = match ? match[1] : (url.pathname === '/uc' ? url.searchParams.get('id') : '');
+      var host = url.hostname.toLowerCase();
+      if (host.indexOf('www.') === 0) host = host.slice(4);
+      if (host !== 'drive.google.com') return '';
+      var segments = url.pathname.split('/');
+      var id = segments[1] === 'file' && segments[2] === 'd'
+        ? segments[3]
+        : ((url.pathname === '/uc' || url.pathname === '/open') ? url.searchParams.get('id') : '');
       return id && /^[A-Za-z0-9_-]+$/.test(id)
         ? 'https://drive.google.com/thumbnail?id=' + encodeURIComponent(id) + '&sz=w1200'
         : '';
@@ -53,7 +57,7 @@
     var candidates = [row.demo_url, row.video_url];
     for (var i = 0; i < candidates.length; i++) {
       var candidate = safeHref(candidates[i]);
-      if (candidate && /\\.(?:png|jpe?g|gif|webp|avif)(?:$|[?#])/i.test(candidate)) return candidate;
+      if (candidate && /\.(?:png|jpe?g|gif|webp|avif)(?:$|[?#])/i.test(candidate)) return candidate;
     }
     var videoSources = [row.video_url, row.demo_url, row.prototype_url];
     for (var j = 0; j < videoSources.length; j++) {
