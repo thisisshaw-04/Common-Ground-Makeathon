@@ -112,12 +112,16 @@
         links += (links ? ' ' : '') + '<span>' + escape(project.supporting) + '</span>';
       }
       var labels = {
+        overview:'Project overview', build:'The build',
         oneLiner:'One-liner', inspiration:'Problem / inspiration', solution:'Solution', interesting:'What makes it interesting?',
         technology:'Technology used', made:'What works now', experiment:'Experiment / learning', next:'What they would do next',
         designReflection:'Design × Tech reflection', cultureReflection:'Culture × Tech reflection',
         collaboration:'Team & collaboration', attribution:'AI & tool attribution'
       };
-      var fieldOrder = ['oneLiner','inspiration','solution','interesting','technology','made','experiment','next','designReflection','cultureReflection','collaboration','attribution'];
+      var hasCombinedAnswers = Object.prototype.hasOwnProperty.call(project, 'overview') || Object.prototype.hasOwnProperty.call(project, 'build');
+      var fieldOrder = hasCombinedAnswers
+        ? ['overview','build','designReflection','cultureReflection','collaboration','attribution']
+        : ['oneLiner','inspiration','solution','interesting','technology','made','experiment','next','designReflection','cultureReflection','collaboration','attribution'];
       var fields = fieldOrder.filter(function (key) { return project[key]; }).map(function (key) {
         return '<section class="submission-detail"><strong>' + escape(labels[key]) + '</strong><p>' + escape(project[key]) + '</p></section>';
       }).join('');
