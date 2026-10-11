@@ -28,8 +28,8 @@
       var id = card.getAttribute('data-submission-id');
       var isMyTeam = card.getAttribute('data-is-my-team') === 'true';
       var alreadyVoted = voted.has(id);
-      var buttonText = isMyTeam ? 'Your team' : alreadyVoted ? 'Vote recorded' : remaining === 0 ? 'Limit reached' : 'Vote for this project';
-      var disabled = isMyTeam || alreadyVoted || remaining === 0;
+      var buttonText = isMyTeam ? 'Your team' : alreadyVoted ? 'Remove vote' : remaining === 0 ? 'Limit reached' : 'Vote for this project';
+      var disabled = isMyTeam || (!alreadyVoted && remaining === 0);
       var actions = document.createElement('div');
       actions.className = 'gallery-vote-actions';
       actions.setAttribute('data-vote-actions', '');
@@ -54,7 +54,7 @@
         ? 'Voting closed at 5:00 PM SGT.'
         : 'Voting is paused by the organisers.');
     } else if (votesCast >= 3) {
-      setMessage('You’ve used all three votes.');
+      setMessage('You’ve used all three votes. Remove a vote to change your choices.');
     } else {
       setMessage('Choose up to three different projects. ' + (3 - votesCast) + ' ' +
         (3 - votesCast === 1 ? 'vote' : 'votes') + ' left.');
@@ -89,10 +89,11 @@
     var button = event.target.closest('[data-vote-project]');
     if (!button || button.disabled || !client || !eligible) return;
     var submissionId = button.getAttribute('data-vote-project');
+    var isRemovingVote = votedIds.indexOf(submissionId) !== -1;
     button.disabled = true;
-    setMessage('Recording your vote…');
+    setMessage(isRemovingVote ? 'Removing your vote…' : 'Recording your vote…');
     try {
-      var result = await client.rpc('cast_people_choice_vote', {
+      var result = await client.rpc(isRemovingVote ? 'remove_people_choice_vote' : 'cast_people_choice_vote', {
         p_submission_id: submissionId,
         p_event_id: EVENT_ID
       });
@@ -107,7 +108,9 @@
           ? 'You cannot vote for a project from your team.'
           : detail.indexOf('three votes') >= 0
             ? 'You’ve used all three votes.'
-            : 'Your vote was not recorded. Voting may have closed. Refresh and try again.', true);
+            : isRemovingVote
+              ? 'Your vote could not be removed. Voting may have closed. Refresh and try again.'
+              : 'Your vote was not recorded. Voting may have closed. Refresh and try again.', true);
     }
   });
   document.addEventListener('cg-gallery-loaded', renderVoteButtons);
