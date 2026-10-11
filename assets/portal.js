@@ -295,7 +295,7 @@
       if (result.error) throw result.error;
       if (result.data !== true) {
         clearBuilderAccess();
-        showError('This email is not on the approved builder list. If you registered with a different address, sign out and try that one.');
+        showError('This email is verified, but it isn't on the approved builder list. You can still cast one People’s Choice vote with it; partner offers and project submissions need your registered email.');
         return;
       }
       clearError();
