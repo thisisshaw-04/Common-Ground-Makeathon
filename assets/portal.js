@@ -91,14 +91,15 @@
 
   /* ---------------- live schedule and server cutoff ---------------- */
   var EVENT_START_AT = Date.parse('2026-10-11T09:00:00+08:00');
-  var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-11T15:15:00+08:00');
+  var GALLERY_OPEN_AT = Date.parse('2026-10-11T15:15:00+08:00');
+  var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-11T15:30:00+08:00');
   var EVENT_END_AT = Date.parse('2026-10-11T17:00:00+08:00');
   var serverClockOffset = 0;
   var eventStatus = {
     current_at: new Date().toISOString(),
     submissions_closed: Date.now() >= SUBMISSION_CUTOFF_AT,
-    gallery_open: Date.now() >= SUBMISSION_CUTOFF_AT,
-    voting_open: Date.now() >= SUBMISSION_CUTOFF_AT && Date.now() < EVENT_END_AT,
+    gallery_open: Date.now() >= GALLERY_OPEN_AT,
+    voting_open: Date.now() >= GALLERY_OPEN_AT && Date.now() < EVENT_END_AT,
     authoritative: false
   };
   window.CGEventStatus = eventStatus;
@@ -161,7 +162,7 @@
       }
     }
     if (now < SUBMISSION_CUTOFF_AT) {
-      if (label) label.textContent = 'SUBMISSIONS CLOSE IN';
+      if (label) label.textContent = now < GALLERY_OPEN_AT ? 'FINAL SUBMISSIONS CLOSE IN' : 'FINAL EDITS CLOSE IN';
       if (countdown) countdown.textContent = formatCountdown(SUBMISSION_CUTOFF_AT - now);
     } else if (now < EVENT_END_AT) {
       if (label) label.textContent = 'VOTING CLOSES IN';
@@ -190,11 +191,12 @@
   function localEventFallback() {
     var now = Date.now();
     var closed = now >= SUBMISSION_CUTOFF_AT;
+    var galleryOpen = now >= GALLERY_OPEN_AT;
     return {
       current_at: new Date(now).toISOString(),
       submissions_closed: closed,
-      gallery_open: closed,
-      voting_open: closed && now < EVENT_END_AT,
+      gallery_open: galleryOpen,
+      voting_open: galleryOpen && now < EVENT_END_AT,
       authoritative: false
     };
   }
