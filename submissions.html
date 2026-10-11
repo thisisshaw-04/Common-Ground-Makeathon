@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="./assets/portal.css?v=20261002-team">
+<link rel="stylesheet" href="./assets/portal.css?v=20261011-live-gallery">
 <link rel="stylesheet" href="./assets/identity.css?v=20261011-deck-style">
 <style>
 .inbox-hero{padding:56px 0 38px;border-bottom:1px solid var(--line)}
@@ -100,9 +100,10 @@
     </div>
     <div class="inbox-list" id="inbox-list" hidden>
       <div class="section-head">
-        <h2>Builder submissions</h2>
+        <h2>Live project gallery</h2>
         <span class="eyebrow" id="inbox-count">0 SUBMISSIONS</span>
       </div>
+      <p class="helper">Private organiser view: drafts and ready entries refresh automatically every 15 seconds.</p>
       <div class="inbox-toolbar">
         <label class="field"><span>STATUS</span><select id="inbox-filter"><option value="">All submissions</option><option value="draft">Draft</option><option value="ready">Ready</option></select></label>
         <button class="btn" id="inbox-refresh" type="button">Refresh</button>
@@ -157,6 +158,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-auth-return"></script>
-<script src="./assets/submissions-admin.js?v=20261011-auth-return"></script>
+<script src="./assets/submissions-admin.js?v=20261011-live-gallery"></script>
 </body>
 </html>
