@@ -21,9 +21,10 @@
   function renderVoteButtons() {
     if (!cards) return;
     cards.querySelectorAll('[data-vote-actions]').forEach(function (node) { node.remove(); });
-    if (!eventStatus.voting_open || !eligible || !session || !session.user) return;
+    if (!eventStatus.voting_open || !session || !session.user) return;
     var voted = new Set(votedIds);
-    var remaining = Math.max(0, 3 - votesCast);
+    var limit = eligible ? 3 : 1;
+    var remaining = Math.max(0, limit - votesCast);
     cards.querySelectorAll('.project-gallery-card[data-submission-id]').forEach(function (card) {
       var id = card.getAttribute('data-submission-id');
       var isMyTeam = card.getAttribute('data-is-my-team') === 'true';
@@ -41,12 +42,10 @@
   }
   function renderState() {
     area.hidden = !eventStatus.gallery_open;
-    signIn.hidden = !!(session && session.user) || eligible;
+    signIn.hidden = !!(session && session.user);
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
-      setMessage('Sign in with your approved event email in Part A to vote.');
-    } else if (!eligible) {
-      setMessage('Use an approved event email to vote.', true);
+      setMessage('Sign in with any verified email to vote.');
     } else if (!eventStatus.voting_open) {
       var now = Date.parse(eventStatus.current_at || '');
       var votingStart = Date.parse('2026-10-12T12:00:00+08:00');
@@ -56,17 +55,21 @@
         : Number.isFinite(now) && now < votingStart
           ? 'Voting opens at 12:00 PM SGT Monday, 12 October and closes at 11:59 PM Wednesday, 14 October.'
           : 'Voting is paused by the organisers.');
-    } else if (votesCast >= 3) {
-      setMessage('You’ve used all three votes. Unvote a project to free a slot.');
+    } else if (votesCast >= (eligible ? 3 : 1)) {
+      setMessage(eligible
+        ? 'You’ve used all three votes. Unvote a project to free a slot.'
+        : 'You’ve used your one vote. Unvote a project to free the slot.');
     } else {
-      setMessage('Choose up to three different projects. ' + (3 - votesCast) + ' ' +
-        (3 - votesCast === 1 ? 'vote' : 'votes') + ' left.');
+      var limit = eligible ? 3 : 1;
+      var remaining = limit - votesCast;
+      setMessage('Choose up to ' + limit + ' different project' + (limit === 1 ? '' : 's') + '. ' +
+        remaining + ' ' + (remaining === 1 ? 'vote' : 'votes') + ' left.');
     }
     renderVoteButtons();
   }
   async function refreshStatus() {
     var sequence = ++statusRequest;
-    if (!client || !eligible || !session || !session.user) {
+    if (!client || !session || !session.user) {
       votesCast = 0;
       votedIds = [];
       renderState();
@@ -90,7 +93,7 @@
   }
   if (cards) cards.addEventListener('click', async function (event) {
     var button = event.target.closest('[data-vote-project]');
-    if (!button || button.disabled || !client || !eligible) return;
+    if (!button || button.disabled || !client || !session || !session.user) return;
     var submissionId = button.getAttribute('data-vote-project');
     var removingVote = votedIds.indexOf(submissionId) !== -1;
     button.disabled = true;
