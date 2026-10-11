@@ -307,8 +307,8 @@
   }
   function buildJudgingWorkbook(XLSX) {
     var tracks = [
-      {sheetName:'Design × Tech', track:'Design × Tech'},
-      {sheetName:'Culture × Tech', track:'Culture × Tech'}
+      {sheetName:'Design × Tech', track:'Design × Tech', judges:['Clement Zheng','Phil Hedayatnia','Lucian Grey']},
+      {sheetName:'Culture × Tech', track:'Culture × Tech', judges:['Yee Chia','Ilke Senturk','Yaziz Hassan']}
     ];
     var readyRows = allRows.filter(function (row) { return row.status === 'ready'; });
     var workbook = XLSX.utils.book_new();
@@ -327,9 +327,9 @@
       var groupRows = [];
       groups.forEach(function (row) {
         var firstRow = dataRows.length;
-        dataRows.push([row.team && row.team.name || '', row.project && row.project.name || '', 'Open project in gallery ↗', 'Judge 1', '', '', '', '', '']);
-        dataRows.push(['', '', '', 'Judge 2', '', '', '', '', '']);
-        dataRows.push(['', '', '', 'Judge 3', '', '', '', '', '']);
+        dataRows.push([row.team && row.team.name || '', row.project && row.project.name || '', 'Open project in gallery ↗', definition.judges[0], '', '', '', '', '']);
+        dataRows.push(['', '', '', definition.judges[1], '', '', '', '', '']);
+        dataRows.push(['', '', '', definition.judges[2], '', '', '', '', '']);
         groupRows.push({row:row,start:firstRow});
       });
       if (!groups.length) dataRows.push(['No ready submissions for this track yet.']);
