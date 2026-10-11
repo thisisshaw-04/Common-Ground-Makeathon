@@ -63,6 +63,15 @@
     var href = safeHref(value);
     return href ? '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + escape(label) + ' ↗</a>' : '';
   }
+  function focusRequestedProject() {
+    var projectId = new URLSearchParams(window.location.search).get('project');
+    if (!projectId) return;
+    var card = document.getElementById('project-' + projectId);
+    if (!card) return;
+    var details = card.querySelector('details');
+    if (details) details.open = true;
+    window.setTimeout(function () { card.scrollIntoView({behavior:'smooth',block:'center'}); }, 100);
+  }
   function render(rows) {
     if (!rows.length) {
       message.textContent = 'No ready submissions were received by 3:15 PM.';
@@ -92,7 +101,7 @@
         detail('AI & tool attribution', row.ai_attribution) +
         detail('Supporting materials', row.supporting_materials) +
         (links ? '<div class="project-gallery-links">' + links + '</div>' : '');
-      return '<article class="project-gallery-card" data-submission-id="' + escape(row.submission_id) +
+      return '<article class="project-gallery-card" id="project-' + escape(row.submission_id) + '" data-submission-id="' + escape(row.submission_id) +
         '" data-is-my-team="' + (row.is_my_team ? 'true' : 'false') + '">' +
         '<details class="project-gallery-details"><summary>' +
         previewMarkup(row, name, oneLiner) +
@@ -108,6 +117,7 @@
         (expanded || '<p class="helper">No additional details were shared.</p>') +
         '</div></details></article>';
     }).join('');
+    focusRequestedProject();
     document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:rows}}));
   }
   async function load() {
