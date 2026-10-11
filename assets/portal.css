@@ -381,3 +381,8 @@ body .topbar{position:sticky;top:0;z-index:30;height:auto;min-height:82px;displa
 @media(prefers-reduced-motion:reduce){
   #main-nav .portal-tab[data-panel-select="access"] span{transition:none}
 }
+
+/* Submission form requirement labels */
+.field-status{display:inline-block!important;margin:0 0 0 7px;padding:2px 5px;border:1px solid currentColor;font:500 9px var(--mono);letter-spacing:.04em;line-height:1.25;vertical-align:1px;white-space:nowrap}
+.field-status.is-required{color:#76550b;background:#fff7df}
+.field-status.is-optional{color:#727666;background:#f1f1eb;border-color:#d8d9cf}
