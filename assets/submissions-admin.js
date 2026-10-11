@@ -278,10 +278,50 @@
   $('inbox-login').addEventListener('submit', async function (event) {
     event.preventDefault();
     var email = $('inbox-email').value.trim().toLowerCase();
+    var submit = $('inbox-login').querySelector('button[type="submit"]');
+    submit.disabled = true;
     try {
       await window.CGSubmission.signIn(email);
-      message('Check your inbox and spam folder. Open the newest link in this browser to view the inbox.');
+      $('inbox-code').value = '';
+      $('inbox-login').hidden = true;
+      $('inbox-code-form').hidden = false;
+      $('inbox-code').focus();
+      message('We sent an 8-digit code to ' + email + '. Enter it here to open the organiser inbox.');
     } catch (_err) { message(window.CGSubmission.signInErrorMessage(_err), true); }
+    finally { submit.disabled = false; }
+  });
+  $('inbox-code-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var email = $('inbox-email').value.trim().toLowerCase();
+    var token = $('inbox-code').value.replace(/\\D/g, '');
+    var submit = $('inbox-code-form').querySelector('button[type="submit"]');
+    submit.disabled = true;
+    message('Verifying your code…');
+    try {
+      var verified = await window.CGSubmission.verifyEmailCode(email, token);
+      $('inbox-code-form').hidden = true;
+      await handleSession({user:verified.user || (verified.session && verified.session.user)});
+    } catch (_err) {
+      message('That code is invalid, expired, or already used. Check the newest email or request a new code.', true);
+    } finally { submit.disabled = false; }
+  });
+  $('inbox-resend').addEventListener('click', async function () {
+    var email = $('inbox-email').value.trim().toLowerCase();
+    this.disabled = true;
+    try {
+      await window.CGSubmission.signIn(email);
+      $('inbox-code').value = '';
+      message('We sent a new 8-digit code to ' + email + '. Use the newest code.');
+      $('inbox-code').focus();
+    } catch (_err) { message(window.CGSubmission.signInErrorMessage(_err), true); }
+    finally { this.disabled = false; }
+  });
+  $('inbox-change-email').addEventListener('click', function () {
+    $('inbox-code-form').hidden = true;
+    $('inbox-login').hidden = false;
+    $('inbox-code').value = '';
+    $('inbox-email').focus();
+    message('Enter the organiser email to request a code.');
   });
   $('inbox-signout').addEventListener('click', async function () {
     try { await window.CGSubmission.signOut(); }
