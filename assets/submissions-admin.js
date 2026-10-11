@@ -12,6 +12,39 @@
   var $ = function (id) { return document.getElementById(id); };
   var escape = function (value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); };
   function safeHref(value) { try { var url = new URL(value); return /^https?:$/.test(url.protocol) ? escape(url.href) : ''; } catch (_err) { return ''; } }
+  function youtubeThumbnail(value) {
+    try {
+      var url = new URL(value);
+      var host = url.hostname.toLowerCase().replace(/^www\\./, '');
+      var id = '';
+      if (host === 'youtu.be') id = url.pathname.split('/').filter(Boolean)[0] || '';
+      else if (host === 'youtube.com' || host === 'm.youtube.com' || host === 'youtube-nocookie.com') {
+        id = url.searchParams.get('v') || '';
+        if (!id) id = (url.pathname.match(/\\/(?:embed|shorts|live)\\/([\\w-]{6,})/) || [])[1] || '';
+      }
+      return /^[\\w-]{6,}$/.test(id) ? 'https://i.ytimg.com/vi/' + id + '/hqdefault.jpg' : '';
+    } catch (_err) { return ''; }
+  }
+  function previewImage(project) {
+    var image = safeHref(project.preview_image_url || project.preview_image || project.previewImage);
+    if (image) return image;
+    var candidates = [project.demo, project.video];
+    for (var i = 0; i < candidates.length; i++) {
+      var candidate = safeHref(candidates[i]);
+      if (candidate && /\\.(?:png|jpe?g|gif|webp|avif)(?:$|[?#])/i.test(candidate)) return candidate;
+    }
+    return youtubeThumbnail(project.video || '');
+  }
+  function previewMarkup(project, name) {
+    var image = previewImage(project);
+    var oneLiner = project.oneLiner || '';
+    return '<div class="submission-preview' + (image ? ' has-image' : '') + '">' +
+      (image ? '<img src="' + image + '" alt="' + escape(name) + ' project preview" loading="lazy" referrerpolicy="no-referrer">' : '') +
+      '<span class="preview-kicker">COMMON GROUND / PROJECT</span>' +
+      (!image ? '<strong>' + escape(name) + '</strong>' : '') +
+      '<span class="preview-caption">' + escape(image ? 'A look inside the project' : (oneLiner || 'Open the project details to see what the team made.')) + '</span>' +
+      '</div>';
+  }
   function message(text, error) {
     $('inbox-message').textContent = text;
     $('inbox-message').classList.toggle('error', !!error);
@@ -65,6 +98,7 @@
     }
     $('inbox-cards').innerHTML = rows.map(function (row) {
       var project = row.project || {}, team = row.team || {};
+      var name = project.name || 'Untitled project';
       var members = Array.isArray(team.members) ? team.members : [];
       var linkItems = [
         ['Live demo', project.demo], ['Demo video', project.video], ['Source code', project.source],
@@ -73,7 +107,7 @@
       var links = linkItems.map(function (item) {
         var href = item[1] && safeHref(item[1]);
         return href ? '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + escape(item[0]) + ' ↗</a>' : '';
-      }).join('');
+      }).filter(Boolean).join('');
       if (project.supporting) {
         links += (links ? ' ' : '') + '<span>' + escape(project.supporting) + '</span>';
       }
@@ -91,15 +125,19 @@
       var memberNames = members.map(function (member) {
         return escape(member.name || '') + (member.email ? ' · ' + escape(member.email) : '');
       }).filter(Boolean).join('<br>');
-      return '<article class="submission-card"><header><div><h2>' + escape(project.name || 'Untitled project') + '</h2>' +
-        '<span class="submission-meta">' + escape(row.owner_email) + ' · ' + escape(team.name || 'No team') + '</span></div>' +
-        '<span class="submission-badge ' + (row.status === 'ready' ? 'ready' : '') + '">' + escape(row.status) + '</span></header>' +
-        (tracks.length ? '<div class="submission-tracks">' + tracks.map(function (track) { return '<span>' + escape(track) + '</span>'; }).join('') + '</div>' : '') +
+      var expanded = (tracks.length ? '<div class="submission-tracks">' + tracks.map(function (track) { return '<span>' + escape(track) + '</span>'; }).join('') + '</div>' : '') +
         (memberNames ? '<div class="submission-meta"><strong>Team members</strong><br>' + memberNames + '</div>' : '') +
         '<div class="submission-meta">' + escape(members.length + 1) + ' team member(s) · Updated ' + escape(new Date(row.updated_at).toLocaleString()) + '</div>' +
         (fields ? '<div class="submission-fields">' + fields + '</div>' : '<p>No project details yet.</p>') +
-        (links ? '<div class="submission-links">' + links + '</div>' : '') +
-        '</article>';
+        (links ? '<div class="submission-links">' + links + '</div>' : '');
+      return '<article class="submission-card"><details class="submission-card-details"><summary>' +
+        previewMarkup(project, name) +
+        '<div class="submission-card-copy"><header><div><span class="submission-meta">' + escape(team.name || 'No team') +
+        '</span><h2>' + escape(name) + '</h2></div><span class="submission-badge ' + (row.status === 'ready' ? 'ready' : '') +
+        '">' + escape(row.status) + '</span></header>' +
+        (project.oneLiner ? '<p class="submission-one-liner">' + escape(project.oneLiner) + '</p>' : '') +
+        '<span class="submission-card-toggle"><span>View project details</span><span aria-hidden="true">↘</span></span>' +
+        '</div></summary><div class="submission-card-expanded">' + expanded + '</div></details></article>';
     }).join('');
   }
   function peopleChoiceMessage(text, isError) {
