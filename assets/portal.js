@@ -94,12 +94,14 @@
   var GALLERY_OPEN_AT = Date.parse('2026-10-11T15:15:00+08:00');
   var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-11T16:08:02.945+08:00');
   var EVENT_END_AT = Date.parse('2026-10-11T17:00:00+08:00');
+  var VOTING_START_AT = Date.parse('2026-10-13T12:00:00+08:00');
+  var VOTING_END_AT = Date.parse('2026-10-14T23:59:59+08:00');
   var serverClockOffset = 0;
   var eventStatus = {
     current_at: new Date().toISOString(),
     submissions_closed: Date.now() >= SUBMISSION_CUTOFF_AT,
     gallery_open: Date.now() >= GALLERY_OPEN_AT,
-    voting_open: Date.now() >= GALLERY_OPEN_AT && Date.now() < EVENT_END_AT,
+    voting_open: Date.now() >= VOTING_START_AT && Date.now() < VOTING_END_AT,
     authoritative: false
   };
   window.CGEventStatus = eventStatus;
@@ -169,11 +171,14 @@
         if (label) label.textContent = 'SUBMISSIONS OPEN';
         if (countdown) countdown.textContent = 'Until organiser closes';
       }
-    } else if (now < EVENT_END_AT) {
+    } else if (now < VOTING_START_AT) {
+      if (label) label.textContent = 'PEOPLE’S CHOICE OPENS IN';
+      if (countdown) countdown.textContent = formatCountdown(VOTING_START_AT - now);
+    } else if (now < VOTING_END_AT) {
       if (label) label.textContent = 'VOTING CLOSES IN';
-      if (countdown) countdown.textContent = formatCountdown(EVENT_END_AT - now);
+      if (countdown) countdown.textContent = formatCountdown(VOTING_END_AT - now);
     } else {
-      if (label) label.textContent = 'SUBMISSIONS + VOTING';
+      if (label) label.textContent = 'VOTING';
       if (countdown) countdown.textContent = 'Closed';
     }
   }
