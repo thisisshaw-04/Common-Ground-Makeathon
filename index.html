@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<link rel="stylesheet" href="./assets/portal.css?v=20261003-project">
+<link rel="stylesheet" href="./assets/portal.css?v=20261011-main-navigation">
 <link rel="stylesheet" href="./assets/identity.css?v=20261011-deck-style">
 <style>
 #submission-form fieldset{border:1px solid var(--ink);border-radius:14px;padding:18px;margin:22px 0;min-width:0}
@@ -37,7 +37,7 @@
 .nav-note{grid-column:1/-1;padding:2px 6px;font:10px var(--mono);color:var(--muted)}
 .portal-panel[hidden]{display:none!important}
 .portal-panel{min-height:45vh}
-#panel-access .hero{padding-top:38px}
+#panel-overview .hero{padding-top:38px}
 #panel-access .gate{margin:28px 0}
 #panel-access .result{margin:24px 0}
 #panel-choice .team-section{margin:28px 0}
@@ -112,10 +112,10 @@
 </section>
 <section class="portal-panel" id="panel-access" data-portal-panel="access" role="tabpanel" aria-labelledby="nav-access" hidden>
   <section class="gate" id="gate" aria-labelledby="gate-title">
-    <div class="gate-aside" aria-hidden="true"><span class="gate-symbol">✳</span><span>ONE VERIFIED EMAIL.<br>YOUR BUILDER ACCESS.</span><div class="tool-labels"><span>Codex</span><span>Figma</span><span>Mobbin</span></div></div>
+    <div class="gate-aside" aria-hidden="true"><span class="gate-symbol">✳</span><span>ONE VERIFIED EMAIL.<br>YOUR EVENT ACCESS.</span><div class="tool-labels"><span>Codex</span><span>Figma</span><span>Mobbin</span></div></div>
     <div class="gate-inner">
       <span class="eyebrow">YOUR ACCESS</span>
-      <h2 id="gate-title">Sign in to your event access.</h2>
+      <h2 id="gate-title">Sign in for your partner offers.</h2>
       <p>Use the email approved for the event. We’ll send one sign-in link to that inbox. Gmail is not required.</p>
       <form class="gate-form" id="gate-form" novalidate>
         <label for="email">Your registration email</label>
@@ -206,7 +206,7 @@
   <section class="section" id="weekend">
     <div class="section-head">
       <h2>Event schedule</h2>
-      <span class="eyebrow">03 / SCHEDULE</span>
+      <span class="eyebrow">LIVE SCHEDULE</span>
     </div>
     <div class="event-live" id="event-live">
       <div class="event-live-top">
@@ -229,7 +229,7 @@
   <section class="section" id="questions">
     <div class="section-head">
       <h2>Questions we get</h2>
-      <span class="eyebrow">04 / FAQ</span>
+      <span class="eyebrow">FAQ</span>
     </div>
     <div class="faq" id="faq"></div>
   </section>
@@ -244,7 +244,7 @@
     <a class="btn btn-primary" href="#nav-access" data-panel-select="access">Go to sign in</a>
   </div>
 <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
-      <span class="eyebrow">NEXT / YOUR TEAM</span>
+      <span class="eyebrow">YOUR TEAM</span>
       <h2 id="team-title">Good things start with a team.</h2>
       <p>Add your team details for your submission. You are included as the team contact.</p>
       <p id="team-contact" class="helper"></p>
@@ -266,7 +266,7 @@
       </form>
     </section>
 <section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
-      <span class="eyebrow">THEN / YOUR SUBMISSION</span>
+      <span class="eyebrow">PROJECT DETAILS</span>
       <h2 id="submission-title">Show us what you made.</h2>
       <p>Submit one entry per team. Choose up to two award tracks, then save drafts as you build. Only one teammate should submit for your team.</p>
       <p id="submission-team" class="helper"></p>
@@ -356,7 +356,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-root-redirect"></script>
-<script src="./assets/data.js?v=20261011-published-copy"></script>
+<script src="./assets/data.js?v=20261011-main-navigation"></script>
 <script src="./assets/portal.js?v=20261011-main-navigation"></script>
 <script src="./assets/project-gallery.js?v=20261011-public-gallery"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
