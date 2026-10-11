@@ -7,6 +7,7 @@
   if (!authBox) return;
   var client = window.CGSubmission && window.CGSubmission.client;
   var lastUserId = null;
+  var savedReflections = {designReflection:'',cultureReflection:''};
 
   function participantEmail() {
     return ($('p-detail').textContent.split('·')[0] || '').trim().toLowerCase();
@@ -75,8 +76,8 @@
       prototype: $('project-prototype').value.trim(),
       noCode: $('project-no-code').checked,
       supporting: $('project-supporting').value.trim(),
-      designReflection: $('project-design-reflection').value.trim(),
-      cultureReflection: $('project-culture-reflection').value.trim(),
+      designReflection: savedReflections.designReflection,
+      cultureReflection: savedReflections.cultureReflection,
       collaboration: $('project-collaboration').value.trim(),
       attribution: $('project-attribution').value.trim()
     };
@@ -92,8 +93,6 @@
     $('overview-count').textContent = overview + ' / 100 words';
     $('build-count').textContent = build + ' / 100 words';
     $('track-count').textContent = tracks.length + ' of 2 selected';
-    $('design-reflection-field').hidden = tracks.indexOf('Design × Tech') === -1;
-    $('culture-reflection-field').hidden = tracks.indexOf('Culture × Tech') === -1;
   }
   function validateReady(project, team) {
     if (!project.name || !project.overview || !project.build ||
@@ -108,8 +107,6 @@
     }
     if (!(project.demo || project.video)) return 'Add a live demo or a demo video so judges can experience the project.';
     if (!project.noCode && !project.source) return 'Add a GitHub/source code link, or mark that the project is not based on code.';
-    if (project.tracks.indexOf('Design × Tech') !== -1 && !project.designReflection) return 'Add the Design × Tech reflection for that track.';
-    if (project.tracks.indexOf('Culture × Tech') !== -1 && !project.cultureReflection) return 'Add the Culture × Tech reflection for that track.';
     return '';
   }
   async function checkEligibility(user) {
@@ -171,6 +168,10 @@
   }
   function fillRemote(record) {
     var project = record.project || {};
+    savedReflections = {
+      designReflection: project.designReflection || '',
+      cultureReflection: project.cultureReflection || ''
+    };
     var values = {
       name: project.name || '',
       overview: project.overview || [project.oneLiner, project.inspiration, project.solution, project.interesting].filter(Boolean).join('\n\n'),
@@ -278,7 +279,7 @@
       updateSubmissionGuidance();
     });
   });
-  ['project-one-liner','project-inspiration','project-solution','project-interesting','project-technology','project-made','project-experiment','project-next'].forEach(function (id) {
+  ['project-overview','project-build'].forEach(function (id) {
     $(id).addEventListener('input', updateSubmissionGuidance);
   });
   updateSubmissionGuidance();
