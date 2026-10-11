@@ -479,7 +479,7 @@
       $('gate-code-form').hidden = false;
       $('gate-change-email').hidden = false;
       $('email-code').value = '';
-      setGateStatus('Check your inbox and spam folder for the sign-in code. Enter the newest six-digit code below.');
+      setGateStatus('Check your inbox and spam folder. Open the newest sign-in link in this browser, or enter its six-digit code below if the email includes one.');
       $('email-code').focus();
     } catch (_err) {
       showError(window.CGSubmission.signInErrorMessage(_err));
