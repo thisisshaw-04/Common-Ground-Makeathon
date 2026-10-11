@@ -3,13 +3,7 @@
   'use strict';
   var client = window.CGSubmission && window.CGSubmission.client;
   var allRows = [];
-  var allScores = [];
-  var currentJudgeId = '';
-  var currentJudgeEmail = '';
-  var currentJudgeName = '';
   var xlsxPromise = null;
-  var scoringReady = true;
-  var finalistIds = [];
   var votingOpen = false;
   var voteCount = 0;
   var votingStatusTimer = null;
@@ -105,145 +99,9 @@
         '<div class="submission-meta">' + escape(members.length + 1) + ' team member(s) · Updated ' + escape(new Date(row.updated_at).toLocaleString()) + '</div>' +
         (fields ? '<div class="submission-fields">' + fields + '</div>' : '<p>No project details yet.</p>') +
         (links ? '<div class="submission-links">' + links + '</div>' : '') +
-        (row.status === 'ready' ? renderJudgeScore(row) : '') + '</article>';
+        '</article>';
     }).join('');
   }
-  var scoreCriteria = [
-    ['concept', 'Concept'],
-    ['track_fit', 'Track fit'],
-    ['execution', 'Execution'],
-    ['presentation', 'Presentation']
-  ];
-  function judgeScoreRows(submissionId) {
-    return allScores.filter(function (score) { return score.submission_id === submissionId; });
-  }
-  function averageScore(submissionId) {
-    var rows = judgeScoreRows(submissionId);
-    if (!rows.length) return null;
-    var total = rows.reduce(function (sum, score) {
-      return sum + Number(score.concept) + Number(score.track_fit) +
-        Number(score.execution) + Number(score.presentation);
-    }, 0);
-    return total / rows.length;
-  }
-  function scoreField(submissionId, field, label, ownScore) {
-    var value = ownScore ? String(ownScore[field]) : '';
-    var options = '<option value="">Choose 1–5</option>' + [1,2,3,4,5].map(function (number) {
-      return '<option value="' + number + '"' + (value === String(number) ? ' selected' : '') + '>' + number + '</option>';
-    }).join('');
-    return '<label class="field"><span>' + escape(label) + '</span><select data-score-criterion="' + escape(field) + '">' + options + '</select></label>';
-  }
-  function renderJudgeScore(row) {
-    var ownScore = allScores.find(function (score) {
-      return score.submission_id === row.id && score.judge_id === currentJudgeId;
-    });
-    var total = averageScore(row.id);
-    var summary = total == null ? 'No scores yet' :
-      'Average ' + total.toFixed(1) + ' / 20 across ' + judgeScoreRows(row.id).length +
-      (judgeScoreRows(row.id).length === 1 ? ' judge' : ' judges');
-    if (!scoringReady) {
-      return '<section class="judge-score-block"><h3>Judge rubric</h3><p class="helper">Run the gallery and judging migration in Supabase to enable scoring.</p></section>';
-    }
-    return '<section class="judge-score-block" data-submission-id="' + escape(row.id) + '">' +
-      '<h3>Judge rubric <span class="judge-score-summary">' + escape(summary) + '</span></h3>' +
-      '<div class="judge-score-grid">' + scoreCriteria.map(function (criterion) {
-        return scoreField(row.id, criterion[0], criterion[1] + ' · 25%', ownScore);
-      }).join('') + '</div>' +
-      '<label class="field"><span>PRIVATE ORGANISER NOTES</span><textarea data-score-notes maxlength="2000">' +
-      escape(ownScore && ownScore.notes || '') + '</textarea></label>' +
-      '<div class="judge-score-actions"><button class="btn btn-sm" data-score-save type="button">Save my scores</button>' +
-      '<span class="helper">Scores are 1–5 each; all four criteria count equally.</span></div></section>';
-  }
-  function setJudgingMessage(text, isError) {
-    $('judging-message').textContent = text || '';
-    $('judging-message').classList.toggle('error', !!isError);
-  }
-  async function loadJudgeScores() {
-    var result = await client.rpc('get_common_ground_judging_export', {p_event_id:'common-ground-2026-10-11'});
-    if (result.error) {
-      scoringReady = false;
-      allScores = [];
-      setJudgingMessage('Could not load judge scores. Confirm the judging export migration is applied, then reload.', true);
-      return;
-    }
-    scoringReady = true;
-    allScores = result.data || [];
-    setJudgingMessage('Score each ready project. Your notes stay in the organiser inbox.');
-  }
-  async function saveJudgeScore(button) {
-    var block = button.closest('.judge-score-block');
-    var submissionId = block && block.getAttribute('data-submission-id');
-    if (!submissionId || !currentJudgeId) return;
-    var values = {};
-    var complete = true;
-    block.querySelectorAll('[data-score-criterion]').forEach(function (select) {
-      if (!select.value) complete = false;
-      values[select.getAttribute('data-score-criterion')] = Number(select.value);
-    });
-    if (!complete) {
-      setJudgingMessage('Choose a score from 1–5 for all four criteria before saving.', true);
-      return;
-    }
-    button.disabled = true;
-    try {
-      var record = {
-        submission_id: submissionId,
-        judge_id: currentJudgeId,
-        concept: values.concept,
-        track_fit: values.track_fit,
-        execution: values.execution,
-        presentation: values.presentation,
-        notes: block.querySelector('[data-score-notes]').value.trim(),
-        updated_at: new Date().toISOString()
-      };
-      var result = await client.from('submission_scores').upsert(record, {onConflict:'submission_id,judge_id'});
-      if (result.error) throw result.error;
-      allScores = allScores.filter(function (score) {
-        return !(score.submission_id === submissionId && score.judge_id === currentJudgeId);
-      });
-      allScores.push(Object.assign({}, record, {judge_name:currentJudgeName, judge_email:currentJudgeEmail}));
-      setJudgingMessage('Your scores are saved. ' + (averageScore(submissionId).toFixed(1)) + ' / 20 average across all judges.');
-      render();
-    } catch (error) {
-      setJudgingMessage(error && error.message ? error.message : 'Could not save your scores.', true);
-    } finally { button.disabled = false; }
-  }
-  function autoSelectShortlist() {
-    if (!scoringReady) {
-      $('judging-shortlist-results').textContent = 'The score-based shortlist is not available until the judging migration is applied.';
-      return;
-    }
-    var selected = [];
-    ['Design × Tech', 'Culture × Tech'].forEach(function (track) {
-      var ranked = allRows.filter(function (row) {
-        return row.status === 'ready' && Array.isArray(row.project && row.project.tracks) &&
-          row.project.tracks.indexOf(track) !== -1;
-      }).map(function (row) {
-        return {row:row, score:averageScore(row.id)};
-      }).filter(function (item) { return item.score !== null; });
-      ranked.sort(function (a, b) {
-        return b.score - a.score ||
-          String(a.row.project.name || '').localeCompare(String(b.row.project.name || ''));
-      });
-      ranked.slice(0, 4).forEach(function (item) {
-        if (!selected.some(function (entry) { return entry.row.id === item.row.id; })) {
-          selected.push({row:item.row, score:item.score});
-        }
-      });
-    });
-    var target = $('judging-shortlist-results');
-    if (!selected.length) {
-      target.textContent = 'No ready projects have complete judge scores yet.';
-      return;
-    }
-    target.innerHTML = '<h3>Top scoring projects by judged track</h3><ol>' +
-      selected.map(function (item) {
-        var project = item.row.project || {}, team = item.row.team || {};
-        return '<li>' + escape(project.name || 'Untitled project') + ' · ' +
-          escape(team.name || 'No team') + ' — ' + item.score.toFixed(1) + ' / 20</li>';
-      }).join('') + '</ol><p class="helper">This judging shortlist is separate from People’s Choice voting.</p>';
-  }
-
   function peopleChoiceMessage(text, isError) {
     $('people-choice-message').textContent = text || '';
     $('people-choice-message').classList.toggle('error', !!isError);
@@ -281,7 +139,6 @@
     await loadToolClaims();
     this.disabled = false;
   });
-  $('judging-shortlist').addEventListener('click', autoSelectShortlist);
   $('people-choice-pause').addEventListener('click', async function () {
     this.disabled = true;
     try {
@@ -330,7 +187,6 @@
     if (!client) { message('Supabase is not configured on this site.', true); return; }
     message('Loading submissions…');
     await refreshSubmissionRows();
-    await loadJudgeScores();
     $('inbox-list').hidden = false;
     render();
     await refreshPeopleChoice();
@@ -349,10 +205,6 @@
   }
   async function handleSession(session) {
     var user = session && session.user;
-    currentJudgeId = user && user.id || '';
-    currentJudgeEmail = user && user.email || '';
-    var profile = user && user.user_metadata || {};
-    currentJudgeName = profile.full_name || profile.name || currentJudgeEmail;
     $('inbox-login').hidden = !!user;
     $('inbox-signout').hidden = !user;
     if (!user) {
@@ -381,10 +233,6 @@
       await window.CGSubmission.signIn(email);
       message('Check your inbox and spam folder. Open the newest link in this browser to view the inbox.');
     } catch (_err) { message(window.CGSubmission.signInErrorMessage(_err), true); }
-  });
-  $('inbox-cards').addEventListener('click', function (event) {
-    var button = event.target.closest('[data-score-save]');
-    if (button) saveJudgeScore(button);
   });
   $('inbox-signout').addEventListener('click', async function () {
     try { await window.CGSubmission.signOut(); }
@@ -419,7 +267,7 @@
           project.inspiration ? 'Problem / inspiration: ' + project.inspiration : '',
           project.solution ? 'Solution: ' + project.solution : '',
           project.interesting ? 'What makes it interesting: ' + project.interesting : ''
-        ].filter(Boolean).join('\n\n');
+        ].filter(Boolean).join('\\n\\n');
       }],
       ['Live demo / site', function (row) { return row.project && row.project.demo || ''; }],
       ['GitHub / source code', function (row) { return row.project && row.project.source || ''; }],
@@ -448,99 +296,74 @@
       ['Submission status', function (row) { return row.status || ''; }],
       ['Last updated', function (row) { return row.updated_at || ''; }]
     ];
-    var judgeMap = Object.create(null);
-    allScores.forEach(function (score) {
-      if (!score.judge_id) return;
-      var key = String(score.judge_id);
-      if (!judgeMap[key]) {
-        judgeMap[key] = {id:key, name:score.judge_name || score.judge_email || '', email:score.judge_email || ''};
-      }
-    });
-    var judges = Object.keys(judgeMap).map(function (key) { return judgeMap[key]; });
-    judges.sort(function (a, b) {
-      return String(a.name || a.email || a.id).localeCompare(String(b.name || b.email || b.id));
-    });
-    judges.forEach(function (judge, index) {
-      if (!judge.name && !judge.email) judge.name = 'Judge ' + (index + 1);
-      judge.label = judge.name && judge.email && judge.name.toLowerCase() !== judge.email.toLowerCase()
-        ? judge.name + ' (' + judge.email + ')' : judge.name || judge.email || ('Judge ' + (index + 1));
-    });
-
-    var top = core.map(function (column) { return column[0]; });
-    var sub = core.map(function () { return ''; });
-    var judgeFields = [
-      ['Concept','concept'], ['Track fit','track_fit'], ['Execution','execution'],
-      ['Presentation','presentation'], ['Total / 20','total'], ['Notes','notes']
-    ];
-    judges.forEach(function (judge) {
-      top.push(judge.label, '', '', '', '', '');
-      judgeFields.forEach(function (field) { sub.push(field[0]); });
-    });
-    var averageColumn = top.length;
-    top.push('Average judge score / 20');
-    sub.push('');
-    var dataRows = [top, sub];
-    allRows.forEach(function (row) {
-      var values = core.map(function (column) {
+    var scoreHeaders = ['Judge', 'Concept', 'Track fit', 'Execution', 'Presentation', 'Final marks / 20'];
+    var header = core.map(function (column) { return column[0]; }).concat(scoreHeaders);
+    var dataRows = [header];
+    var readyRows = allRows.filter(function (row) { return row.status === 'ready'; });
+    readyRows.forEach(function (row) {
+      var projectData = core.map(function (column) {
         var value = column[1](row);
         return value == null ? '' : value;
       });
-      var rowScores = [];
-      judges.forEach(function (judge) {
-        var score = allScores.find(function (item) {
-          return item.submission_id === row.id && item.judge_id === judge.id;
-        });
-        if (!score) { values.push('', '', '', '', '', ''); return; }
-        var criteria = ['concept','track_fit','execution','presentation'].map(function (key) {
-          var value = Number(score[key]);
-          return Number.isFinite(value) ? value : '';
-        });
-        var complete = criteria.every(function (value) { return value !== ''; });
-        var total = complete ? criteria.reduce(function (sum, value) { return sum + value; }, 0) : '';
-        values.push(criteria[0], criteria[1], criteria[2], criteria[3], total, score.notes || '');
-        if (complete) rowScores.push(total);
+      [1, 2, 3].forEach(function (judgeNumber) {
+        dataRows.push(projectData.concat(['Judge ' + judgeNumber, '', '', '', '', '']));
       });
-      values.push(rowScores.length
-        ? rowScores.reduce(function (sum, value) { return sum + value; }, 0) / rowScores.length : '');
-      dataRows.push(values);
     });
     var sheet = XLSX.utils.aoa_to_sheet(dataRows);
-    var merges = [];
-    for (var c = 0; c < core.length; c++) merges.push({s:{r:0,c:c},e:{r:1,c:c}});
-    for (var j = 0; j < judges.length; j++) {
-      var start = core.length + j * judgeFields.length;
-      merges.push({s:{r:0,c:start},e:{r:0,c:start + judgeFields.length - 1}});
-    }
-    merges.push({s:{r:0,c:averageColumn},e:{r:1,c:averageColumn}});
-    sheet['!merges'] = merges;
+    var criterionStart = core.length + 1;
+    dataRows.slice(1).forEach(function (_values, index) {
+      var rowIndex = index + 1;
+      var firstCriterion = XLSX.utils.encode_cell({r:rowIndex,c:criterionStart});
+      var lastCriterion = XLSX.utils.encode_cell({r:rowIndex,c:criterionStart + 3});
+      var totalCell = XLSX.utils.encode_cell({r:rowIndex,c:core.length + 5});
+      sheet[totalCell] = {
+        t:'n',
+        f:'IF(COUNT(' + firstCriterion + ':' + lastCriterion + ')=4,SUM(' + firstCriterion + ':' + lastCriterion + '),"")'
+      };
+    });
     sheet['!autofilter'] = {ref:XLSX.utils.encode_range({
-      s:{r:1,c:0},e:{r:Math.max(1,dataRows.length - 1),c:averageColumn}
+      s:{r:0,c:0},e:{r:Math.max(0,dataRows.length - 1),c:core.length + 5}
     })};
     var widths = [20,26,58,34,34,30,30,38,28,38,32,32,32,32,34,34,34,34,18,22];
-    sheet['!cols'] = core.map(function (_column, index) { return {wch:widths[index] || 26}; });
-    judges.forEach(function () {
-      sheet['!cols'].push({wch:12},{wch:12},{wch:12},{wch:14},{wch:14},{wch:36});
-    });
-    sheet['!cols'].push({wch:22});
-    sheet['!rows'] = [{hpt:30},{hpt:24}];
-    dataRows.slice(2).forEach(function (values) {
+    sheet['!cols'] = core.map(function (_column, index) { return {wch:widths[index] || 26}; })
+      .concat([{wch:14},{wch:13},{wch:13},{wch:13},{wch:15},{wch:18}]);
+    sheet['!rows'] = [{hpt:32}];
+    dataRows.slice(1).forEach(function (values) {
       var maxLines = 1;
       values.forEach(function (value) {
         var text = String(value == null ? '' : value);
-        var lines = text.split('\n').reduce(function (sum, line) {
+        var lines = text.split('\\n').reduce(function (sum, line) {
           return sum + Math.max(1, Math.ceil(line.length / 58));
         }, 0);
         maxLines = Math.max(maxLines, lines);
       });
       sheet['!rows'].push({hpt:Math.min(240,Math.max(30,maxLines * 15))});
     });
+
+    var guide = XLSX.utils.aoa_to_sheet([
+      ['COMMON GROUND — SCORING GUIDE'],
+      ['Score', 'Meaning'],
+      [1, 'Weak'],
+      [2, 'Below Expectations'],
+      [3, 'Meets Expectations'],
+      [4, 'Strong'],
+      [5, 'Exceptional'],
+      [],
+      ['Criteria', 'Concept · Track fit · Execution · Presentation'],
+      ['Scoring', 'Enter one score from 1–5 for each criterion in the Judging Sheet.'],
+      ['Per judge', 'Maximum 20 marks across four criteria.'],
+      ['Project total', 'Three judges; maximum 60 marks.']
+    ]);
+    guide['!cols'] = [{wch:24},{wch:76}];
     var workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, sheet, 'Submissions & scores');
+    XLSX.utils.book_append_sheet(workbook, sheet, 'Judging Sheet');
+    XLSX.utils.book_append_sheet(workbook, guide, 'Scoring Guide');
     workbook.Props = {
       Title:'Common Ground Makeathon judging sheet',
-      Subject:'Project submissions and judge scores',
+      Subject:'Project submissions and offline judge scoring',
       Author:'Common Ground Makeathon'
     };
+    if (workbook.Workbook) workbook.Workbook.CalcPr = {fullCalcOnLoad:true,forceFullCalc:true};
     return workbook;
   }
   async function exportSpreadsheet(button) {
