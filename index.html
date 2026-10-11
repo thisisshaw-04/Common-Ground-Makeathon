@@ -141,7 +141,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
                autocomplete="email" inputmode="email" spellcheck="false" aria-describedby="gate-hint gate-error" required>
         <button type="submit">Send sign-in email <span aria-hidden="true">→</span></button>
       </form>
-      <form class="gate-form" id="gate-code-form" hidden novalidate><label for="email-code">Six-digit sign-in code</label><input type="text" id="email-code" name="token" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" aria-describedby="gate-code-hint" required><button type="submit">Verify code <span aria-hidden="true">→</span></button><p class="gate-hint" id="gate-code-hint">Enter the six-digit code from your email. Keep this page open.</p></form><button class="text-link" id="gate-change-email" type="button" hidden>Use a different email</button><p class="gate-hint" id="gate-hint">After sign-in, claim partner offers and save your team’s project submission.</p>
+      <form class="gate-form" id="gate-code-form" hidden novalidate><label for="email-code">Eight-digit sign-in code</label><input type="text" id="email-code" name="token" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" maxlength="8" placeholder="00000000" aria-describedby="gate-code-hint" required><button type="submit">Verify code <span aria-hidden="true">→</span></button><p class="gate-hint" id="gate-code-hint">Enter the eight-digit code from your email. Keep this page open.</p></form><button class="text-link" id="gate-change-email" type="button" hidden>Use a different email</button><p class="gate-hint" id="gate-hint">After sign-in, claim partner offers and save your team’s project submission.</p>
       <p class="gate-luma" id="gate-luma" hidden>Event details: <a href="https://luma.com/yjffwqr2" target="_blank" rel="noopener noreferrer">Common Ground on Luma ↗</a></p>
       <p class="gate-error" id="gate-error" role="alert"></p><p class="gate-hint" id="gate-status" role="status"></p><button class="btn btn-sm" id="portal-signout" type="button" hidden>Sign out</button>
     </div>
@@ -376,7 +376,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-email-code"></script>
 <script src="./assets/data.js?v=20261011-main-navigation"></script>
-<script src="./assets/portal.js?v=20261011-email-code"></script>
+<script src="./assets/portal.js?v=20261011-email-code-8digit"></script>
 <script src="./assets/project-gallery.js?v=20261011-public-gallery"></script>
 <script src="./assets/people-choice-vote.js?v=20261011-three-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
