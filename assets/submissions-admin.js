@@ -130,14 +130,21 @@
         '<div class="submission-meta">' + escape(members.length + 1) + ' team member(s) · Updated ' + escape(new Date(row.updated_at).toLocaleString()) + '</div>' +
         (fields ? '<div class="submission-fields">' + fields + '</div>' : '<p>No project details yet.</p>') +
         (links ? '<div class="submission-links">' + links + '</div>' : '');
-      return '<article class="submission-card"><details class="submission-card-details"><summary>' +
+      var modalContent = '<div class="project-modal-project">' +
+        '<h2>' + escape(name) + '</h2>' +
+        '<p class="project-modal-team">' + escape(team.name || 'No team') + '</p>' +
+        '<p class="project-modal-status"><span class="submission-badge ' + (row.status === 'ready' ? 'ready' : '') + '">' + escape(row.status) + '</span></p>' +
+        '<div class="project-modal-details">' + expanded + '</div>' +
+        '</div>';
+      return '<article class="submission-card" data-project-modal-card>' +
+        '<button class="project-modal-trigger submission-card-trigger" type="button" data-project-modal-open aria-haspopup="dialog">' +
         previewMarkup(project, name) +
         '<div class="submission-card-copy"><header><div><span class="submission-meta">' + escape(team.name || 'No team') +
         '</span><h2>' + escape(name) + '</h2></div><span class="submission-badge ' + (row.status === 'ready' ? 'ready' : '') +
         '">' + escape(row.status) + '</span></header>' +
         (project.oneLiner ? '<p class="submission-one-liner">' + escape(project.oneLiner) + '</p>' : '') +
-        '<span class="submission-card-toggle"><span>View project details</span><span aria-hidden="true">↘</span></span>' +
-        '</div></summary><div class="submission-card-expanded">' + expanded + '</div></details></article>';
+        '<span class="submission-card-toggle"><span>View project details</span><span aria-hidden="true">↗</span></span>' +
+        '</div></button><template data-project-modal-content>' + modalContent + '</template></article>';
     }).join('');
   }
   function peopleChoiceMessage(text, isError) {
