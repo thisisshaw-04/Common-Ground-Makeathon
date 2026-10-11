@@ -29,7 +29,7 @@ footer { padding-inline:clamp(20px,5vw,76px); color:#555; border-color:var(--ink
 .wire-note { border-left-color:var(--acid); }
 
 /* Bright cover treatment, with intersecting rings as a nod to the event theme. */
-.hero { position:relative; isolation:isolate; overflow:hidden; min-height:440px; grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:clamp(28px,6vw,90px); align-items:center; padding:clamp(54px,8vw,112px) clamp(24px,5vw,76px); margin:0 calc(clamp(20px,5vw,76px) * -1); background:var(--acid); color:var(--ink); border:0; }
+.hero { position:relative; isolation:isolate; overflow:hidden; min-height:max(440px,calc(100svh - 82px)); grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr); gap:clamp(28px,6vw,90px); align-items:center; padding:clamp(54px,8vw,112px) clamp(24px,5vw,76px); margin:0 calc(clamp(20px,5vw,76px) * -1); background:var(--acid); color:var(--ink); border:0; }
 .hero:before { content:""; position:absolute; inset:0 0 0 40%; z-index:-1; opacity:.44; pointer-events:none;
   background:
     radial-gradient(circle at 64% 48%,transparent 0 104px,rgba(0,0,0,.34) 105px 106px,transparent 107px),
@@ -131,7 +131,7 @@ body.admin-page .judge-score-grid select,body.admin-page .judge-score-block text
 @media(max-width:760px) {
   .tool-claim-grid { grid-template-columns:1fr; }
   .topbar { height:64px; }
-  .hero { grid-template-columns:1fr; min-height:0; padding-block:58px; }
+  .hero { grid-template-columns:1fr; min-height:calc(100svh - 120px); padding-block:58px; }
   .hero:before { inset:0; opacity:.28; }
   .hero:after { right:8%; top:10%; width:140px; opacity:.42; }
   .hero-meta { max-width:460px; }
