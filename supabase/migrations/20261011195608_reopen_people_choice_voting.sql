@@ -6,7 +6,7 @@ declare
   v_function regprocedure;
   v_definition text;
   v_old_open constant text := '2026-10-11 15:15:00+08';
-  v_new_open constant text := '2026-10-13 12:00:00+08';
+  v_new_open constant text := '2026-10-12 12:00:00+08';
   v_old_close constant text := '2026-10-11 17:00:00+08';
   v_new_close constant text := '2026-10-14 23:59:59+08';
 begin
@@ -35,12 +35,12 @@ begin
     v_definition := pg_catalog.replace(
       v_definition,
       'People’s Choice voting is open from 3:15 PM to 5:00 PM SGT.',
-      'People’s Choice voting is open from 12:00 PM Tuesday, 13 October to 11:59 PM Wednesday, 14 October SGT.'
+      'People’s Choice voting is open from 12:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT.'
     );
     v_definition := pg_catalog.replace(
       v_definition,
       'Voting runs from 3:15 PM to 5:00 PM SGT.',
-      'Voting runs from 12:00 PM Tuesday, 13 October to 11:59 PM Wednesday, 14 October SGT.'
+      'Voting runs from 12:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT.'
     );
     execute v_definition;
   end loop;
@@ -75,7 +75,7 @@ begin
       else not v_manual_open
     end,
     v_now >= timestamptz '2026-10-11 15:15:00+08',
-    v_now >= timestamptz '2026-10-13 12:00:00+08'
+    v_now >= timestamptz '2026-10-12 12:00:00+08'
       and v_now < timestamptz '2026-10-14 23:59:59+08'
       and not coalesce(v_paused, false);
 end;
@@ -105,9 +105,9 @@ begin
   if not (select public.is_current_user_eligible()) then
     raise exception 'Only approved attendees can change votes.' using errcode = '42501';
   end if;
-  if v_now < timestamptz '2026-10-13 12:00:00+08'
+  if v_now < timestamptz '2026-10-12 12:00:00+08'
      or v_now >= timestamptz '2026-10-14 23:59:59+08' then
-    raise exception 'People’s Choice voting is open from 12:00 PM Tuesday, 13 October to 11:59 PM Wednesday, 14 October SGT.' using errcode = '55000';
+    raise exception 'People’s Choice voting is open from 12:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT.' using errcode = '55000';
   end if;
 
   select coalesce(settings.voting_paused, false) into v_paused
