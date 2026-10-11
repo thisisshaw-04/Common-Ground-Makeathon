@@ -187,21 +187,21 @@
     var readyCount = Number(status.ready_project_count || 0);
     var paused = !!status.voting_paused;
     var now = Date.now();
-    var cutoff = Date.parse('2026-10-11T15:15:00+08:00');
-    var ends = Date.parse('2026-10-11T17:00:00+08:00');
+    var cutoff = Date.parse('2026-10-13T12:00:00+08:00');
+    var ends = Date.parse('2026-10-14T23:59:59+08:00');
     if (votingOpen) {
       peopleChoiceMessage('Voting is open · ' + readyCount + ' projects · ' + voteCount + ' votes cast.');
     } else if (paused) {
       peopleChoiceMessage('Voting is paused · ' + readyCount + ' projects · ' + voteCount + ' votes cast.');
     } else if (now < cutoff) {
-      peopleChoiceMessage('Voting opens automatically at 3:15 PM SGT after submissions close · ' + readyCount + ' ready projects.');
+      peopleChoiceMessage('Voting opens at 12:00 PM SGT Tuesday, 13 October and closes at 11:59 PM Wednesday, 14 October · ' + readyCount + ' ready projects.');
     } else if (now < ends) {
       peopleChoiceMessage('Voting is closed · ' + readyCount + ' ready projects · ' + voteCount + ' votes cast.');
     } else {
       peopleChoiceMessage('Voting has ended · ' + readyCount + ' projects · ' + voteCount + ' votes cast.');
     }
     $('people-choice-pause').hidden = !votingOpen;
-    $('people-choice-resume').hidden = votingOpen || !paused || now >= ends;
+    $('people-choice-resume').hidden = votingOpen || !paused || now < cutoff || now >= ends;
     $('people-choice-results-button').hidden = votingOpen;
   }
 
