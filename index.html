@@ -72,6 +72,10 @@
 @media(max-width:700px){.portal-tabs{grid-template-columns:1fr;position:static}.portal-tab{min-height:46px}.event-countdown{text-align:left}.timeline-labels span{font-size:8px}.event-timeline{padding-left:0;padding-right:0}}
 @media(prefers-reduced-motion:reduce){.timeline-fill,.timeline-cursor{transition:none}}
 \n.project-gallery-card .submission-detail{margin-top:14px;padding-top:12px}\n.project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}\n.project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}\n
+
+/* Make the primary submission tab easy to spot. */
+#main-nav #nav-choice{min-height:52px;padding:10px 24px;border:1px solid var(--ink);border-radius:999px;background:var(--acid);color:var(--ink);font-size:clamp(15px,1.4vw,19px);font-weight:700}
+#main-nav #nav-choice:hover,#main-nav #nav-choice[aria-selected="true"]{background:var(--acid);border-color:var(--ink)}
 /* Full-bleed cover; keep the home footer in the first desktop view. */
 body.builder-page{overflow-x:clip}
 body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw)}
