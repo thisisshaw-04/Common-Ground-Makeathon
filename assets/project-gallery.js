@@ -90,7 +90,7 @@
   var FINALIST_BY_PROJECT = {
     'common heritage': true,
     'saami': true,
-    'preReads: search. plan. read.'.toLowerCase(): true,
+    'prereads: search. plan. read.': true,
     'you & ai': true
   };
 
