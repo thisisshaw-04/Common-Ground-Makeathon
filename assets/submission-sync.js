@@ -142,7 +142,7 @@
   }
   async function syncDraft(status) {
     if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
-      showStatus('Submissions closed at 3:15 PM SGT. The gallery is open in Part C.', true);
+      showStatus('Submissions and final edits closed at 3:30 PM SGT. The gallery remains open in Part C.', true);
       return false;
     }
     var user = window.CGSubmission && window.CGSubmission.getUser();
@@ -207,7 +207,7 @@
       return false;
     }
     if (result.error) throw result.error;
-    showStatus(status === 'ready' ? 'Submitted. Organisers can see your entry now; it appears in the public gallery when submissions close at 3:15 PM SGT.' : 'Draft saved centrally for the organisers.');
+    showStatus(status === 'ready' ? 'Submitted. Organisers can see your entry now; it appears in the public gallery from 3:15 PM SGT.' : 'Draft saved centrally for the organisers.');
     $('submission-feedback').textContent = status === 'ready' ? 'Your final entry is saved for the organisers.' : 'Draft saved centrally. You can return to edit it.';
     return true;
   }
