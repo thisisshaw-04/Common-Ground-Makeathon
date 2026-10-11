@@ -83,6 +83,21 @@
       '<span class="preview-caption">' + escape(image ? 'A look inside the project' : (oneLiner || 'Open the project details to see what the team made.')) + '</span>' +
       '</div>';
   }
+  var AWARD_BY_SUBMISSION = {
+    '571179e5-7f4c-4c66-93c1-ede16510df69': 'Culture × Tech',
+    '05ffd087-231c-4672-ba73-32e0424d89cd': 'Design × Tech',
+    '42d8f39b-0c16-4fd5-8493-c37afeb808fc': 'Best Use of Tech',
+    'f690e28f-9605-4047-952d-c3ce5c49a619': 'Best Common Ground'
+  };
+
+  function awardMarkup(row) {
+    var award = AWARD_BY_SUBMISSION[String(row.submission_id || '')];
+    if (!award) return '';
+    return '<div class="project-award-badge" aria-label="Final award winner: ' + escape(award) + '">' +
+      '<span class="project-award-kicker">FINAL AWARD WINNER</span>' +
+      '<strong>' + escape(award) + '</strong>' +
+      '</div>';
+  }
   function detail(label, value) {
     if (!value) return '';
     return '<div class="submission-detail"><strong>' + escape(label) + '</strong><p>' + escape(value) + '</p></div>';
@@ -146,6 +161,7 @@
       var modalContent = '<div class="project-modal-project">' +
         '<h2>' + escape(name) + '</h2>' +
         '<p class="project-modal-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</p>' +
+        awardMarkup(row) +
         (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
           return '<span>' + escape(track) + '</span>';
         }).join('') + '</div>' : '') +
@@ -159,6 +175,7 @@
         '<div class="project-gallery-copy">' +
         '<span class="gallery-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</span>' +
         '<h3>' + escape(name) + '</h3>' +
+        awardMarkup(row) +
         (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
           return '<span>' + escape(track) + '</span>';
         }).join('') + '</div>' : '') +
