@@ -412,6 +412,7 @@
   };
   var projectFieldIds = {
     name:'project-name', overview:'project-overview', build:'project-build',
+    previewImage:'project-preview-image',
     demo:'project-demo', video:'project-video', source:'project-source', prototype:'project-prototype',
     supporting:'project-supporting', collaboration:'project-collaboration', attribution:'project-attribution'
   };
