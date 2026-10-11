@@ -10,7 +10,9 @@
   var savedReflections = {designReflection:'',cultureReflection:''};
 
   function participantEmail() {
-    return ($('p-detail').textContent.split('·')[0] || '').trim().toLowerCase();
+    var participant = window.CGBuilderParticipant || {};
+    var detailEmail = ($('p-detail').textContent.split('·')[0] || '').trim().toLowerCase();
+    return String(participant.email || (/^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/.test(detailEmail) ? detailEmail : '')).trim().toLowerCase();
   }
   function showStatus(message, isError) {
     var status = $('submission-auth-status');
@@ -233,7 +235,10 @@
   async function syncAuth(session) {
     var user = session && session.user;
     var wanted = participantEmail();
+    var signedInEmail = String(user && user.email || '').trim().toLowerCase();
     $('submission-auth-form').hidden = !!user;
+    $('submission-auth-identity').hidden = !user;
+    $('submission-auth-email-display').value = user ? signedInEmail : '';
     $('submission-signout').hidden = !user;
     $('submission-auth-email').value = wanted;
     if (!user) {
@@ -241,7 +246,6 @@
       showStatus(client ? 'Sign in with your registration email. Organisers only see submissions after you save them.' : 'Supabase is not configured on this site yet.', !client);
       return;
     }
-    var signedInEmail = String(user.email || '').trim().toLowerCase();
     if (signedInEmail !== wanted) {
       showStatus('Signed in as ' + signedInEmail + '. Sign out and use your registration email (' + wanted + ').', true);
       return;
