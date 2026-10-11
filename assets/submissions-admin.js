@@ -318,6 +318,13 @@
       var dataRows = [
         ['COMMON GROUND — ' + definition.track.toUpperCase() + ' JUDGING'],
         ['Score each criterion 1–5: 1 Weak · 2 Below expectations · 3 Meets expectations · 4 Strong · 5 Exceptional. Each judge can award 20 marks; project total is out of 60.'],
+        ['TOP FOUR — AUTOMATICALLY RANKED BY FINAL MARKS'],
+        ['RANK', 'TEAM NAME', 'PROJECT NAME', 'FINAL MARKS / 60'],
+        ['', '', '', ''],
+        ['', '', '', ''],
+        ['', '', '', ''],
+        ['', '', '', ''],
+        ['PROJECT SCORE SHEET'],
         ['TEAM NAME', 'PROJECT NAME', 'PROJECT GALLERY', 'JUDGE', 'CONCEPT', 'TRACK FIT', 'EXECUTION', 'PRESENTATION', 'FINAL MARKS / 60']
       ];
       var groups = readyRows.filter(function (row) {
@@ -337,9 +344,13 @@
       var sheet = XLSX.utils.aoa_to_sheet(dataRows);
       var merges = [
         {s:{r:0,c:0},e:{r:0,c:8}},
-        {s:{r:1,c:0},e:{r:1,c:8}}
+        {s:{r:1,c:0},e:{r:1,c:8}},
+        {s:{r:2,c:0},e:{r:2,c:8}},
+        {s:{r:8,c:0},e:{r:8,c:8}}
       ];
-      if (!groups.length) merges.push({s:{r:3,c:0},e:{r:3,c:8}});
+      if (!groups.length) merges.push({s:{r:10,c:0},e:{r:10,c:8}});
+      var firstProjectExcelRow = groupRows.length ? groupRows[0].start + 1 : 0;
+      var lastProjectExcelRow = groupRows.length ? groupRows[groupRows.length - 1].start + 1 : 0;
       groupRows.forEach(function (group) {
         var row = group.row;
         var start = group.start;
@@ -364,11 +375,43 @@
           t:'n',
           f:'IF(COUNT(E' + firstExcelRow + ':H' + lastExcelRow + ')=12,SUM(E' + firstExcelRow + ':H' + lastExcelRow + '),"")'
         };
+        var rankCell = XLSX.utils.encode_cell({r:start,c:9});
+        sheet[rankCell] = {
+          t:'n',
+          f:'IF(I' + firstExcelRow + '="","",RANK(I' + firstExcelRow + ',$I$' + firstProjectExcelRow + ':$I$' + lastProjectExcelRow + ',0)+COUNTIF($I$' + firstProjectExcelRow + ':I' + firstExcelRow + ',I' + firstExcelRow + ')-1)'
+        };
       });
+      if (groupRows.length) {
+        for (var rank = 1; rank <= 4; rank++) {
+          var summaryRow = rank + 3;
+          var summaryExcelRow = summaryRow + 1;
+          var rankKeyCell = XLSX.utils.encode_cell({r:summaryRow,c:10});
+          var rankCell = XLSX.utils.encode_cell({r:summaryRow,c:0});
+          var teamCell = XLSX.utils.encode_cell({r:summaryRow,c:1});
+          var projectCell = XLSX.utils.encode_cell({r:summaryRow,c:2});
+          var scoreCell = XLSX.utils.encode_cell({r:summaryRow,c:3});
+          var matchFormula = 'MATCH($K$' + summaryExcelRow + ',$J$' + firstProjectExcelRow + ':$J$' + lastProjectExcelRow + ',0)';
+          sheet[rankKeyCell] = {t:'n',v:rank};
+          sheet[rankCell] = {t:'n',f:'IF(B' + summaryExcelRow + '="","",K' + summaryExcelRow + ')'};
+          sheet[teamCell] = {
+            t:'s',
+            f:'IFERROR(INDEX($A$' + firstProjectExcelRow + ':$A$' + lastProjectExcelRow + ',' + matchFormula + '),"")'
+          };
+          sheet[projectCell] = {
+            t:'s',
+            f:'IFERROR(INDEX($B$' + firstProjectExcelRow + ':$B$' + lastProjectExcelRow + ',' + matchFormula + '),"")'
+          };
+          sheet[scoreCell] = {
+            t:'n',
+            f:'IFERROR(INDEX($I$' + firstProjectExcelRow + ':$I$' + lastProjectExcelRow + ',' + matchFormula + '),"")'
+          };
+        }
+      }
       sheet['!merges'] = merges;
       sheet['!cols'] = [
         {wch:24},{wch:30},{wch:25},{wch:14},
-        {wch:18},{wch:18},{wch:18},{wch:18},{wch:19}
+        {wch:18},{wch:18},{wch:18},{wch:18},{wch:19},
+        {hidden:true,wch:0},{hidden:true,wch:0}
       ];
       sheet['!rows'] = [{hpt:30},{hpt:36},{hpt:26}];
       for (var rowIndex=3; rowIndex<dataRows.length; rowIndex++) sheet['!rows'].push({hpt:25});
