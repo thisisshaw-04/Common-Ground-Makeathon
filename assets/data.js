@@ -7,19 +7,19 @@
     event: {
       name: 'Common Ground',
       edition: 'MAKEATHON',
-      tagline: 'A one-day makeathon. One idea. Built together.',
+      tagline: 'A one-day makeathon where design, technology and culture meet.',
       dates: 'SUNDAY, 11 OCTOBER 2026',
       venue: 'SQ Collective',
       hours: '9:00 AM — 5:00 PM',
       codesAvailableOn: '2026-10-10',
-      heroNote: 'Build it. Show how it works.',
+      heroNote: 'Bring what you know unusually well. Someone else will bring what you don’t.',
       intro: [
         { title: 'What this is',
-          body: 'One thing worth making. Join us at SQ Collective on 11 October, from 9am to 5pm. Kick off together, find your team, build, and share what you made before the day is out.' },
+          body: 'A day at SQ Collective to experiment where design, technology and culture meet. Work solo or in a team of up to three, then share what you made.' },
         { title: 'What you get',
-          body: 'Verified attendees can claim limited partner offers from this page. Each code pool is first come, first served. You will also find food, a desk, power, and people who know things you do not.' },
+          body: 'All backgrounds and skill levels are welcome; no coding experience is needed. Claim limited partner offers here, then find teammates with skills and perspectives different from yours.' },
         { title: 'What we ask',
-          body: 'Build in the open. Help the team next to you when they are stuck. Ship something honest on Sunday, even if it is held together with tape.' }
+          body: 'Bring a laptop, internet access and a charger. There is no fixed medium: make a website, visual experiment, AI experience, speculative prototype or something new.' }
       ],
       schedule: [
         { time: '09:00', title: 'Check-in', detail: 'Arrive, collect your badge, and get settled at SQ Collective.' },
@@ -35,7 +35,9 @@
       ],
       faq: [
         { q: 'Which email should I use?', a: 'Use the email on your event registration.' },
-        { q: 'Can I join without a team?', a: 'Yes. Teams can form at the 9:30 kick-off.' },
+        { q: 'Can I join without a team?', a: 'Yes. Register individually and meet people at the 9:30 kick-off. Teams can have up to three people.' },
+        { q: 'Do I need to know how to code?', a: 'No. All backgrounds and skill levels are welcome. Bring what you know unusually well.' },
+        { q: 'What can we make?', a: 'There is no fixed medium or outcome. Build a website, visual experiment, AI experience, speculative prototype or something else.' },
         { q: 'How do partner offers work?', a: 'Sign in and claim each offer. Claims are limited and first come, first served.' },
         { q: 'When do submissions close?', a: '3:15 PM SGT on 11 October. Ready projects then appear in the public gallery.' },
         { q: 'How does People’s Choice work?', a: 'Sign in and vote for up to three projects from 3:15 to 5:00 PM SGT. You cannot vote for your own team.' },
