@@ -54,9 +54,9 @@
 .project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
 .project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}
 .project-gallery-links a{font:11px var(--mono);text-decoration:underline;text-underline-offset:3px}
-.project-gallery-share-row{display:flex;justify-content:flex-end;padding:0 20px 18px}
-.project-gallery-share{border:1px solid var(--ink);border-radius:999px;background:var(--acid);color:var(--ink);padding:8px 12px;font:10px var(--mono);cursor:pointer;transition:background .16s ease,transform .16s ease}
-.project-gallery-share:hover:not(:disabled){background:#ffe277;transform:translateY(-1px)}
+.project-gallery-share-row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;padding:0 20px 18px}
+.project-gallery-share{border:1px solid var(--ink);border-radius:999px;background:#fff;color:var(--ink);padding:8px 12px;font:10px var(--mono);cursor:pointer;transition:background .16s ease,transform .16s ease}
+.project-gallery-share:hover:not(:disabled){background:#f2f2f2;transform:translateY(-1px)}
 .project-gallery-share:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
 .project-gallery-share:disabled{opacity:.65;cursor:wait}
 
@@ -122,7 +122,7 @@
 .people-choice-code-buttons{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 @media(max-width:560px){.people-choice-auth form#people-choice-signin-form{grid-template-columns:1fr}.people-choice-auth button.btn{width:100%}}
 .people-choice-code-buttons .btn{flex:0 1 auto;width:auto;white-space:nowrap}
-.gallery-vote-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 20px 20px}
+.gallery-vote-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0}
 .gallery-vote-actions [data-vote-project]{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;min-height:0;padding:12px 20px;font-size:13px;line-height:1.2}
 .gallery-vote-actions .btn[disabled]{opacity:.55;cursor:not-allowed}
 .gallery-vote-actions .vote-state{font:10px var(--mono);color:var(--muted)}
