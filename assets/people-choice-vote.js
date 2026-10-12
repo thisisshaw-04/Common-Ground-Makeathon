@@ -32,8 +32,12 @@
   }
   function renderVoteButtons() {
     if (!cards) return;
-    cards.querySelectorAll('[data-vote-actions]').forEach(function (node) { node.remove(); });
-    if (!eventStatus.voting_open || !session || !session.user || !voteStatusResolved) return;
+    if (!eventStatus.voting_open || !session || !session.user) {
+      cards.querySelectorAll('[data-vote-actions]').forEach(function (node) { node.remove(); });
+      return;
+    }
+    // Keep the existing controls mounted while the latest vote status is loading.
+    if (!voteStatusResolved) return;
     var voted = new Set(votedIds);
     var limit = eligible ? 3 : 1;
     var remaining = Math.max(0, limit - votesCast);
@@ -43,15 +47,25 @@
       var alreadyVoted = voted.has(id);
       var buttonText = isMyTeam ? 'Your team' : alreadyVoted ? 'Unvote' : remaining === 0 ? 'Limit reached' : 'Vote for this project';
       var disabled = isMyTeam || (!alreadyVoted && remaining === 0);
-      var actions = document.createElement('div');
-      actions.className = 'gallery-vote-actions';
-      actions.setAttribute('data-vote-actions', '');
-      actions.innerHTML = '<button class="btn btn-primary" type="button" data-vote-project="' +
-        String(id).replace(/[&<>"']/g, '') + '"' + (disabled ? ' disabled' : '') + '>' +
-        buttonText + '</button>';
+      var actions = card.querySelector('[data-vote-actions]');
+      if (!actions) {
+        actions = document.createElement('div');
+        actions.className = 'gallery-vote-actions';
+        actions.setAttribute('data-vote-actions', '');
+      }
       var actionRow = card.querySelector('.project-gallery-share-row');
-      if (actionRow) actionRow.appendChild(actions);
-      else card.appendChild(actions);
+      if (actionRow && actions.parentElement !== actionRow) actionRow.appendChild(actions);
+      else if (!actionRow && actions.parentElement !== card) card.appendChild(actions);
+      var button = actions.querySelector('[data-vote-project]');
+      if (!button) {
+        button = document.createElement('button');
+        button.type = 'button';
+        actions.appendChild(button);
+      }
+      button.className = 'btn ' + (alreadyVoted && !isMyTeam ? 'btn-unvote' : 'btn-primary');
+      button.setAttribute('data-vote-project', id);
+      button.disabled = disabled;
+      button.textContent = buttonText;
     });
   }
   function updatePhaseLabel() {
