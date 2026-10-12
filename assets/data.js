@@ -28,14 +28,14 @@
         { time: '12:00', title: 'Lunch', detail: 'Take a break and meet other teams.' },
         { time: '13:00', title: 'Build session 02', detail: 'Test the idea, get feedback, and keep building.' },
         { time: '14:30', title: 'Final sprint', detail: 'Finish the essentials and prepare your demo.' },
-        { time: '15:15', title: 'Gallery opens · Final edit window', detail: 'Ready submissions appear in the public gallery. People’s Choice voting opens at 12:00 PM SGT on Monday, 12 October.' },
+        { time: '15:15', title: 'Gallery opens · Voting Monday', detail: 'Ready submissions appear in the public gallery. People’s Choice voting opens at 12:00 PM SGT on Monday, 12 October.' },
         { time: '15:30', title: 'Submission window continues', detail: 'New entries and updates stay open until an organiser closes submissions.' },
         { time: '16:00', title: 'Demos + judging', detail: 'Present your build and what you learned.' },
         { time: '16:45', title: 'Wrap-up', detail: 'Share next steps and celebrate the work.' },
         { time: '17:00', title: 'Event ends · People’s Choice voting later', detail: 'The makeathon ends. Voting runs from 12:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT.' }
       ],
       faq: [
-        { q: 'Which email should I use?', a: 'Use the email on your event registration.' },
+        { q: 'Which email should I use?', a: 'For project updates, use an approved builder email already listed on the saved project. For People’s Choice, any verified email can vote.' },
         { q: 'Can I join without a team?', a: 'Yes. Register individually and meet people at the 9:30 kick-off. Teams can have up to three people.' },
         { q: 'Do I need to know how to code?', a: 'No. All backgrounds and skill levels are welcome. Bring what you know unusually well.' },
         { q: 'What can we make?', a: 'There is no fixed medium or outcome. Build a website, visual experiment, AI experience, speculative prototype or something else.' },
