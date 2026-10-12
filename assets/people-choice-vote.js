@@ -129,7 +129,7 @@
     renderState();
   });
   signIn.addEventListener('click', function () {
-    try { sessionStorage.setItem('cg-return-to-choice-after-signin', '1'); } catch (_err) { /* Navigation can still be manual. */ }
+    try { localStorage.setItem('cg-return-to-choice-after-signin', String(Date.now())); } catch (_err) { /* Navigation can still be manual. */ }
   });
   document.addEventListener('cg-submission-auth', function (event) {
     session = event.detail && event.detail.session || null;
@@ -137,8 +137,9 @@
     if (session && session.user) {
       var returnToChoice = false;
       try {
-        returnToChoice = sessionStorage.getItem('cg-return-to-choice-after-signin') === '1';
-        if (returnToChoice) sessionStorage.removeItem('cg-return-to-choice-after-signin');
+        var requestedAt = Number(localStorage.getItem('cg-return-to-choice-after-signin'));
+        returnToChoice = Number.isFinite(requestedAt) && Date.now() - requestedAt < 30 * 60 * 1000;
+        if (returnToChoice) localStorage.removeItem('cg-return-to-choice-after-signin');
       } catch (_err) { /* Keep voting available even if storage is blocked. */ }
       if (returnToChoice) {
         window.setTimeout(function () {
