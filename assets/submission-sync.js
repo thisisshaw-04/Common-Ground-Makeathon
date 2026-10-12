@@ -2,11 +2,13 @@
 (function () {
   'use strict';
   var EVENT_ID = 'common-ground-2026-10-11';
+  var FINALIZABLE_SUBMISSION_ID = '6ce562cc-650e-4a7e-b05a-1a9496c3464d';
   var $ = function (id) { return document.getElementById(id); };
   var authBox = $('submission-auth');
   if (!authBox) return;
   var client = window.CGSubmission && window.CGSubmission.client;
   var lastUserId = null;
+  var currentSubmissionRecord = null;
   var savedReflections = {designReflection:'',cultureReflection:''};
   var PREVIEW_IMAGE_CUTOFF = Date.parse('2026-10-12T18:00:00+08:00');
 
@@ -20,13 +22,50 @@
     status.textContent = message;
     status.classList.toggle('error', !!isError);
   }
-  function readTeam(email) {
-    try { return JSON.parse(localStorage.getItem('cg-team-draft-v1:' + email) || 'null'); }
-    catch (_err) { return null; }
+  function isFinalizableSubmission(record) {
+    if (record && record.id === FINALIZABLE_SUBMISSION_ID) return true;
+    var teamName = String(record && record.team && record.team.name || '').trim().toLowerCase();
+    var projectName = String(record && record.project && record.project.name || '').trim().toLowerCase();
+    return teamName === 'uno dos tres' && projectName === 'uno dos tres';
   }
-  function readProject(email) {
-    try { return JSON.parse(localStorage.getItem('cg-project-draft-v1:' + email) || 'null'); }
-    catch (_err) { return null; }
+  function updateSubmissionControls(record) {
+    var button = $('project-ready');
+    var guidance = $('submission-finalize-guidance');
+    if (!button) return;
+    if (!record) {
+      button.disabled = true;
+      button.textContent = 'Submission unavailable';
+      if (guidance) guidance.textContent = 'Only an already-saved project can be edited here. New project entries are closed.';
+    } else if (record.status === 'ready') {
+      button.disabled = false;
+      button.textContent = 'Save submitted changes';
+      if (guidance) guidance.textContent = 'This project is already submitted. Saving keeps it submitted and visible in the gallery.';
+    } else if (isFinalizableSubmission(record)) {
+      button.disabled = false;
+      button.textContent = 'Submit final entry';
+      if (guidance) guidance.textContent = 'This is the only saved draft that can be submitted. Other existing drafts can still be edited.';
+    } else {
+      button.disabled = true;
+      button.textContent = 'Submission closed';
+      if (guidance) guidance.textContent = 'You can edit and save this existing draft, but only the existing Uno Dos Tres draft can be submitted.';
+    }
+  }
+  function setEntryLock(title, message) {
+    window.CGHasExistingSubmission = false;
+    document.dispatchEvent(new CustomEvent('cg-existing-submission-change', {detail:{available:false}}));
+    var lock = $('submission-locked');
+    if (lock) {
+      lock.hidden = false;
+      var heading = lock.querySelector('h2');
+      var copy = lock.querySelector('p');
+      if (heading) heading.textContent = title || 'Edit an existing project.';
+      if (copy) copy.textContent = message || 'Sign in with the approved event email attached to an existing project. New project submissions are closed.';
+    }
+    updateSubmissionControls(null);
+  }
+  function setEntryUnlocked() {
+    window.CGHasExistingSubmission = true;
+    document.dispatchEvent(new CustomEvent('cg-existing-submission-change', {detail:{available:true}}));
   }
   function formTeam(email, existingTeam) {
     var participant = window.CGBuilderParticipant || {};
@@ -155,13 +194,14 @@
   }
   async function syncDraft(status) {
     if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
+      setEntryLock('Project edits are closed.', 'Submissions have been closed by the event schedule or an organiser. The public gallery remains open.');
       showStatus('Submissions are closed by the event schedule or an organiser. The public gallery remains open.', true);
       return false;
     }
     var user = window.CGSubmission && window.CGSubmission.getUser();
     var email = participantEmail();
     if (!user || String(user.email || '').trim().toLowerCase() !== email) {
-      showStatus('Sign in with your registration email to save this centrally. Your local draft remains on this device.', true);
+      showStatus('Sign in with your registration email to edit your existing project.', true);
       return false;
     }
     var eligible = await checkEligibility(user);
@@ -171,13 +211,23 @@
     }
     var lookup = await findSubmissionForUser(user, email);
     if (lookup.ambiguous) {
+      setEntryLock('We could not identify one project.', 'This email appears on more than one team entry. Ask an organiser to correct the team list.');
       showStatus('This email appears on more than one team entry. Ask an organiser to correct the team list.', true);
       return false;
     }
     var existing = lookup.record;
-    var teamResult = formTeam(email, existing && existing.team);
+    if (!existing) {
+      setEntryLock('No existing project found.', 'New project entries are closed. Sign in with an email listed on a previously saved project to edit it.');
+      showStatus('No existing project is linked to this email. New submissions are closed.', true);
+      return false;
+    }
+    setEntryUnlocked();
+
+    var teamResult = formTeam(email, existing.team);
     var team = teamResult.team;
     var project = formProject();
+    var targetStatus = existing.status === 'ready' ? 'ready' : status;
+
     if (project.previewImage) {
       try {
         if (!/^https?:$/.test(new URL(project.previewImage).protocol)) throw new Error();
@@ -187,7 +237,13 @@
         return false;
       }
     }
-    if (status === 'ready') {
+    if (status === 'ready' && existing.status === 'draft') {
+      if (!isFinalizableSubmission(existing)) {
+        var closedMessage = 'Only the existing Uno Dos Tres entry may be submitted. Other saved projects can still be edited.';
+        showStatus(closedMessage, true);
+        $('submission-feedback').textContent = closedMessage;
+        return false;
+      }
       if (teamResult.issue) {
         showStatus(teamResult.issue, true);
         $('submission-feedback').textContent = teamResult.issue;
@@ -201,39 +257,47 @@
       }
       try { localStorage.setItem('cg-team-draft-v1:' + email, JSON.stringify(team)); } catch (_err) { /* The central submission remains authoritative. */ }
     }
-    var result;
-    if (existing) {
-      result = await client.from('submissions').update({
-        status: status,
-        project: project,
-        team: team,
-        updated_at: new Date().toISOString()
-      }).eq('id', existing.id).select('id').maybeSingle();
-      if (!result.error && !result.data) {
-        showStatus('The saved team entry was not available to update. Reload the page and try again.', true);
-        return false;
-      }
-    } else {
-      result = await client.from('submissions').upsert({
-        event_id: EVENT_ID,
-        user_id: user.id,
-        owner_email: email,
-        status: status,
-        project: project,
-        team: team,
-        updated_at: new Date().toISOString()
-      }, { onConflict: 'event_id,user_id' });
+
+    var result = await client.from('submissions').update({
+      status: targetStatus,
+      project: project,
+      team: team,
+      updated_at: new Date().toISOString()
+    }).eq('id', existing.id).select('id,event_id,user_id,owner_email,project,team,status').maybeSingle();
+    if (!result.error && !result.data) {
+      showStatus('The saved team entry was not available to update. Reload the page and try again.', true);
+      return false;
     }
     if (result.error && result.error.code === '23505') {
       showStatus('A project with this team name already exists. Sign in with an email listed on that team entry to update it.', true);
       return false;
     }
     if (result.error) throw result.error;
-    showStatus(status === 'ready' ? 'Submitted. Organisers can see your entry now; it appears in the public gallery from 3:15 PM SGT.' : 'Draft saved centrally for the organisers.');
-    $('submission-feedback').textContent = status === 'ready' ? 'Your final entry is saved for the organisers.' : 'Draft saved centrally. You can return to edit it.';
+
+    currentSubmissionRecord = Object.assign({}, existing, result.data || {}, {
+      status: targetStatus,
+      project: project,
+      team: team
+    });
+    updateSubmissionControls(currentSubmissionRecord);
+    var newlySubmitted = existing.status === 'draft' && targetStatus === 'ready';
+    var statusMessage = newlySubmitted
+      ? 'Submitted. Organisers can see your entry now; it appears in the public gallery from 3:15 PM SGT.'
+      : targetStatus === 'ready'
+        ? 'Submitted project updated. It remains submitted and visible in the gallery.'
+        : 'Draft updated and saved for the organisers.';
+    showStatus(statusMessage);
+    $('submission-feedback').textContent = newlySubmitted
+      ? 'Your final entry is saved for the organisers.'
+      : targetStatus === 'ready'
+        ? 'Your submitted entry was updated.'
+        : 'Draft updated centrally. You can return to edit it.';
     return true;
   }
   function fillRemote(record) {
+    currentSubmissionRecord = record;
+    setEntryUnlocked();
+    updateSubmissionControls(record);
     var project = record.project || {};
     savedReflections = {
       designReflection: project.designReflection || '',
@@ -310,38 +374,58 @@
     $('submission-auth-email').value = wanted;
     if (!user) {
       lastUserId = null;
-      showStatus(client ? 'Sign in with your registration email. Organisers only see submissions after you save them.' : 'Supabase is not configured on this site yet.', !client);
+      currentSubmissionRecord = null;
+      setEntryLock('Sign in to edit an existing project.', client
+        ? 'Sign in with the approved event email attached to a previously saved project. New project entries are closed.'
+        : 'Supabase is not configured on this site yet.');
+      showStatus(client ? 'Sign in with your registration email to edit an existing project.' : 'Supabase is not configured on this site yet.', !client);
       return;
     }
     if (signedInEmail !== wanted) {
+      currentSubmissionRecord = null;
+      setEntryLock('Use the registration email on your project.', 'Sign out and use the approved email listed on the existing team entry.');
       showStatus('Signed in as ' + signedInEmail + '. Sign out and use your registration email (' + wanted + ').', true);
       return;
     }
     try {
       if (!(await checkEligibility(user))) {
+        currentSubmissionRecord = null;
+        setEntryLock('This email is not approved for editing.', 'Use an approved builder email listed on an existing project, or contact an organiser.');
         showStatus('This email is not on the builder list enabled for submissions. Contact an organiser.', true);
         return;
       }
       if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
+        currentSubmissionRecord = null;
+        setEntryLock('Project edits are closed.', 'Submissions have been closed by the event schedule or an organiser. The public gallery remains open.');
         showStatus('Submissions are closed by the event schedule or an organiser. The public gallery remains open.');
         return;
       }
-      showStatus('Signed in as ' + signedInEmail + '. Save a draft or submit while submissions are open.');
       if (lastUserId !== user.id) {
         lastUserId = user.id;
         var lookup = await findSubmissionForUser(user, signedInEmail);
         if (lookup.ambiguous) {
+          currentSubmissionRecord = null;
+          setEntryLock('We could not identify one project.', 'This email appears on more than one team entry. Ask an organiser to correct the team list.');
           showStatus('This email appears on more than one team entry. Ask an organiser to correct the team list.', true);
           return;
         }
-        if (lookup.record) fillRemote(lookup.record);
-        else {
-          var local = readProject(wanted);
-          var team = readTeam(wanted);
-          if (local && local.project) fillRemote({ project: local.project, team: team || local.team || {}, status: local.status || 'draft' });
+        if (lookup.record) {
+          fillRemote(lookup.record);
+          showStatus(lookup.record.status === 'ready'
+            ? 'Signed in as ' + signedInEmail + '. You can edit and save your submitted project.'
+            : 'Signed in as ' + signedInEmail + '. You can edit this saved draft; only Uno Dos Tres can be submitted.');
+        } else {
+          currentSubmissionRecord = null;
+          setEntryLock('No existing project found.', 'New project entries are closed. Sign in with an email listed on a previously saved project to edit it.');
+          showStatus('No existing project is linked to this email. New submissions are closed.', true);
         }
+      } else if (currentSubmissionRecord) {
+        setEntryUnlocked();
+        updateSubmissionControls(currentSubmissionRecord);
       }
-    } catch (err) {
+    } catch (_err) {
+      currentSubmissionRecord = null;
+      setEntryLock('Could not verify your project.', 'Reload the page and try again. If the problem continues, ask an organiser for help.');
       showStatus('Could not check submission access. Ask an organiser to finish the Supabase setup, then reload.', true);
     }
   }
@@ -416,9 +500,8 @@
       $('submission-feedback').textContent = 'Could not submit. Your draft remains saved on this device; try again.';
     } finally {
       readyBusy = false;
-      readyButton.disabled = false;
       readyButton.removeAttribute('aria-busy');
-      readyButton.textContent = 'Submit final entry';
+      updateSubmissionControls(currentSubmissionRecord);
     }
   });
 
