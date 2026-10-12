@@ -19,6 +19,9 @@
   var votedIds = [];
   var votesCast = 0;
   var statusRequest = 0;
+  var phaseLabel = document.getElementById('gallery-phase-label');
+  var VOTING_START_AT = Date.parse('2026-10-12T18:00:00+08:00');
+  var VOTING_END_AT = Date.parse('2026-10-14T23:59:59+08:00');
 
   function setMessage(text, isError) {
     message.textContent = text || '';
@@ -46,7 +49,18 @@
       card.appendChild(actions);
     });
   }
+  function updatePhaseLabel() {
+    if (!phaseLabel) return;
+    var now = Date.parse(eventStatus.current_at || '');
+    if (!Number.isFinite(now)) now = Date.now();
+    phaseLabel.textContent = eventStatus.voting_open
+      ? 'VOTING OPEN'
+      : now >= VOTING_END_AT ? 'VOTING CLOSED'
+        : now >= VOTING_START_AT ? 'VOTING PAUSED'
+          : 'EDITING OPEN';
+  }
   function renderState() {
+    updatePhaseLabel();
     area.hidden = !eventStatus.gallery_open;
     renderSignInState();
     if (!eventStatus.gallery_open) return;
@@ -54,12 +68,12 @@
       setMessage('Sign in to vote. Participants get 3 votes each; non-participants get 1.');
     } else if (!eventStatus.voting_open) {
       var now = Date.parse(eventStatus.current_at || '');
-      var votingStart = Date.parse('2026-10-13T00:00:00+08:00');
+      var votingStart = VOTING_START_AT;
       var votingEnd = Date.parse('2026-10-14T23:59:59+08:00');
       setMessage(Number.isFinite(now) && now >= votingEnd
         ? 'Voting closed at 11:59 PM SGT Wednesday, 14 October.'
         : Number.isFinite(now) && now < votingStart
-          ? 'Voting opens at 12:00 AM SGT Tuesday, 13 October and closes at 11:59 PM Wednesday, 14 October.'
+          ? 'Voting opens at 6:00 PM SGT Monday, 12 October and closes at 11:59 PM Wednesday, 14 October.'
           : 'Voting is paused by the organisers.');
     } else if (votesCast >= (eligible ? 3 : 1)) {
       setMessage(eligible

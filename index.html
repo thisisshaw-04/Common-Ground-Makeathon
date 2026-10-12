@@ -313,7 +313,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
   <div class="submission-locked" id="submission-locked">
     <span class="eyebrow">PROJECT SUBMISSION</span>
     <h2>Sign in to edit an existing project.</h2>
-    <p>Editing is open now through 12:00 AM Tuesday, 13 October SGT. Teams with submitted projects already visible in the gallery can update only their preview image, live demo, and demo video. Other drafts and new project entries are locked. The existing Uno Dos Tres draft is the only draft that may be updated or submitted. At midnight, project editing closes and voting opens through 11:59 PM Wednesday, 14 October.</p>
+    <p>Editing is open now through 12:00 AM Tuesday, 13 October SGT. Teams with submitted projects already visible in the gallery can update only their preview image, live demo, and demo video. Other drafts and new project entries are locked. The existing Uno Dos Tres draft is the only draft that may be updated or submitted. People’s Choice voting opens at 6:00 PM SGT Monday, 12 October and closes at 11:59 PM Wednesday, 14 October.</p>
     <a class="btn btn-primary" href="#nav-access" data-panel-select="access">Go to sign in</a>
   </div>
 <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
@@ -404,9 +404,9 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
   <section class="section project-gallery" id="project-gallery" hidden aria-labelledby="project-gallery-title">
     <div class="section-head">
       <h2 id="project-gallery-title">Project gallery</h2>
-      <span class="eyebrow">SIGN IN TO VOTE · PARTICIPANTS GET 3 VOTES EACH · NON-PARTICIPANTS GET 1</span>
+      <span class="eyebrow"><span id="gallery-phase-label" class="eyebrow" aria-live="polite">EDITING OPEN</span></span>
     </div>
-    <p id="project-gallery-message" class="helper" role="status">Editing is open now through 12:00 AM Tuesday, 13 October SGT. Submitted projects already visible in the gallery can update their preview image, live demo, and demo video links. Other drafts and new projects are locked; the existing Uno Dos Tres draft is the only draft exception. Voting opens at 12:00 AM Tuesday, 13 October for anyone with a verified email and closes at 11:59 PM Wednesday, 14 October.</p>
+    <p id="project-gallery-message" class="helper" role="status">Editing is open now through 12:00 AM Tuesday, 13 October SGT. Submitted projects already visible in the gallery can update their preview image, live demo, and demo video links. Other drafts and new projects are locked; the existing Uno Dos Tres draft is the only draft exception. People’s Choice voting opens at 6:00 PM SGT Monday, 12 October for anyone with a verified email and closes at 11:59 PM Wednesday, 14 October.</p>
     <section class="gallery-voting" id="people-choice-area" aria-labelledby="people-choice-title" hidden>
       <span class="eyebrow">PEOPLE’S CHOICE</span><h3 id="people-choice-title">People’s Choice voting</h3>
       <p class="helper" id="people-choice-message" role="status">Sign in to vote. Participants get 3 votes each; non-participants get 1.</p>
@@ -442,11 +442,11 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261012-voting-six-pm"></script>
-<script src="./assets/data.js?v=20261012-edits-now-voting-midnight"></script>
-<script src="./assets/portal.js?v=20261012-edits-now-voting-midnight"></script>
+<script src="./assets/data.js?v=20261012-voting-6pm"></script>
+<script src="./assets/portal.js?v=20261012-voting-6pm"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261012-hide-gallery-count"></script>
-<script src="./assets/people-choice-vote.js?v=20261012-edits-now-voting-midnight"></script>
+<script src="./assets/people-choice-vote.js?v=20261012-voting-6pm"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
 <script src="./assets/submission-sync.js?v=20261012-edits-now-voting-midnight"></script>
 </body>

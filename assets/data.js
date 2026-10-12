@@ -3,7 +3,7 @@
 */
 (function (global) {
   const SEED = {
-    eventRevision: '2026-10-12-evening-voting-midnight-media',
+    eventRevision: '2026-10-12-voting-1800-media',
     event: {
       name: 'Common Ground',
       edition: 'MAKEATHON',
@@ -28,11 +28,11 @@
         { time: '12:00', title: 'Lunch', detail: 'Take a break and meet other teams.' },
         { time: '13:00', title: 'Build session 02', detail: 'Test the idea, get feedback, and keep building.' },
         { time: '14:30', title: 'Final sprint', detail: 'Finish the essentials and prepare your demo.' },
-        { time: '15:15', title: 'Gallery opens', detail: 'Ready submissions appear in the public gallery. People’s Choice voting opens at 12:00 AM SGT Tuesday, 13 October.' },
+        { time: '15:15', title: 'Gallery opens', detail: 'Ready submissions appear in the public gallery. People’s Choice voting opens at 6:00 PM SGT Monday, 12 October.' },
         { time: '15:30', title: 'Gallery project media updates', detail: 'Existing gallery projects can update their preview image and demo links now through 12:00 AM SGT Tuesday, 13 October. The existing Uno Dos Tres draft remains the only draft that may be submitted.' },
         { time: '16:00', title: 'Demos + judging', detail: 'Present your build and what you learned.' },
         { time: '16:45', title: 'Wrap-up', detail: 'Share next steps and celebrate the work.' },
-        { time: '17:00', title: 'Event ends · People’s Choice voting later', detail: 'The makeathon ends. Voting runs from 12:00 AM Tuesday, 13 October to 11:59 PM Wednesday, 14 October SGT.' }
+        { time: '17:00', title: 'Event ends · People’s Choice voting opens Monday', detail: 'The makeathon ends. Voting runs from 6:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT.' }
       ],
       faq: [
         { q: 'Which email should I use?', a: 'For project updates, use an approved builder email already listed on the saved project. For People’s Choice, any verified email can vote.' },
@@ -40,8 +40,8 @@
         { q: 'Do I need to know how to code?', a: 'No. All backgrounds and skill levels are welcome. Bring what you know unusually well.' },
         { q: 'What can we make?', a: 'There is no fixed medium or outcome. Build a website, visual experiment, AI experience, speculative prototype or something else.' },
         { q: 'How do partner offers work?', a: 'Sign in and claim each offer. Claims are limited and first come, first served.' },
-        { q: 'Can I update my project?', a: 'Editing is open now until 12:00 AM Tuesday, 13 October SGT. Only projects already submitted and visible in the gallery can update their preview image, live demo, and demo video links. Other drafts and new projects are locked. The existing Uno Dos Tres draft is the only draft exception and the only draft that may be submitted. Voting opens at midnight and closes at 11:59 PM Wednesday, 14 October.' },
-        { q: 'How does People’s Choice work?', a: 'Sign in with any verified email. Approved event builders can cast up to three votes; other verified email accounts can cast one. Voting runs from 12:00 AM SGT Tuesday, 13 October to 11:59 PM Wednesday, 14 October. You can unvote before voting closes, but cannot vote for your own team.' },
+        { q: 'Can I update my project?', a: 'Editing is open now until 12:00 AM Tuesday, 13 October SGT. Only projects already submitted and visible in the gallery can update their preview image, live demo, and demo video links. Other drafts and new projects are locked. The existing Uno Dos Tres draft is the only draft exception and the only draft that may be submitted. Voting opens at 6:00 PM SGT Monday, 12 October and closes at 11:59 PM Wednesday, 14 October.' },
+        { q: 'How does People’s Choice work?', a: 'Sign in with any verified email. Approved event builders can cast up to three votes; other verified email accounts can cast one. Voting runs from 6:00 PM SGT Monday, 12 October to 11:59 PM Wednesday, 14 October. You can unvote before voting closes, but cannot vote for your own team.' },
         { q: 'Do I need source code?', a: 'Add a source link unless the project is no-code. Include a live demo or video.' }
       ]
     },
