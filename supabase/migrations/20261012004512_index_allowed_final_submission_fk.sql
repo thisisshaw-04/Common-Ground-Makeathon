@@ -1,0 +1,1 @@
+create index allowed_final_submissions_submission_id_idx on private.allowed_final_submissions (submission_id);
