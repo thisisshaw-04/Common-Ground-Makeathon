@@ -133,6 +133,13 @@
     var href = safeHref(value);
     return href ? '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + escape(label) + ' ↗</a>' : '';
   }
+  function projectShareUrl(submissionId) {
+    var url = new URL(window.location.href);
+    url.search = '';
+    url.searchParams.set('project', submissionId);
+    url.hash = 'choice';
+    return url.toString();
+  }
   function focusRequestedProject() {
     var projectId = new URLSearchParams(window.location.search).get('project');
     if (!projectId) return;
@@ -202,11 +209,61 @@
         (oneLiner ? '<p class="project-gallery-one-liner">' + escape(oneLiner) + '</p>' : '') +
         '<span class="project-gallery-toggle"><span>View project details</span><span aria-hidden="true">↗</span></span>' +
         '</div></button>' +
+        '<div class="project-gallery-share-row"><button class="project-gallery-share" type="button" data-copy-project-link data-share-url="' +
+        escape(projectShareUrl(row.submission_id)) + '" aria-label="Copy a link to ' + escape(name) + '" aria-live="polite">Copy project link</button></div>' +
         '<template data-project-modal-content>' + modalContent + '</template></article>';
     }).join('');
     focusRequestedProject();
     document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:rows}}));
   }
+  function fallbackCopy(text) {
+    var field = document.createElement('textarea');
+    field.value = text;
+    field.setAttribute('readonly', '');
+    field.style.position = 'fixed';
+    field.style.opacity = '0';
+    field.style.pointerEvents = 'none';
+    document.body.appendChild(field);
+    field.select();
+    var copied = false;
+    try { copied = document.execCommand('copy'); } catch (_err) { copied = false; }
+    field.remove();
+    if (!copied) throw new Error('Clipboard copy failed.');
+  }
+  function copyText(text) {
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      return navigator.clipboard.writeText(text).catch(function () {
+        fallbackCopy(text);
+      });
+    }
+    fallbackCopy(text);
+    return Promise.resolve();
+  }
+  cards.addEventListener('click', function (event) {
+    var button = event.target.closest('[data-copy-project-link]');
+    if (!button || !cards.contains(button)) return;
+    event.preventDefault();
+    var url = button.getAttribute('data-share-url');
+    if (!url) return;
+    var label = 'Copy project link';
+    var ariaLabel = button.getAttribute('aria-label') || label;
+    button.disabled = true;
+    copyText(url).then(function () {
+      button.textContent = 'Link copied';
+      button.setAttribute('aria-label', 'Project link copied');
+    }).catch(function () {
+      button.textContent = 'Copy failed';
+      button.setAttribute('aria-label', 'Could not copy project link');
+    }).finally(function () {
+      button.disabled = false;
+      window.setTimeout(function () {
+        if (!button.isConnected) return;
+        button.textContent = label;
+        button.setAttribute('aria-label', ariaLabel);
+      }, 1800);
+    });
+  });
+
   async function load() {
     var current = ++request;
     if (!status.gallery_open) return;
