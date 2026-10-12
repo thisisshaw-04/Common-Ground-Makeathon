@@ -184,7 +184,7 @@
       status.submissions_closed !== true;
   }
   function updateMediaEditAvailability() {
-    var inputIds = ['project-preview-image', 'project-demo', 'project-video'];
+    var inputIds = ['project-preview-file', 'project-preview-image', 'project-demo', 'project-video'];
     var form = $('submission-form');
     var helper = $('project-image-edit-deadline');
     var editLock = $('project-edit-lock');
@@ -253,6 +253,53 @@
     if (result.error) throw result.error;
     return result.data === true;
   }
+  var MAX_PREVIEW_BYTES = 5 * 1024 * 1024;
+  var PREVIEW_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
+  function validatePreviewFile(file) {
+    if (!file) return 'Choose an image file to upload.';
+    if (PREVIEW_IMAGE_TYPES.indexOf(String(file.type || '').toLowerCase()) === -1) {
+      return 'Upload a JPG, PNG, WebP, GIF, or AVIF image.';
+    }
+    if (file.size <= 0 || file.size > MAX_PREVIEW_BYTES) {
+      return 'Choose an image smaller than 5 MB.';
+    }
+    return '';
+  }
+  async function uploadPreviewImage(submissionId, file) {
+    var session = window.CGSubmission && window.CGSubmission.getSession();
+    var config = window.CG_SUPABASE_CONFIG || {};
+    if (!session || !session.access_token || !config.url || !config.publishableKey) {
+      throw new Error('Your sign-in expired. Sign in again, then retry the upload.');
+    }
+    var form = new FormData();
+    form.append('submissionId', submissionId);
+    form.append('image', file, file.name);
+    var endpoint = String(config.url).replace(/\/+$/, '') + '/functions/v1/project-preview-upload';
+    var response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'apikey': config.publishableKey,
+        'Authorization': 'Bearer ' + session.access_token
+      },
+      body: form
+    });
+    var data = await response.json().catch(function () { return {}; });
+    if (!response.ok || !data.publicUrl) {
+      throw new Error(data.error || 'The image upload failed. Try again.');
+    }
+    var uploadedUrl;
+    try {
+      uploadedUrl = new URL(data.publicUrl);
+      var projectUrl = new URL(config.url);
+      if (uploadedUrl.origin !== projectUrl.origin ||
+          uploadedUrl.pathname.indexOf('/storage/v1/object/public/project-previews/') !== 0) {
+        throw new Error();
+      }
+    } catch (_error) {
+      throw new Error('The upload returned an invalid image link. Try again.');
+    }
+    return uploadedUrl.href;
+  }
   async function syncDraft(status) {
     if (!isMediaEditOpen()) {
       var closedMessage = mediaEditNow() < MEDIA_EDIT_START
@@ -292,6 +339,34 @@
       return false;
     }
     setEntryUnlocked();
+
+    var previewWasUploaded = false;
+    var previewFileInput = $('project-preview-file');
+    var previewFile = previewFileInput && previewFileInput.files && previewFileInput.files[0];
+    if (previewFile) {
+      var fileIssue = validatePreviewFile(previewFile);
+      if (fileIssue) {
+        $('project-image-upload-status').textContent = fileIssue;
+        showStatus(fileIssue, true);
+        $('submission-feedback').textContent = fileIssue;
+        return false;
+      }
+      showStatus('Uploading your preview image…');
+      $('project-image-upload-status').textContent = 'Uploading ' + previewFile.name + '…';
+      $('submission-feedback').textContent = 'Uploading the preview image, then saving your project update…';
+      try {
+        $('project-preview-image').value = await uploadPreviewImage(existing.id, previewFile);
+        previewWasUploaded = true;
+        previewFileInput.value = '';
+        $('project-image-upload-status').textContent = 'Image uploaded. Saving it to this project…';
+      } catch (uploadError) {
+        var uploadMessage = uploadError && uploadError.message || 'The image upload failed. Try again.';
+        $('project-image-upload-status').textContent = uploadMessage;
+        showStatus(uploadMessage, true);
+        $('submission-feedback').textContent = uploadMessage;
+        return false;
+      }
+    }
 
     var project = Object.assign({}, existing.project || {});
     var mediaValues = {
@@ -376,8 +451,9 @@
       ? 'Submitted. Organisers can see your entry now; it appears in the public gallery from 3:15 PM SGT.'
       : targetStatus === 'ready'
         ? 'Project updated. It remains submitted and visible in the gallery.'
-        : 'Preview image and demo links updated for this saved draft.';
+        : 'Preview image and demo links updated for this saved project.';
     showStatus(statusMessage);
+    if (previewWasUploaded) $('project-image-upload-status').textContent = 'Preview image saved to this project.';
     $('submission-feedback').textContent = newlySubmitted
       ? 'Your final entry is saved for the organisers.'
       : targetStatus === 'ready'
@@ -543,6 +619,22 @@
   });
   ['project-overview','project-build'].forEach(function (id) {
     $(id).addEventListener('input', updateSubmissionGuidance);
+  });
+  $('project-preview-file').addEventListener('change', function () {
+    var file = this.files && this.files[0];
+    var status = $('project-image-upload-status');
+    if (!file) {
+      status.textContent = 'Leave this empty to keep the current preview image.';
+      return;
+    }
+    var issue = validatePreviewFile(file);
+    if (issue) {
+      this.value = '';
+      status.textContent = issue;
+      showStatus(issue, true);
+      return;
+    }
+    status.textContent = file.name + ' selected. Save project changes to upload it.';
   });
   updateSubmissionGuidance();
   updateMediaEditAvailability();
