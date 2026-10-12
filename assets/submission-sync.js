@@ -61,7 +61,7 @@
     document.dispatchEvent(new CustomEvent('cg-existing-submission-change', {detail:{available:false}}));
     var lock = $('submission-locked');
     if (lock) {
-      lock.hidden = false;
+      lock.hidden = !(window.CGBuilderEligibility === true && window.CGHasExistingSubmission === true);
       var heading = lock.querySelector('h2');
       var copy = lock.querySelector('p');
       if (heading) heading.textContent = title || 'Edit an existing project.';
