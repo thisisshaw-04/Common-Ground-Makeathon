@@ -3,7 +3,7 @@
 */
 (function (global) {
   const SEED = {
-    eventRevision: '2026-10-11-v2',
+    eventRevision: '2026-10-12-media-edit-vote-window',
     event: {
       name: 'Common Ground',
       edition: 'MAKEATHON',
@@ -40,8 +40,8 @@
         { q: 'Do I need to know how to code?', a: 'No. All backgrounds and skill levels are welcome. Bring what you know unusually well.' },
         { q: 'What can we make?', a: 'There is no fixed medium or outcome. Build a website, visual experiment, AI experience, speculative prototype or something else.' },
         { q: 'How do partner offers work?', a: 'Sign in and claim each offer. Claims are limited and first come, first served.' },
-        { q: 'When do submissions close?', a: 'The public gallery and voting opened at 3:15 PM SGT on 11 October. Submissions remain open until an organiser closes them.' },
-        { q: 'How does People’s Choice work?', a: 'Sign in and vote for up to three projects from 12:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT. You cannot vote for your own team.' },
+        { q: 'Can I update my project?', a: 'Existing project teams can update only the preview image, live demo, and demo video links from 12:00 PM to 6:00 PM SGT on Monday, 12 October. New project entries are closed. After 6:00 PM, only voting remains open.' },
+        { q: 'How does People’s Choice work?', a: 'Sign in with any verified email. Approved event builders can cast up to three votes; other verified email accounts can cast one. Voting runs from 12:00 PM SGT Monday, 12 October to 11:59 PM Wednesday, 14 October. You can unvote before voting closes, but cannot vote for your own team.' },
         { q: 'Do I need source code?', a: 'Add a source link unless the project is no-code. Include a live demo or video.' }
       ]
     },
