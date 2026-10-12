@@ -2,7 +2,6 @@
 (function () {
   'use strict';
   var EVENT_ID = 'common-ground-2026-10-11';
-  var FINALIZABLE_SUBMISSION_ID = '6ce562cc-650e-4a7e-b05a-1a9496c3464d';
   var $ = function (id) { return document.getElementById(id); };
   var authBox = $('submission-auth');
   if (!authBox) return;
@@ -24,12 +23,8 @@
     status.textContent = message;
     status.classList.toggle('error', !!isError);
   }
-  function isFinalizableSubmission(record) {
-    return !!record && record.id === FINALIZABLE_SUBMISSION_ID;
-  }
   function canEditExistingRecord(record) {
-    return !!record && (record.status === 'ready' ||
-      (record.status === 'draft' && isFinalizableSubmission(record)));
+    return !!record && record.status === 'ready';
   }
   function updateSubmissionControls(record) {
     var button = $('project-ready');
@@ -46,16 +41,10 @@
       button.disabled = true;
       if (guidance) guidance.textContent = 'This project is submitted. You can update its preview image, live demo, and demo video during the edit window.';
       if (saveButton) saveButton.textContent = 'Save project changes';
-    } else if (isFinalizableSubmission(record)) {
-      button.hidden = false;
-      button.disabled = false;
-      button.textContent = 'Submit final entry';
-      if (guidance) guidance.textContent = 'This is the only saved draft that can be submitted, during the edit window.';
-      if (saveButton) saveButton.textContent = 'Save image & demo links';
     } else {
       button.hidden = true;
       button.disabled = true;
-      if (guidance) guidance.textContent = 'This draft is not published in the gallery and is locked. Only submitted gallery projects and the existing Uno Dos Tres draft can be edited.';
+      if (guidance) guidance.textContent = 'This draft is not published in the gallery and is locked. Only projects already submitted and visible in the gallery can update media.';
       if (saveButton) saveButton.textContent = 'Save image & demo links';
     }
     updateMediaEditAvailability();
@@ -192,9 +181,7 @@
     var downloadButton = $('project-download');
     var submitButton = $('project-ready');
     var canEdit = canEditExistingRecord(currentSubmissionRecord);
-    var restrictedDraft = !!currentSubmissionRecord &&
-      currentSubmissionRecord.status === 'draft' &&
-      !isFinalizableSubmission(currentSubmissionRecord);
+    var restrictedDraft = !!currentSubmissionRecord && currentSubmissionRecord.status !== 'ready';
     var open = canEdit && isMediaEditOpen();
     window.CGMediaEditOpen = open;
     if (form) {
@@ -212,22 +199,19 @@
     if (editLock) {
       editLock.hidden = !restrictedDraft;
       editLock.textContent = restrictedDraft
-        ? 'This saved draft is not published in the gallery and cannot be edited. Only submitted projects already visible in the gallery and the existing Uno Dos Tres draft can be changed.'
+        ? 'This saved draft is not published in the gallery and cannot be edited. Only submitted projects already visible in the gallery can be changed.'
         : '';
     }
     if (saveButton) saveButton.disabled = !open;
     if (downloadButton) downloadButton.hidden = true;
     if (submitButton) {
-      var mayFinalize = open && currentSubmissionRecord &&
-        currentSubmissionRecord.status === 'draft' &&
-        isFinalizableSubmission(currentSubmissionRecord);
-      submitButton.hidden = !mayFinalize;
-      submitButton.disabled = !mayFinalize;
+      submitButton.hidden = true;
+      submitButton.disabled = true;
     }
     if (helper) {
       var now = mediaEditNow();
       helper.textContent = now < MEDIA_EDIT_START
-        ? 'Submitted gallery projects and the existing Uno Dos Tres draft can update these links from 12:00 AM Monday, 12 October to 12:00 AM Tuesday, 13 October SGT.'
+        ? 'Submitted gallery projects can update these links from 12:00 AM Monday, 12 October to 12:00 AM Tuesday, 13 October SGT.'
         : now >= MEDIA_EDIT_END || (window.CGEventStatus && window.CGEventStatus.submissions_closed)
           ? 'The edit window closes at 12:00 AM SGT Tuesday, 13 October. Only voting remains open through 11:59 PM Wednesday, 14 October.'
           : 'Update these links until 12:00 AM SGT Tuesday, 13 October. Other drafts and new projects are locked.';
@@ -332,8 +316,8 @@
       showStatus('No existing project is linked to this email. New submissions are closed.', true);
       return false;
     }
-    if (existing.status === 'draft' && !isFinalizableSubmission(existing)) {
-      var draftLockMessage = 'This draft is not published in the gallery and cannot be edited. Only submitted gallery projects and the existing Uno Dos Tres draft can be changed.';
+    if (existing.status !== 'ready') {
+      var draftLockMessage = 'This draft is not published in the gallery and cannot be edited. Only submitted gallery projects can be changed.';
       showStatus(draftLockMessage, true);
       $('submission-feedback').textContent = draftLockMessage;
       return false;
@@ -399,29 +383,7 @@
       }
     }
 
-    var targetStatus = existing.status === 'ready' ? 'ready' : status;
-    if (status === 'ready' && existing.status === 'draft') {
-      if (!isFinalizableSubmission(existing)) {
-        var closedMessage = 'Only the existing Uno Dos Tres entry may be submitted. Other drafts and new projects cannot be edited or submitted.';
-        showStatus(closedMessage, true);
-        $('submission-feedback').textContent = closedMessage;
-        return false;
-      }
-      var validationProject = Object.assign({}, project);
-      if (!validationProject.overview) {
-        validationProject.overview = [project.oneLiner, project.inspiration, project.solution, project.interesting].filter(Boolean).join(' ');
-      }
-      if (!validationProject.build) {
-        validationProject.build = [project.technology, project.made, project.experiment, project.next].filter(Boolean).join(' ');
-      }
-      if (!Array.isArray(validationProject.tracks)) validationProject.tracks = [];
-      var issue = validateReady(validationProject, existing.team || {});
-      if (issue) {
-        showStatus(issue, true);
-        $('submission-feedback').textContent = issue;
-        return false;
-      }
-    }
+    var targetStatus = 'ready';
 
     var result = await client.from('submissions').update({
       status: targetStatus,
@@ -446,19 +408,9 @@
       project: project
     });
     updateSubmissionControls(currentSubmissionRecord);
-    var newlySubmitted = existing.status === 'draft' && targetStatus === 'ready';
-    var statusMessage = newlySubmitted
-      ? 'Submitted. Organisers can see your entry now; it appears in the public gallery from 3:15 PM SGT.'
-      : targetStatus === 'ready'
-        ? 'Project updated. It remains submitted and visible in the gallery.'
-        : 'Preview image and demo links updated for this saved project.';
-    showStatus(statusMessage);
+    showStatus('Project updated. It remains submitted and visible in the gallery.');
     if (previewWasUploaded) $('project-image-upload-status').textContent = 'Preview image saved to this project.';
-    $('submission-feedback').textContent = newlySubmitted
-      ? 'Your final entry is saved for the organisers.'
-      : targetStatus === 'ready'
-        ? 'Your submitted entry was updated.'
-        : 'Your saved draft media links were updated.';
+    $('submission-feedback').textContent = 'Your submitted entry was updated.';
     return true;
   }
   function fillRemote(record) {
@@ -537,9 +489,7 @@
     }
     $('submission-feedback').textContent = record.status === 'ready'
       ? 'Your submitted project is loaded.'
-      : isFinalizableSubmission(record)
-        ? 'The existing Uno Dos Tres draft is loaded. It is the only draft that can be submitted.'
-        : 'This draft is not published in the gallery and is locked. Only submitted gallery projects and the existing Uno Dos Tres draft can be edited.';
+      : 'This draft is not published in the gallery and is locked. Only submitted gallery projects can be edited.';
   }
   async function syncAuth(session) {
     var user = session && session.user;
@@ -591,9 +541,7 @@
           fillRemote(lookup.record);
           showStatus(lookup.record.status === 'ready'
             ? 'Signed in as ' + signedInEmail + '. You can update the submitted gallery project during the edit window.'
-            : isFinalizableSubmission(lookup.record)
-              ? 'Signed in as ' + signedInEmail + '. The existing Uno Dos Tres draft can be updated and submitted during the edit window.'
-              : 'Signed in as ' + signedInEmail + '. This draft is not published in the gallery and is locked.');
+            : 'Signed in as ' + signedInEmail + '. This draft is not published in the gallery and is locked.');
         } else {
           currentSubmissionRecord = null;
           setEntryLock('No existing project found.', 'New project entries are closed. Sign in with an email listed on a previously saved project to edit it.');
