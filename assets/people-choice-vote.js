@@ -176,7 +176,7 @@
       await window.CGSubmission.signIn(email);
       pendingEmail = email;
       if (signInStatus) {
-        signInStatus.textContent = 'Check your inbox and spam folder. Enter the newest eight-digit code here, or open the sign-in link; it returns to this voting page.';
+        signInStatus.textContent = 'Enter the newest eight-digit code from your email.';
         signInStatus.classList.remove('error');
       }
       if (signInCode) signInCode.value = '';
