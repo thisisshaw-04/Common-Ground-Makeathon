@@ -22,9 +22,14 @@
       currentUrl.hash = '';
       return currentUrl.href;
     }
+    var returnToChoice = false;
+    try {
+      var requestedAt = Number(window.localStorage.getItem('cg-return-to-choice-after-signin'));
+      returnToChoice = Number.isFinite(requestedAt) && Date.now() - requestedAt < 30 * 60 * 1000;
+    } catch (_err) { /* Fall back to the access page if browser storage is unavailable. */ }
     var portalUrl = new URL('./', currentUrl.href);
     portalUrl.search = '';
-    portalUrl.hash = 'access';
+    portalUrl.hash = returnToChoice ? 'choice' : 'access';
     return portalUrl.href;
   }
 
