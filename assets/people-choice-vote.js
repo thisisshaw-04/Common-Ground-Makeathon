@@ -123,7 +123,9 @@
       row = row || {};
       votesCast = Number(row.votes_cast || 0);
       votedIds = Array.isArray(row.voted_submission_ids) ? row.voted_submission_ids : [];
-      eventStatus.voting_open = !!row.voting_open && !!(window.CGEventStatus && window.CGEventStatus.voting_open);
+      eventStatus = Object.assign({}, window.CGEventStatus || {}, {
+        voting_open: !!row.voting_open && (!!(window.CGEventStatus && window.CGEventStatus.voting_open) || isOrganizer)
+      });
       voteStatusResolved = true;
       renderState();
     } catch (_error) {
