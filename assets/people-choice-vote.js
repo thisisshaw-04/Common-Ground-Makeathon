@@ -124,7 +124,7 @@
       votesCast = Number(row.votes_cast || 0);
       votedIds = Array.isArray(row.voted_submission_ids) ? row.voted_submission_ids : [];
       eventStatus = Object.assign({}, window.CGEventStatus || {}, {
-        voting_open: !!row.voting_open && (!!(window.CGEventStatus && window.CGEventStatus.voting_open) || isOrganizer)
+        voting_open: !!row.voting_open && (!!(window.CGEventStatus && window.CGEventStatus.voting_open) || eligible)
       });
       voteStatusResolved = true;
       renderState();
@@ -192,8 +192,7 @@
         : eligible
           ? 'Signed in as ' + String(user.email || 'your email') + '. ' +
             (isParticipant && isOrganizer ? 'Participant and organiser accounts get up to 3 votes.' :
-              isOrganizer ? 'Organisers get up to 3 votes.' : 'Participant-list emails get up to 3 votes.') +
-
+              isOrganizer ? 'Organisers get up to 3 votes.' : 'Participant-list emails get up to 3 votes.')
           : 'Signed in as ' + String(user.email || 'your email') + '. This email gets 1 vote after voting opens.';
     }
   }
