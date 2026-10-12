@@ -202,21 +202,25 @@
     var closed = !!eventStatus.submissions_closed;
     var eligible = window.CGBuilderEligibility === true;
     var codeAccess = !!(current && current.status === 'confirmed' && CGData.codesOpen(data.event));
+    var signedIn = !!(window.CGSubmission && window.CGSubmission.getUser && window.CGSubmission.getUser());
     var hasExistingSubmission = window.CGHasExistingSubmission === true;
     var canAccess = eligible && codeAccess && !closed;
-    var canEdit = canAccess && hasExistingSubmission;
+    var canEdit = signedIn && hasExistingSubmission && !closed;
     if ($('team-section')) $('team-section').hidden = !canAccess;
     if ($('team-form')) $('team-form').hidden = true;
     if ($('submission-section')) $('submission-section').hidden = !canEdit;
     if ($('submission-locked')) {
       $('submission-locked').hidden = canEdit;
+      var lockHeading = $('submission-locked').querySelector('h2');
+      var lockCopy = $('submission-locked').querySelector('p');
       if (closed) {
-        var lockHeading = $('submission-locked').querySelector('h2');
-        var lockCopy = $('submission-locked').querySelector('p');
-        if (lockHeading) lockHeading.textContent = eventNow() < SUBMISSION_OPEN_AT ? 'Project updates opened at 12:00 AM SGT Monday, 12 October.' : 'Project edits are closed.';
+        if (lockHeading) lockHeading.textContent = eventNow() < SUBMISSION_OPEN_AT ? 'Project updates have not opened yet.' : 'Project edits are closed.';
         if (lockCopy) lockCopy.textContent = eventNow() < SUBMISSION_OPEN_AT
-          ? 'From 12:00 AM SGT Monday, 12 October until 12:00 AM SGT Tuesday, 13 October, existing project teams can update only their preview image, live demo, and demo video links. People’s Choice voting opens at 6:00 PM SGT Monday, 12 October and closes at 11:59 PM Wednesday, 14 October.'
+          ? 'Existing submitted projects can update their preview image, live demo, and demo video during the edit window. Anyone can sign in to vote: participant-list emails get three votes; other verified emails get one.'
           : 'The project media edit window closes at 12:00 AM SGT Tuesday, 13 October. People’s Choice voting is open through 11:59 PM Wednesday, 14 October.';
+      } else if (signedIn && !hasExistingSubmission) {
+        if (lockHeading) lockHeading.textContent = 'No submitted project is linked to this email.';
+        if (lockCopy) lockCopy.textContent = 'You are signed in and can still vote. Only an email listed on an already submitted gallery project can edit its preview image and demo links.';
       }
     }
   }
@@ -325,11 +329,12 @@
       if (result.error) throw result.error;
       if (result.data !== true) {
         clearBuilderAccess();
-        showError("This email is verified, but it isn't on the approved builder list. You can still cast one People’s Choice vote with it; partner offers and project submissions need your registered email.");
+        clearError();
+        setGateStatus('Signed in and verified. You can cast one vote. Participant-list emails can cast up to three; email addresses listed on a submitted project can edit its image and demo links during the edit window.');
         return;
       }
       clearError();
-      setGateStatus('Signed in and verified. Your claims and team draft are tied to this email.');
+      setGateStatus('Signed in and verified. Participant-list email: up to three votes. You can update a submitted project’s image and demo links if this email is listed on its team.');
       var returnPanel = location.hash.match(/^#(access|schedule|faq|choice)$/i);
       if (!returnPanel) activatePanel('access', true);
       renderResult({
