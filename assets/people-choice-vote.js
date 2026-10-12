@@ -14,6 +14,8 @@
   var pendingEmail = '';
   var cards = document.getElementById('project-gallery-cards');
   var eligible = false;
+  var isParticipant = false;
+  var isOrganizer = false;
   var voteStatusResolved = false;
   var session = window.CGSubmission && window.CGSubmission.getSession();
   var eventStatus = window.CGEventStatus || {};
@@ -66,7 +68,7 @@
     renderSignInState();
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
-      setMessage('Sign in to vote after 6:00 PM SGT. Participant-list emails get 3 votes; other verified emails get 1.');
+      setMessage('Sign in to vote after 6:00 PM SGT. Participant-list emails and organisers get 3 votes; other verified emails get 1.');
     } else if (!voteStatusResolved) {
       setMessage('Checking your sign-in and vote limit…');
     } else if (!eventStatus.voting_open) {
@@ -96,16 +98,24 @@
       votesCast = 0;
       votedIds = [];
       eligible = false;
+      isParticipant = false;
+      isOrganizer = false;
       voteStatusResolved = false;
       renderState();
       return;
     }
     voteStatusResolved = false;
     try {
-      var eligibility = await client.rpc('is_current_user_eligible');
+      var eligibilityChecks = await Promise.all([
+        client.rpc('is_current_user_eligible'),
+        client.rpc('is_current_user_organizer')
+      ]);
       if (sequence !== statusRequest) return;
-      if (eligibility.error) throw eligibility.error;
-      eligible = eligibility.data === true;
+      if (eligibilityChecks[0].error) throw eligibilityChecks[0].error;
+      if (eligibilityChecks[1].error) throw eligibilityChecks[1].error;
+      isParticipant = eligibilityChecks[0].data === true;
+      isOrganizer = eligibilityChecks[1].data === true;
+      eligible = isParticipant || isOrganizer;
       var result = await client.rpc('get_people_choice_status', {p_event_id: EVENT_ID});
       if (sequence !== statusRequest) return;
       if (result.error) throw result.error;
@@ -119,6 +129,8 @@
     } catch (_error) {
       if (sequence !== statusRequest) return;
       eligible = false;
+      isParticipant = false;
+      isOrganizer = false;
       voteStatusResolved = false;
       setMessage('Could not load your vote status. Refresh and try again.', true);
       renderVoteButtons();
@@ -170,7 +182,10 @@
       signInStatus.textContent = !voteStatusResolved
         ? 'Signed in as ' + String(user.email || 'your email') + '. Checking your vote limit…'
         : eligible
-          ? 'Signed in as ' + String(user.email || 'your email') + '. Participant-list emails get up to 3 votes; project edits are limited to their own linked submission.'
+          ? 'Signed in as ' + String(user.email || 'your email') + '. ' +
+            (isParticipant && isOrganizer ? 'Participant and organiser accounts get up to 3 votes.' :
+              isOrganizer ? 'Organisers get up to 3 votes.' : 'Participant-list emails get up to 3 votes.') +
+            ' Project edits still require a participant email linked to that project.'
           : 'Signed in as ' + String(user.email || 'your email') + '. This email gets 1 vote after voting opens.';
     }
   }
