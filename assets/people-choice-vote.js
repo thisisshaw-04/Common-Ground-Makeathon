@@ -25,6 +25,7 @@
   var statusRequest = 0;
   var editingLabel = document.getElementById('gallery-editing-label');
   var phaseLabel = document.getElementById('gallery-phase-label');
+  var galleryMessage = document.getElementById('project-gallery-message');
   var EDITING_START_AT = Date.parse('2026-10-12T00:00:00+08:00');
   var EDITING_END_AT = Date.parse('2026-10-13T00:00:00+08:00');
   var VOTING_START_AT = Date.parse('2026-10-12T18:00:00+08:00');
@@ -87,13 +88,34 @@
         : now >= VOTING_START_AT ? 'VOTING PAUSED'
           : 'VOTING SOON';
   }
+  function updateGalleryMessage() {
+    if (!galleryMessage) return;
+    var now = Date.parse(eventStatus.current_at || '');
+    if (!Number.isFinite(now)) now = Date.now();
+    var editingOpen = now >= EDITING_START_AT && now < EDITING_END_AT && eventStatus.submissions_closed !== true;
+    var editingText = now < EDITING_START_AT
+      ? 'Editing opens at 12:00 AM SGT Monday, 12 October. Only submitted gallery projects can update their preview image and demo links.'
+      : editingOpen
+        ? 'Editing is open for projects already submitted and visible in the gallery until 11:59 PM tonight, Monday, 12 October SGT. Drafts and new projects are locked.'
+        : 'Editing closed at 11:59 PM SGT Monday, 12 October. Drafts and new projects are locked.';
+    var votingText = eventStatus.voting_open
+      ? 'Voting is open: participants get 3 votes; everyone else gets 1. Voting closes at 11:59 PM Wednesday, 14 October SGT.'
+      : now >= VOTING_END_AT
+        ? 'Voting closed at 11:59 PM Wednesday, 14 October SGT.'
+        : now >= VOTING_START_AT
+          ? 'Voting is paused by the organisers. Participants get 3 votes; everyone else gets 1. Voting closes at 11:59 PM Wednesday, 14 October SGT.'
+          : 'Voting opens at 6:00 PM SGT Monday, 12 October. Participants get 3 votes; everyone else gets 1. Voting closes at 11:59 PM Wednesday, 14 October SGT.';
+    var nextText = editingText + ' ' + votingText;
+    if (galleryMessage.textContent !== nextText) galleryMessage.textContent = nextText;
+  }
   function renderState() {
     updatePhaseLabel();
+    updateGalleryMessage();
     area.hidden = false;
     renderSignInState();
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
-      setMessage('Sign in to vote. Organisers and participant-list emails get 3 votes; other verified emails get 1.');
+      setMessage('Sign in to vote. Participants get 3 votes; everyone else gets 1.');
     } else if (!voteStatusResolved) {
       setMessage('Checking your sign-in and vote limit…');
     } else if (!eventStatus.voting_open) {
@@ -213,8 +235,7 @@
         ? 'Signed in as ' + String(user.email || 'your email') + '. Checking your vote limit…'
         : eligible
           ? 'Signed in as ' + String(user.email || 'your email') + '. ' +
-            (isParticipant && isOrganizer ? 'Participant and organiser accounts get up to 3 votes.' :
-              isOrganizer ? 'Organisers get up to 3 votes.' : 'Participant-list emails get up to 3 votes.')
+            ('You get up to 3 votes.')
           : 'Signed in as ' + String(user.email || 'your email') + '. This email gets 1 vote.';
       if (signInStatus.textContent !== nextStatus) signInStatus.textContent = nextStatus;
     }
