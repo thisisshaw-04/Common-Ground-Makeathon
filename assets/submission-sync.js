@@ -10,7 +10,9 @@
   var lastUserId = null;
   var currentSubmissionRecord = null;
   var savedReflections = {designReflection:'',cultureReflection:''};
-  var PREVIEW_IMAGE_CUTOFF = Date.parse('2026-10-12T18:00:00+08:00');
+  var MEDIA_EDIT_START = Date.parse('2026-10-12T12:00:00+08:00');
+  var MEDIA_EDIT_END = Date.parse('2026-10-12T18:00:00+08:00');
+  var mediaClockOffset = 0;
 
   function participantEmail() {
     var participant = window.CGBuilderParticipant || {};
@@ -31,24 +33,31 @@
   function updateSubmissionControls(record) {
     var button = $('project-ready');
     var guidance = $('submission-finalize-guidance');
+    var saveButton = $('submission-form') && $('submission-form').querySelector('button[type="submit"]');
     if (!button) return;
     if (!record) {
+      button.hidden = true;
       button.disabled = true;
-      button.textContent = 'Submission unavailable';
       if (guidance) guidance.textContent = 'Only an already-saved project can be edited here. New project entries are closed.';
+      if (saveButton) saveButton.textContent = 'Save image & demo links';
     } else if (record.status === 'ready') {
-      button.disabled = false;
-      button.textContent = 'Save submitted changes';
-      if (guidance) guidance.textContent = 'This project is already submitted. Saving keeps it submitted and visible in the gallery.';
+      button.hidden = true;
+      button.disabled = true;
+      if (guidance) guidance.textContent = 'This project is submitted. You can update its preview image, live demo, and demo video during the edit window.';
+      if (saveButton) saveButton.textContent = 'Save project changes';
     } else if (isFinalizableSubmission(record)) {
+      button.hidden = false;
       button.disabled = false;
       button.textContent = 'Submit final entry';
-      if (guidance) guidance.textContent = 'This is the only saved draft that can be submitted. Other existing drafts can still be edited.';
+      if (guidance) guidance.textContent = 'This is the only saved draft that can be submitted, during the edit window.';
+      if (saveButton) saveButton.textContent = 'Save image & demo links';
     } else {
+      button.hidden = true;
       button.disabled = true;
-      button.textContent = 'Submission closed';
-      if (guidance) guidance.textContent = 'You can edit and save this existing draft, but only the existing Uno Dos Tres draft can be submitted.';
+      if (guidance) guidance.textContent = 'This saved draft can only update its preview image and demo links; it cannot be submitted.';
+      if (saveButton) saveButton.textContent = 'Save image & demo links';
     }
+    updateMediaEditAvailability();
   }
   function setEntryLock(title, message) {
     window.CGHasExistingSubmission = false;
@@ -161,16 +170,56 @@
     $('build-count').textContent = build + ' / 100 words';
     $('track-count').textContent = tracks.length + ' of 2 selected';
   }
-  function updatePreviewImageAvailability() {
-    var input = $('project-preview-image');
+  function mediaEditNow() {
+    var status = window.CGEventStatus || {};
+    var now = Date.now() + mediaClockOffset;
+    return Number.isFinite(now) ? now : Date.now();
+  }
+  function isMediaEditOpen() {
+    var status = window.CGEventStatus || {};
+    var now = mediaEditNow();
+    return !!currentSubmissionRecord &&
+      now >= MEDIA_EDIT_START && now < MEDIA_EDIT_END &&
+      status.submissions_closed !== true;
+  }
+  function updateMediaEditAvailability() {
+    var inputIds = ['project-preview-image', 'project-demo', 'project-video'];
+    var form = $('submission-form');
+    var image = $('project-preview-image');
     var helper = $('project-image-edit-deadline');
-    if (!input || !helper) return;
-    var closed = Date.now() >= PREVIEW_IMAGE_CUTOFF;
-    input.readOnly = closed;
-    input.setAttribute('aria-readonly', closed ? 'true' : 'false');
-    helper.textContent = closed
-      ? 'Image updates closed at 6:00 PM SGT Monday, 12 October.'
-      : 'Paste a direct image URL. You can change it until 6:00 PM SGT Monday, 12 October.';
+    var saveButton = form && form.querySelector('button[type="submit"]');
+    var downloadButton = $('project-download');
+    var submitButton = $('project-ready');
+    var open = isMediaEditOpen();
+    window.CGMediaEditOpen = open;
+    if (form) {
+      form.classList.toggle('media-edit-only', open);
+      form.querySelectorAll('input, textarea, select').forEach(function (field) {
+        var allowed = inputIds.indexOf(field.id) !== -1;
+        field.disabled = open && !allowed;
+        if (allowed && field.type !== 'checkbox') {
+          field.readOnly = !open;
+          field.setAttribute('aria-readonly', open ? 'false' : 'true');
+        }
+      });
+    }
+    if (saveButton) saveButton.disabled = !open;
+    if (downloadButton) downloadButton.hidden = true;
+    if (submitButton) {
+      var mayFinalize = open && currentSubmissionRecord &&
+        currentSubmissionRecord.status === 'draft' &&
+        isFinalizableSubmission(currentSubmissionRecord);
+      submitButton.hidden = !mayFinalize;
+      submitButton.disabled = !mayFinalize;
+    }
+    if (helper) {
+      var now = mediaEditNow();
+      helper.textContent = now < MEDIA_EDIT_START
+        ? 'Image and demo link updates open at 12:00 PM SGT Monday, 12 October and close at 6:00 PM.'
+        : now >= MEDIA_EDIT_END || (window.CGEventStatus && window.CGEventStatus.submissions_closed)
+          ? 'The edit window ended at 6:00 PM SGT Monday, 12 October. Only voting remains open through 11:59 PM Wednesday, 14 October.'
+          : 'Update the preview image, live demo, or demo video until 6:00 PM SGT Monday, 12 October.';
+    }
   }
   function validateReady(project, team) {
     if (!project.name || !project.overview || !project.build ||
@@ -193,9 +242,12 @@
     return result.data === true;
   }
   async function syncDraft(status) {
-    if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
-      setEntryLock('Project edits are closed.', 'Submissions have been closed by the event schedule or an organiser. The public gallery remains open.');
-      showStatus('Submissions are closed by the event schedule or an organiser. The public gallery remains open.', true);
+    if (!isMediaEditOpen()) {
+      var closedMessage = mediaEditNow() < MEDIA_EDIT_START
+        ? 'Project media updates open at 12:00 PM SGT Monday, 12 October.'
+        : 'The edit window ended at 6:00 PM SGT Monday, 12 October. Only voting remains open.';
+      showStatus(closedMessage, true);
+      $('submission-feedback').textContent = closedMessage;
       return false;
     }
     var user = window.CGSubmission && window.CGSubmission.getUser();
@@ -206,7 +258,7 @@
     }
     var eligible = await checkEligibility(user);
     if (!eligible) {
-      showStatus('This email is not on the builder list enabled for submissions. Contact an organiser.', true);
+      showStatus('This email is not on the builder list enabled to edit projects. Contact an organiser.', true);
       return false;
     }
     var lookup = await findSubmissionForUser(user, email);
@@ -223,75 +275,96 @@
     }
     setEntryUnlocked();
 
-    var teamResult = formTeam(email, existing.team);
-    var team = teamResult.team;
-    var project = formProject();
-    var targetStatus = existing.status === 'ready' ? 'ready' : status;
+    var project = Object.assign({}, existing.project || {});
+    var mediaValues = {
+      previewImage: $('project-preview-image').value.trim(),
+      demo: $('project-demo').value.trim(),
+      video: $('project-video').value.trim()
+    };
+    delete project.preview_image_url;
+    delete project.preview_image;
+    Object.keys(mediaValues).forEach(function (key) {
+      var value = mediaValues[key];
+      if (value) project[key] = value;
+      else delete project[key];
+    });
 
-    if (project.previewImage) {
+    var links = [
+      {label:'preview image', value:mediaValues.previewImage},
+      {label:'live demo', value:mediaValues.demo},
+      {label:'demo video', value:mediaValues.video}
+    ];
+    for (var i = 0; i < links.length; i++) {
+      if (!links[i].value) continue;
       try {
-        if (!/^https?:$/.test(new URL(project.previewImage).protocol)) throw new Error();
+        if (!/^https?:$/.test(new URL(links[i].value).protocol)) throw new Error();
       } catch (_err) {
-        showStatus('Use a complete http:// or https:// image URL.', true);
-        $('submission-feedback').textContent = 'Use a complete http:// or https:// image URL.';
+        var linkError = 'Use a complete http:// or https:// URL for the ' + links[i].label + '.';
+        showStatus(linkError, true);
+        $('submission-feedback').textContent = linkError;
         return false;
       }
     }
+
+    var targetStatus = existing.status === 'ready' ? 'ready' : status;
     if (status === 'ready' && existing.status === 'draft') {
       if (!isFinalizableSubmission(existing)) {
-        var closedMessage = 'Only the existing Uno Dos Tres entry may be submitted. Other saved projects can still be edited.';
+        var closedMessage = 'Only the existing Uno Dos Tres entry may be submitted. Other saved projects can still update media links.';
         showStatus(closedMessage, true);
         $('submission-feedback').textContent = closedMessage;
         return false;
       }
-      if (teamResult.issue) {
-        showStatus(teamResult.issue, true);
-        $('submission-feedback').textContent = teamResult.issue;
-        return false;
+      var validationProject = Object.assign({}, project);
+      if (!validationProject.overview) {
+        validationProject.overview = [project.oneLiner, project.inspiration, project.solution, project.interesting].filter(Boolean).join(' ');
       }
-      var issue = validateReady(project, team);
+      if (!validationProject.build) {
+        validationProject.build = [project.technology, project.made, project.experiment, project.next].filter(Boolean).join(' ');
+      }
+      if (!Array.isArray(validationProject.tracks)) validationProject.tracks = [];
+      var issue = validateReady(validationProject, existing.team || {});
       if (issue) {
         showStatus(issue, true);
         $('submission-feedback').textContent = issue;
         return false;
       }
-      try { localStorage.setItem('cg-team-draft-v1:' + email, JSON.stringify(team)); } catch (_err) { /* The central submission remains authoritative. */ }
     }
 
     var result = await client.from('submissions').update({
       status: targetStatus,
-      project: project,
-      team: team,
-      updated_at: new Date().toISOString()
+      project: project
     }).eq('id', existing.id).select('id,event_id,user_id,owner_email,project,team,status').maybeSingle();
     if (!result.error && !result.data) {
       showStatus('The saved team entry was not available to update. Reload the page and try again.', true);
       return false;
     }
     if (result.error && result.error.code === '23505') {
-      showStatus('A project with this team name already exists. Sign in with an email listed on that team entry to update it.', true);
+      showStatus('This project could not be updated because its existing team record conflicts. Contact an organiser.', true);
       return false;
     }
-    if (result.error) throw result.error;
+    if (result.error) {
+      showStatus(result.error.message || 'The project update was rejected. Reload the page and try again.', true);
+      $('submission-feedback').textContent = result.error.message || 'The project update was rejected. Reload the page and try again.';
+      return false;
+    }
 
     currentSubmissionRecord = Object.assign({}, existing, result.data || {}, {
       status: targetStatus,
-      project: project,
-      team: team
+      project: project
     });
     updateSubmissionControls(currentSubmissionRecord);
     var newlySubmitted = existing.status === 'draft' && targetStatus === 'ready';
     var statusMessage = newlySubmitted
       ? 'Submitted. Organisers can see your entry now; it appears in the public gallery from 3:15 PM SGT.'
       : targetStatus === 'ready'
-        ? 'Submitted project updated. It remains submitted and visible in the gallery.'
-        : 'Draft updated and saved for the organisers.';
+        ? 'Project updated. It remains submitted and visible in the gallery.'
+        : 'Preview image and demo links updated for this saved draft.';
     showStatus(statusMessage);
     $('submission-feedback').textContent = newlySubmitted
       ? 'Your final entry is saved for the organisers.'
       : targetStatus === 'ready'
         ? 'Your submitted entry was updated.'
-        : 'Draft updated centrally. You can return to edit it.';
+        : 'Your saved draft media links were updated.';
     return true;
   }
   function fillRemote(record) {
@@ -325,7 +398,7 @@
     $('project-no-code').checked = !!project.noCode;
     document.querySelectorAll('input[name="project-track"]').forEach(function (input) { input.checked = Array.isArray(project.tracks) && project.tracks.indexOf(input.value) !== -1; });
     updateSubmissionGuidance();
-    updatePreviewImageAvailability();
+    updateMediaEditAvailability();
     var team = record.team || {};
     if (team.name) {
       $('team-name').value = team.name;
@@ -441,13 +514,21 @@
     $(id).addEventListener('input', updateSubmissionGuidance);
   });
   updateSubmissionGuidance();
-  updatePreviewImageAvailability();
+  updateMediaEditAvailability();
   document.addEventListener('cg-project-draft-loaded', function () {
     updateSubmissionGuidance();
-    updatePreviewImageAvailability();
+    updateMediaEditAvailability();
   });
-  var previewImageDelay = PREVIEW_IMAGE_CUTOFF - Date.now();
-  if (previewImageDelay > 0) window.setTimeout(updatePreviewImageAvailability, previewImageDelay + 100);
+  document.addEventListener('cg-event-status', function (event) {
+    var status = event.detail || {};
+    if (status.authoritative && status.current_at) {
+      var serverTime = Date.parse(status.current_at);
+      if (Number.isFinite(serverTime)) mediaClockOffset = serverTime - Date.now();
+    }
+    updateMediaEditAvailability();
+    var session = window.CGSubmission && window.CGSubmission.getSession();
+    if (session && session.user) syncAuth(session);
+  });
 
   $('submission-auth-form').addEventListener('submit', async function (event) {
     event.preventDefault();
