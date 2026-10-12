@@ -54,6 +54,11 @@
 .project-gallery-card .submission-detail strong{font:10px var(--mono);text-transform:uppercase;color:var(--muted)}
 .project-gallery-card .submission-detail p{margin-top:5px;line-height:1.55;white-space:pre-wrap}
 .project-gallery-links a{font:11px var(--mono);text-decoration:underline;text-underline-offset:3px}
+.project-gallery-share-row{display:flex;justify-content:flex-end;padding:0 20px 18px}
+.project-gallery-share{border:1px solid var(--ink);border-radius:999px;background:var(--acid);color:var(--ink);padding:8px 12px;font:10px var(--mono);cursor:pointer;transition:background .16s ease,transform .16s ease}
+.project-gallery-share:hover:not(:disabled){background:#ffe277;transform:translateY(-1px)}
+.project-gallery-share:focus-visible{outline:3px solid var(--hot);outline-offset:3px}
+.project-gallery-share:disabled{opacity:.65;cursor:wait}
 
 
 .portal-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px;border:1px solid var(--ink);background:#fff;margin:22px 0 0;position:sticky;top:0;z-index:10}
@@ -448,7 +453,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/data.js?v=20261012-gallery-edit-only"></script>
 <script src="./assets/portal.js?v=20261012-own-project-edit-access"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
-<script src="./assets/project-gallery.js?v=20261012-hide-gallery-count"></script>
+<script src="./assets/project-gallery.js?v=20261012-project-share-links"></script>
 <script src="./assets/people-choice-vote.js?v=20261012-participant-list-votes"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
 <script src="./assets/submission-sync.js?v=20261012-linked-project-only"></script>
