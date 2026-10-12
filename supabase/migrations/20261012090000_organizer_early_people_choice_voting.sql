@@ -101,7 +101,7 @@ begin
   values (p_event_id, v_voter, p_submission_id);
   return true;
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.remove_people_choice_vote(p_submission_id uuid, p_event_id text DEFAULT 'common-ground-2026-10-11'::text)
@@ -168,7 +168,7 @@ begin
 
   return true;
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.get_people_choice_status(p_event_id text DEFAULT 'common-ground-2026-10-11'::text)
@@ -215,7 +215,7 @@ begin
   from public.people_choice_votes v
   where v.event_id = p_event_id and v.voter_id = v_voter;
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.get_people_choice_admin_status(p_event_id text DEFAULT 'common-ground-2026-10-11'::text)
@@ -247,7 +247,7 @@ begin
     (select count(*)::integer from public.submissions s where s.event_id = p_event_id and s.status = 'ready'),
     (select count(*)::bigint from public.people_choice_votes v where v.event_id = p_event_id);
 end;
-$function$
+$function$;
 
 
 CREATE OR REPLACE FUNCTION public.set_people_choice_voting(p_open boolean, p_event_id text DEFAULT 'common-ground-2026-10-11'::text)
@@ -278,7 +278,7 @@ begin
     updated_by = excluded.updated_by;
   return coalesce(p_open, false);
 end;
-$function$
+$function$;
 
 
 insert into public.people_choice_settings(event_id, voting_open, voting_paused, updated_at)
