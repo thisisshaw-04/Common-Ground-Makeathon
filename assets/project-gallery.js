@@ -194,7 +194,6 @@
         previewMarkup(row, name, oneLiner) +
         '<div class="project-gallery-copy">' +
         '<span class="gallery-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</span>' +
-        (credit ? '<span class="gallery-credit">CREDIT / ' + escape(credit) + '</span>' : '') +
         '<h3>' + escape(name) + '</h3>' +
         awardMarkup(row) +
         (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
