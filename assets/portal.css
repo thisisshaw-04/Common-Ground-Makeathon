@@ -388,7 +388,9 @@ body .topbar{position:sticky;top:0;z-index:30;height:auto;min-height:68px;displa
 .field-status.is-optional{color:#727666;background:#f1f1eb;border-color:#d8d9cf}
 
 
-/* Full-width, aligned footer rule; use the layout width to avoid 100vw scrollbar overshoot. */
-footer{width:100%;max-width:none;margin:38px 0 0;padding:28px clamp(20px,5vw,76px);border-top:2px solid var(--ink)}
+/* Keep a single, full-width footer divider; remove the nested section rule above it. */
+footer{position:relative;align-self:stretch;flex:0 0 auto;width:100%;max-width:none;margin:38px 0 0;padding:28px clamp(20px,5vw,76px);border-top:0}
+footer::before{content:"";position:absolute;inset:0 0 auto;height:2px;background:var(--ink)}
+#main-content > .portal-panel:not([hidden]) > .section:last-child{border-bottom:0}
 
 @media(max-width:700px){footer{margin-top:24px;padding:24px 20px}}
