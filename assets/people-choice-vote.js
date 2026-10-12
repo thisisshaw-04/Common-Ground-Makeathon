@@ -207,7 +207,7 @@
     try {
       if (!window.CGSubmission || !window.CGSubmission.signIn) throw new Error('Sign-in is not configured.');
       try { localStorage.setItem('cg-return-to-choice-after-signin', String(Date.now())); } catch (_err) { /* The email code still works without storage. */ }
-      await window.CGSubmission.signIn(email);
+      await window.CGSubmission.signIn(email, {returnToPanel: 'choice'});
       pendingEmail = email;
       if (signInStatus) {
         signInStatus.textContent = 'Enter the newest eight-digit code from your email.';
