@@ -51,7 +51,7 @@
     renderSignInState();
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
-      setMessage('Sign in with any verified email to vote.');
+      setMessage('Sign in to vote. Participants get 3 votes each; non-participants get 1.');
     } else if (!eventStatus.voting_open) {
       var now = Date.parse(eventStatus.current_at || '');
       var votingStart = Date.parse('2026-10-12T18:00:00+08:00');
