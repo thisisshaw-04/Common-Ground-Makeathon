@@ -151,7 +151,7 @@
       document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:[]}}));
       return;
     }
-    message.textContent = rows.length + (rows.length === 1 ? ' project' : ' projects');
+    message.textContent = '';
     cards.innerHTML = rows.map(function (row) {
       var name = row.project_name || 'Untitled project';
       var team = row.team_name || 'Team';
