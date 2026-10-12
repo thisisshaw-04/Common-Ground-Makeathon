@@ -403,7 +403,10 @@
   function loadTeam(p) {
     var draft = null;
     try { draft = JSON.parse(localStorage.getItem(teamKey(p))); } catch (err) { /* Start with an empty draft. */ }
-    $('team-contact').textContent = 'Team contact: ' + (p.name || '') + ' · ' + p.email;
+    var contactName = String(p.name || '').trim();
+    var contactEmail = String(p.email || '').trim();
+    var sameAsEmail = contactName.toLowerCase() === contactEmail.toLowerCase();
+    $('team-contact').textContent = 'Team contact: ' + (contactName && !sameAsEmail ? contactName + ' · ' : '') + contactEmail;
     $('team-name').value = draft && draft.name || p.team || '';
     $('team-members').innerHTML = '';
     (draft && Array.isArray(draft.members) ? draft.members : []).forEach(addMember);
