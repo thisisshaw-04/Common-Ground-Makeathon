@@ -78,7 +78,6 @@
     var image = previewImage(row);
     return '<div class="project-gallery-preview' + (image ? ' has-image' : '') + '">' +
       (image ? '<img src="' + image + '" alt="' + escape(name) + ' project preview" loading="lazy" referrerpolicy="no-referrer">' : '') +
-      (!image ? '<strong>' + escape(name) + '</strong>' : '') +
       '</div>';
   }
   var AWARD_BY_SUBMISSION = {
