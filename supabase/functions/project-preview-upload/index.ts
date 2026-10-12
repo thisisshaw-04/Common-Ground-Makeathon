@@ -142,6 +142,17 @@ Deno.serve(async function (request) {
       return response(403, { error: "Use a verified builder email to upload a project image." });
     }
 
+    const eligibilityResponse = await fetch(
+      projectUrl + "/rest/v1/eligible_participants?email=eq." +
+        encodeURIComponent(email) + "&select=email&limit=1",
+      { headers: adminHeaders(serviceKey, !!legacyServiceKey) }
+    );
+    if (!eligibilityResponse.ok) return response(503, { error: "Could not verify participant access. Try again shortly." });
+    const eligibleRows = await eligibilityResponse.json();
+    if (!Array.isArray(eligibleRows) || !eligibleRows.length) {
+      return response(403, { error: "Only recognised participants can edit a submitted project linked to their email." });
+    }
+
     const now = Date.now();
     const opensAt = Date.parse("2026-10-12T00:00:00+08:00");
     const closesAt = Date.parse("2026-10-12T16:00:00Z");
@@ -186,16 +197,15 @@ Deno.serve(async function (request) {
     );
     if (!submissionsResponse.ok) return response(503, { error: "Could not verify the saved project. Try again shortly." });
     const allRows = await submissionsResponse.json();
-    const ownedRows = allRows.filter(function (row) { return row.user_id === user.id; });
-    const matchingRows = ownedRows.length ? ownedRows : allRows.filter(function (row) { return emailMatches(row, email); });
-    if (matchingRows.length !== 1 || matchingRows[0].id !== submissionId || !emailMatches(matchingRows[0], email) && matchingRows[0].user_id !== user.id) {
-      return response(403, { error: "This email is not linked to that single saved project." });
+    const matchingRows = allRows.filter(function (row) {
+      return row.user_id === user.id || emailMatches(row, email);
+    });
+    const matchingReadyRows = matchingRows.filter(function (row) { return row.status === "ready"; });
+    if (matchingReadyRows.length !== 1 || matchingReadyRows[0].id !== submissionId) {
+      return response(403, { error: "This email is not linked to that single submitted project." });
     }
 
-    const record = matchingRows[0];
-    if (record.status !== "ready") {
-      return response(403, { error: "Only already-submitted projects visible in the gallery can be edited." });
-    }
+    const record = matchingReadyRows[0];
 
     if (!(await ensurePublicBucket(projectUrl, serviceKey, !!legacyServiceKey))) {
       return response(503, { error: "Image storage is unavailable. Please try again shortly." });
