@@ -82,10 +82,10 @@
       '</div>';
   }
   var AWARD_BY_SUBMISSION = {
-    '571179e5-7f4c-4c66-93c1-ede16510df69': 'Culture × Tech',
+    '571179e5-7f4c-4c66-93c1-ede16510df69': 'Culture × Tech Award',
     '05ffd087-231c-4672-ba73-32e0424d89cd': 'Design × Tech Award',
-    '42d8f39b-0c16-4fd5-8493-c37afeb808fc': 'Best Use of Tech',
-    'f690e28f-9605-4047-952d-c3ce5c49a619': 'Best Common Ground'
+    '42d8f39b-0c16-4fd5-8493-c37afeb808fc': 'Best Use of Tech Award',
+    'f690e28f-9605-4047-952d-c3ce5c49a619': 'Best Common Ground Award'
   };
   var FINALIST_BY_PROJECT = {
     'common heritage': true,
