@@ -22,7 +22,7 @@
 #submission-form input[type=checkbox]{accent-color:var(--acid);width:16px;height:16px;vertical-align:middle}
 #submission-form [hidden]{display:none!important}
 
-.project-gallery[hidden]{display:none!important}
+.project-gallery[hidden]{display:none!important}.project-gallery{scroll-margin-top:86px}
 .project-gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:18px;align-items:start}
 .project-gallery-card{border:1px solid var(--ink);border-radius:14px;background:#fff;overflow:hidden}
 .project-gallery-details>summary{list-style:none;cursor:pointer}
@@ -155,7 +155,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
     <button id="nav-access" class="portal-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-access" data-panel-select="access" tabindex="-1">Your access <span aria-hidden="true">↗</span></button>
     <button id="nav-schedule" class="portal-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-schedule" data-panel-select="schedule" tabindex="-1">Schedule</button>
     <button id="nav-faq" class="portal-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-faq" data-panel-select="faq" tabindex="-1">FAQ</button>
-    <button id="nav-choice" class="portal-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-choice" data-panel-select="choice" tabindex="-1">Submit</button>
+    <button id="nav-choice" class="portal-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-choice" data-panel-select="choice" data-scroll-target="project-gallery" tabindex="-1">Gallery</button>
   </nav>
 </header>
 
@@ -444,7 +444,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261012-voting-six-pm"></script>
 <script src="./assets/data.js?v=20261012-vote-six-media-midnight"></script>
-<script src="./assets/portal.js?v=20261012-evening-vote-midnight-edit"></script>
+<script src="./assets/portal.js?v=20261012-gallery-navigation"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261012-all-award-labels"></script>
 <script src="./assets/people-choice-vote.js?v=20261012-inline-voting-signin"></script>

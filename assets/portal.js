@@ -50,7 +50,7 @@
 
   /* ---------------- tab navigation ---------------- */
   var panelNames = ['overview', 'access', 'schedule', 'faq', 'choice'];
-  function activatePanel(name, updateHash) {
+  function activatePanel(name, updateHash, scrollToTop) {
     if (panelNames.indexOf(name) === -1) return;
     document.querySelectorAll('[data-portal-panel]').forEach(function (panel) {
       panel.hidden = panel.getAttribute('data-portal-panel') !== name;
@@ -63,7 +63,9 @@
     });
     if (updateHash) {
       history.replaceState(null, '', '#' + name);
-      window.scrollTo({top:0, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+      if (scrollToTop !== false) {
+        window.scrollTo({top:0, behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
+      }
     }
     document.dispatchEvent(new CustomEvent('cg-portal-tab-change', {detail:{panel:name}}));
   }
@@ -71,7 +73,19 @@
     var control = event.target.closest('[data-panel-select]');
     if (!control) return;
     event.preventDefault();
-    activatePanel(control.getAttribute('data-panel-select'), true);
+    var targetId = control.getAttribute('data-scroll-target');
+    activatePanel(control.getAttribute('data-panel-select'), true, !targetId);
+    if (targetId) {
+      var attempts = 0;
+      (function scrollToTarget() {
+        var target = document.getElementById(targetId);
+        if (target && !target.hidden) {
+          target.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block:'start'});
+          return;
+        }
+        if (attempts++ < 30) window.setTimeout(scrollToTarget, 100);
+      })();
+    }
   });
   document.querySelectorAll('.portal-tab[role="tab"]').forEach(function (tab, index, tabs) {
     tab.addEventListener('keydown', function (event) {
