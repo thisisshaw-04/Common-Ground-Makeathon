@@ -157,6 +157,14 @@
       document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:[]}}));
       return;
     }
+    // Show projects with an available preview image first, preserving each group's order.
+    rows = rows.map(function (row, index) {
+      return {row: row, index: index, hasImage: !!previewImage(row)};
+    }).sort(function (a, b) {
+      return (Number(b.hasImage) - Number(a.hasImage)) || (a.index - b.index);
+    }).map(function (item) {
+      return item.row;
+    });
     message.textContent = '';
     cards.innerHTML = rows.map(function (row) {
       var name = row.project_name || 'Untitled project';
