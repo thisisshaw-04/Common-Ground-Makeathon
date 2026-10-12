@@ -400,6 +400,13 @@
     updateSubmissionGuidance();
     updateMediaEditAvailability();
     var team = record.team || {};
+    var members = Array.isArray(team.members) ? team.members : [];
+    $('team-contact').textContent = team.name
+      ? 'Saved team: ' + team.name + ' · ' + (members.length + 1) + ' members'
+      : 'Your saved team details are locked during this media update window.';
+    $('submission-team').textContent = team.name
+      ? 'Team: ' + team.name + ' · ' + (members.length + 1) + ' members'
+      : 'Saved team details are unavailable. Contact an organiser if this is incorrect.';
     if (team.name) {
       $('team-name').value = team.name;
       var email = participantEmail();
