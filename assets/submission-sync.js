@@ -225,10 +225,10 @@
     if (helper) {
       var now = mediaEditNow();
       helper.textContent = now < MEDIA_EDIT_START
-        ? 'Submitted gallery projects can update these links from 12:00 AM Monday, 12 October to 12:00 AM Tuesday, 13 October SGT.'
+        ? 'Submitted gallery projects can update these links from 12:00 AM Monday, 12 October to 11:59 PM tonight, Monday, 12 October SGT.'
         : now >= MEDIA_EDIT_END || (window.CGEventStatus && window.CGEventStatus.submissions_closed)
-          ? 'The edit window closes at 12:00 AM SGT Tuesday, 13 October. Only voting remains open through 11:59 PM Wednesday, 14 October.'
-          : 'Update these links until 12:00 AM SGT Tuesday, 13 October. Other drafts and new projects are locked.';
+          ? 'The edit window closed at 11:59 PM SGT Monday, 12 October. Only voting remains open through 11:59 PM Wednesday, 14 October.'
+          : 'Update these links until 11:59 PM tonight, Monday, 12 October SGT. Other drafts and new projects are locked.';
     }
   }
   function validateReady(project, team) {
@@ -296,7 +296,7 @@
     if (!isMediaEditOpen()) {
       var closedMessage = mediaEditNow() < MEDIA_EDIT_START
         ? 'Project media updates opened at 12:00 AM SGT Monday, 12 October.'
-        : 'The edit window closes at 12:00 AM SGT Tuesday, 13 October. Only voting remains open.';
+        : 'The edit window closed at 11:59 PM SGT Monday, 12 October. Only voting remains open.';
       showStatus(closedMessage, true);
       $('submission-feedback').textContent = closedMessage;
       return false;
@@ -511,7 +511,7 @@
       lastUserId = null;
       currentSubmissionRecord = null;
       setEntryLock('Sign in to vote or edit your project.', client
-        ? 'Sign in with a verified email. A recognised participant email can edit only the submitted project linked to that email. Participant-list emails get three votes after 6:00 PM SGT; other verified emails get one.'
+        ? 'Sign in with a verified email. A recognised participant email can edit only the submitted project linked to that email. Participants get 3 votes; everyone else gets 1.'
         : 'Supabase is not configured on this site yet.');
       showStatus(client ? 'Sign in with the email linked to your submitted project to edit it. Everyone can sign in to vote.' : 'Supabase is not configured on this site yet.', !client);
       return;
