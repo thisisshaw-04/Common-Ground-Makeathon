@@ -14,9 +14,10 @@
   var mediaClockOffset = 0;
 
   function participantEmail() {
+    var sessionUser = window.CGSubmission && window.CGSubmission.getUser && window.CGSubmission.getUser();
     var participant = window.CGBuilderParticipant || {};
     var detailEmail = ($('p-detail').textContent.split('·')[0] || '').trim().toLowerCase();
-    return String(participant.email || (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(detailEmail) ? detailEmail : '')).trim().toLowerCase();
+    return String(sessionUser && sessionUser.email || participant.email || (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(detailEmail) ? detailEmail : '')).trim().toLowerCase();
   }
   function showStatus(message, isError) {
     var status = $('submission-auth-status');
@@ -105,14 +106,21 @@
     });
   }
   async function findSubmissionForUser(user, email) {
+    var wanted = String(email || '').trim().toLowerCase();
     var result = await client.from('submissions')
       .select('id,event_id,user_id,owner_email,project,team,status')
       .eq('event_id', EVENT_ID);
     if (result.error) throw result.error;
     var rows = result.data || [];
+    var matches = rows.filter(function (record) {
+      return String(record.owner_email || '').trim().toLowerCase() === wanted ||
+        teamIncludesEmail(record.team, wanted);
+    });
+    var submitted = matches.filter(canEditExistingRecord);
+    if (submitted.length > 1) return {record:null,ambiguous:true};
+    if (submitted.length === 1) return {record:submitted[0],ambiguous:false};
     var owned = rows.find(function (record) { return record.user_id === user.id; });
     if (owned) return {record:owned,ambiguous:false};
-    var matches = rows.filter(function (record) { return teamIncludesEmail(record.team, email); });
     return {record:matches.length === 1 ? matches[0] : null,ambiguous:matches.length > 1};
   }
   function selectedTracks() {
@@ -231,12 +239,6 @@
     }
     return '';
   }
-  async function checkEligibility(user) {
-    if (!client || !user) return false;
-    var result = await client.rpc('is_current_user_eligible');
-    if (result.error) throw result.error;
-    return result.data === true;
-  }
   var MAX_PREVIEW_BYTES = 5 * 1024 * 1024;
   var PREVIEW_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/avif'];
   function validatePreviewFile(file) {
@@ -299,11 +301,6 @@
       showStatus('Sign in with your registration email to edit your existing project.', true);
       return false;
     }
-    var eligible = await checkEligibility(user);
-    if (!eligible) {
-      showStatus('This email is not on the builder list enabled to edit projects. Contact an organiser.', true);
-      return false;
-    }
     var lookup = await findSubmissionForUser(user, email);
     if (lookup.ambiguous) {
       setEntryLock('We could not identify one project.', 'This email appears on more than one team entry. Ask an organiser to correct the team list.');
@@ -312,8 +309,8 @@
     }
     var existing = lookup.record;
     if (!existing) {
-      setEntryLock('No existing project found.', 'New project entries are closed. Sign in with an email listed on a previously saved project to edit it.');
-      showStatus('No existing project is linked to this email. New submissions are closed.', true);
+      setEntryLock('No submitted project is linked to this email.', 'You are signed in and can still vote. To edit project media, use an email listed on an already submitted project.');
+      showStatus('Signed in as ' + email + '. No submitted project is linked to this email. You can still vote in the gallery.');
       return false;
     }
     if (existing.status !== 'ready') {
@@ -503,25 +500,13 @@
     if (!user) {
       lastUserId = null;
       currentSubmissionRecord = null;
-      setEntryLock('Sign in to edit an existing project.', client
-        ? 'Sign in with the approved event email attached to a previously saved project. New project entries are closed.'
+      setEntryLock('Sign in to update an existing project.', client
+        ? 'Any verified email can sign in to vote. Participant-list emails get three votes, and other verified emails get one. To edit project media, sign in with an email listed on a submitted project.'
         : 'Supabase is not configured on this site yet.');
-      showStatus(client ? 'Sign in with your registration email to edit an existing project.' : 'Supabase is not configured on this site yet.', !client);
-      return;
-    }
-    if (signedInEmail !== wanted) {
-      currentSubmissionRecord = null;
-      setEntryLock('Use the registration email on your project.', 'Sign out and use the approved email listed on the existing team entry.');
-      showStatus('Signed in as ' + signedInEmail + '. Sign out and use your registration email (' + wanted + ').', true);
+      showStatus(client ? 'Sign in to vote or edit a submitted project linked to your email.' : 'Supabase is not configured on this site yet.', !client);
       return;
     }
     try {
-      if (!(await checkEligibility(user))) {
-        currentSubmissionRecord = null;
-        setEntryLock('This email is not approved for editing.', 'Use an approved builder email listed on an existing project, or contact an organiser.');
-        showStatus('This email is not on the builder list enabled for submissions. Contact an organiser.', true);
-        return;
-      }
       if (window.CGEventStatus && window.CGEventStatus.submissions_closed) {
         currentSubmissionRecord = null;
         setEntryLock('Project edits are closed.', 'Submissions have been closed by the event schedule or an organiser. The public gallery remains open.');
@@ -544,8 +529,8 @@
             : 'Signed in as ' + signedInEmail + '. This draft is not published in the gallery and is locked.');
         } else {
           currentSubmissionRecord = null;
-          setEntryLock('No existing project found.', 'New project entries are closed. Sign in with an email listed on a previously saved project to edit it.');
-          showStatus('No existing project is linked to this email. New submissions are closed.', true);
+          setEntryLock('No submitted project is linked to this email.', 'You are signed in and can still vote. To edit project media, use an email listed on an already submitted project.');
+          showStatus('Signed in as ' + signedInEmail + '. No submitted project is linked to this email. You can still vote in the gallery.');
         }
       } else if (currentSubmissionRecord) {
         setEntryUnlocked();
