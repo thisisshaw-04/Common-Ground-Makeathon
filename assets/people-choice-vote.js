@@ -64,7 +64,7 @@
   }
   function renderState() {
     updatePhaseLabel();
-    area.hidden = !eventStatus.gallery_open;
+    area.hidden = false;
     renderSignInState();
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
