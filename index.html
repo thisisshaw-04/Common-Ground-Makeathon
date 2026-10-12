@@ -111,6 +111,8 @@
 .people-choice-auth form[hidden],.people-choice-auth [hidden]{display:none!important}
 .people-choice-auth .helper.error{color:#9b1c1c}
 .people-choice-auth button:disabled{opacity:.6;cursor:wait}
+.people-choice-code-buttons{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.people-choice-code-buttons .btn{flex:0 1 auto;width:auto;white-space:nowrap}
 .gallery-vote-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 20px 20px}
 .gallery-vote-actions [data-vote-project]{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;min-height:0;padding:12px 20px;font-size:13px;line-height:1.2}
 .gallery-vote-actions .btn[disabled]{opacity:.55;cursor:not-allowed}
@@ -417,9 +419,11 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
         </form>
         <form id="people-choice-code-form" hidden>
           <label class="field"><span>8-DIGIT SIGN-IN CODE</span><input id="people-choice-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" maxlength="8" required></label>
-          <button class="btn btn-primary" type="submit">Verify and continue voting</button>
+          <div class="people-choice-code-buttons">
+            <button class="btn btn-primary" type="submit">Verify and continue voting</button>
+            <button class="btn btn-sm" id="people-choice-change-email" type="button" hidden>Use a different email</button>
+          </div>
         </form>
-        <button class="btn btn-sm" id="people-choice-change-email" type="button" hidden>Use a different email</button>
         <p class="helper" id="people-choice-auth-status" role="status" aria-live="polite"></p>
       </div>
     </section>
