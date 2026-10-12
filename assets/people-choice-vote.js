@@ -65,7 +65,7 @@
     renderSignInState();
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
-      setMessage('Sign in to vote. Participants get 3 votes each; non-participants get 1.');
+      setMessage('Sign in to vote after 6:00 PM SGT. Participant-list emails get 3 votes; other verified emails get 1.');
     } else if (!eventStatus.voting_open) {
       var now = Date.parse(eventStatus.current_at || '');
       var votingStart = VOTING_START_AT;
@@ -92,10 +92,15 @@
     if (!client || !session || !session.user) {
       votesCast = 0;
       votedIds = [];
+      eligible = false;
       renderState();
       return;
     }
     try {
+      var eligibility = await client.rpc('is_current_user_eligible');
+      if (sequence !== statusRequest) return;
+      if (eligibility.error) throw eligibility.error;
+      eligible = eligibility.data === true;
       var result = await client.rpc('get_people_choice_status', {p_event_id: EVENT_ID});
       if (sequence !== statusRequest) return;
       if (result.error) throw result.error;
@@ -154,7 +159,9 @@
     if (signInCodeForm) signInCodeForm.hidden = !!user || !pendingEmail;
     if (changeEmail) changeEmail.hidden = !!user || !pendingEmail;
     if (signInStatus && user) {
-      signInStatus.textContent = 'Signed in as ' + String(user.email || 'your email') + '. You can vote here.';
+      signInStatus.textContent = eligible
+        ? 'Signed in as ' + String(user.email || 'your email') + '. This participant email can edit its own linked project and gets up to 3 votes after voting opens.'
+        : 'Signed in as ' + String(user.email || 'your email') + '. This email gets 1 vote after voting opens.';
     }
   }
   if (signInForm) signInForm.addEventListener('submit', async function (event) {
@@ -253,8 +260,7 @@
       }
     }
   });
-  document.addEventListener('cg-builder-eligibility', function (event) {
-    eligible = !!(event.detail && event.detail.eligible);
+  document.addEventListener('cg-builder-eligibility', function () {
     refreshStatus();
   });
   if (window.CGSubmission) {
