@@ -298,8 +298,8 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <section class="portal-panel" id="panel-choice" data-portal-panel="choice" role="tabpanel" aria-labelledby="nav-choice" hidden>
   <div class="submission-locked" id="submission-locked">
     <span class="eyebrow">PROJECT SUBMISSION</span>
-    <h2>Submit one entry per team.</h2>
-    <p>Sign in with your approved event email under Your access. Submissions remain open until an organiser closes them.</p>
+    <h2>Sign in to edit an existing project.</h2>
+    <p>New project entries are closed. Sign in with an approved email already listed on a saved project to edit it. Only the existing Uno Dos Tres draft can be submitted.</p>
     <a class="btn btn-primary" href="#nav-access" data-panel-select="access">Go to sign in</a>
   </div>
 <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
@@ -330,7 +330,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
       <span class="eyebrow">PROJECT DETAILS</span>
       <h2 id="submission-title">Show us what you made.</h2>
-      <p>One entry per team. Any approved teammate listed on the saved entry can edit or submit it until an organiser closes submissions.</p>
+      <p>Existing projects can be edited while submissions are open. New project entries are closed; only the existing Uno Dos Tres draft can be submitted.</p>
       <p id="submission-team" class="helper"></p>
       <form id="submission-form" novalidate>
         <div class="submission-masonry">
@@ -379,7 +379,8 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
         </div>
         <p class="helper">A thoughtful one-day prototype can score higher than a technically complex project. Focus on what you explored, built, and learned.</p>
         <div class="team-actions submission-actions"><button class="btn btn-primary" type="submit">Save project draft</button><button class="btn" type="button" id="project-download">Download draft</button><button class="btn btn-primary" type="button" id="project-ready">Submit final entry</button></div>
-        <p class="helper">Save drafts as you build. Any approved teammate listed on this entry can update it until the submission deadline.</p>
+        <p class="helper">Changes to this saved entry update the existing project. New project entries cannot be created.</p>
+        <p id="submission-finalize-guidance" class="helper" role="status"></p>
         <p id="submission-feedback" class="helper" role="status"></p>
       </form>
     </section>
@@ -389,7 +390,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
       <h2 id="project-gallery-title">Project gallery</h2>
       <span class="eyebrow">PUBLIC AFTER 3:15 PM SGT</span>
     </div>
-    <p id="project-gallery-message" class="helper" role="status">The public gallery is open. Final edits and new submissions remain available until an organiser closes submissions. Project preview images can be updated until 6:00 PM SGT Monday, 12 October. Refresh projects to see updates.</p>
+    <p id="project-gallery-message" class="helper" role="status">The public gallery is open. Existing projects can be edited until an organiser closes submissions; new project entries are closed. Preview images can be updated until 6:00 PM SGT Monday, 12 October. Refresh projects to see updates.</p>
     <section class="gallery-voting" id="people-choice-area" aria-labelledby="people-choice-title" hidden>
       <span class="eyebrow">PEOPLE’S CHOICE</span><h3 id="people-choice-title">People’s Choice voting</h3>
       <p class="helper" id="people-choice-message" role="status">Sign in with any verified email to vote.</p>
@@ -415,11 +416,11 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261011-email-code"></script>
 <script src="./assets/data.js?v=20261012-voting-window-mon"></script>
-<script src="./assets/portal.js?v=20261012-preview-image-window"></script>
+<script src="./assets/portal.js?v=20261012-existing-project-edit-only"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261012-finalist-award-badges"></script>
 <script src="./assets/people-choice-vote.js?v=20261012-public-one-vote"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261012-preview-image-cutoff-6pm"></script>
+<script src="./assets/submission-sync.js?v=20261012-one-final-submission"></script>
 </body>
 </html>
