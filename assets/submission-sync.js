@@ -10,8 +10,8 @@
   var lastUserId = null;
   var currentSubmissionRecord = null;
   var savedReflections = {designReflection:'',cultureReflection:''};
-  var MEDIA_EDIT_START = Date.parse('2026-10-12T12:00:00+08:00');
-  var MEDIA_EDIT_END = Date.parse('2026-10-12T18:00:00+08:00');
+  var MEDIA_EDIT_START = Date.parse('2026-10-12T18:00:00+08:00');
+  var MEDIA_EDIT_END = Date.parse('2026-10-13T00:00:00+08:00');
   var mediaClockOffset = 0;
 
   function participantEmail() {
@@ -227,10 +227,10 @@
     if (helper) {
       var now = mediaEditNow();
       helper.textContent = now < MEDIA_EDIT_START
-        ? 'Submitted gallery projects and the existing Uno Dos Tres draft can update these links from 12:00 PM to 6:00 PM SGT Monday, 12 October.'
+        ? 'Submitted gallery projects and the existing Uno Dos Tres draft can update these links from 6:00 PM Monday, 12 October to 12:00 AM Tuesday, 13 October SGT.'
         : now >= MEDIA_EDIT_END || (window.CGEventStatus && window.CGEventStatus.submissions_closed)
-          ? 'The edit window ended at 6:00 PM SGT Monday, 12 October. Only voting remains open through 11:59 PM Wednesday, 14 October.'
-          : 'Update these links until 6:00 PM SGT Monday, 12 October. Other drafts and new projects are locked.';
+          ? 'The edit window closes at 12:00 AM SGT Tuesday, 13 October. Only voting remains open through 11:59 PM Wednesday, 14 October.'
+          : 'Update these links until 12:00 AM SGT Tuesday, 13 October. Other drafts and new projects are locked.';
     }
   }
   function validateReady(project, team) {
@@ -303,8 +303,8 @@
   async function syncDraft(status) {
     if (!isMediaEditOpen()) {
       var closedMessage = mediaEditNow() < MEDIA_EDIT_START
-        ? 'Project media updates open at 12:00 PM SGT Monday, 12 October.'
-        : 'The edit window ended at 6:00 PM SGT Monday, 12 October. Only voting remains open.';
+        ? 'Project media updates open at 6:00 PM SGT Monday, 12 October.'
+        : 'The edit window closes at 12:00 AM SGT Tuesday, 13 October. Only voting remains open.';
       showStatus(closedMessage, true);
       $('submission-feedback').textContent = closedMessage;
       return false;
