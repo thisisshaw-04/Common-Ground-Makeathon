@@ -3,7 +3,7 @@
 */
 (function (global) {
   const SEED = {
-    eventRevision: '2026-10-12-gallery-edit-only-voting-1800',
+    eventRevision: '2026-10-12-vote-copy-tonight-deadline',
     event: {
       name: 'Common Ground',
       edition: 'MAKEATHON',
@@ -29,7 +29,7 @@
         { time: '13:00', title: 'Build session 02', detail: 'Test the idea, get feedback, and keep building.' },
         { time: '14:30', title: 'Final sprint', detail: 'Finish the essentials and prepare your demo.' },
         { time: '15:15', title: 'Gallery opens', detail: 'Ready submissions appear in the public gallery. People’s Choice voting opens at 6:00 PM SGT Monday, 12 October.' },
-        { time: '15:30', title: 'Gallery project media updates', detail: 'Projects already submitted and visible in the gallery can update their preview image and demo links through 12:00 AM SGT Tuesday, 13 October. Drafts and new project submissions are closed.' },
+        { time: '15:30', title: 'Gallery project media updates', detail: 'Projects already submitted and visible in the gallery can update their preview image and demo links through 11:59 PM tonight, Monday, 12 October SGT. Drafts and new project submissions are closed.' },
         { time: '16:00', title: 'Demos + judging', detail: 'Present your build and what you learned.' },
         { time: '16:45', title: 'Wrap-up', detail: 'Share next steps and celebrate the work.' },
         { time: '17:00', title: 'Event ends · People’s Choice voting opens Monday', detail: 'The makeathon ends. Voting runs from 6:00 PM Monday, 12 October to 11:59 PM Wednesday, 14 October SGT.' }
@@ -40,8 +40,8 @@
         { q: 'Do I need to know how to code?', a: 'No. All backgrounds and skill levels are welcome. Bring what you know unusually well.' },
         { q: 'What can we make?', a: 'There is no fixed medium or outcome. Build a website, visual experiment, AI experience, speculative prototype or something else.' },
         { q: 'How do partner offers work?', a: 'Sign in and claim each offer. Claims are limited and first come, first served.' },
-        { q: 'Can I update my project?', a: 'Editing is open now until 12:00 AM Tuesday, 13 October SGT. Only projects already submitted and visible in the gallery can update their preview image, live demo, and demo video links. Drafts and new projects are locked. Voting opens at 6:00 PM SGT Monday, 12 October and closes at 11:59 PM Wednesday, 14 October.' },
-        { q: 'How does People’s Choice work?', a: 'Sign in with any verified email. Approved event builders can cast up to three votes; other verified email accounts can cast one. Voting runs from 6:00 PM SGT Monday, 12 October to 11:59 PM Wednesday, 14 October. You can unvote before voting closes, but cannot vote for your own team.' },
+        { q: 'Can I update my project?', a: 'Only projects already submitted and visible in the gallery can update their preview image, live demo, and demo video links until 11:59 PM tonight, Monday, 12 October SGT. Drafts and new projects are locked. Voting opens at 6:00 PM SGT Monday, 12 October and closes at 11:59 PM Wednesday, 14 October.' },
+        { q: 'How does People’s Choice work?', a: 'Sign in with any verified email. Participants get 3 votes; everyone else gets 1. Voting runs from 6:00 PM SGT Monday, 12 October to 11:59 PM Wednesday, 14 October. You can unvote before voting closes, but cannot vote for your own team.' },
         { q: 'Do I need source code?', a: 'Add a source link unless the project is no-code. Include a live demo or video.' }
       ]
     },
