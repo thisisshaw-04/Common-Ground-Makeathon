@@ -495,7 +495,7 @@
       });
     }
     $('submission-feedback').textContent = record.status === 'ready'
-      ? 'Your submitted project is loaded.'
+      ? 'Your project is submitted and visible in the gallery.'
       : 'This draft is not published in the gallery and is locked. Only submitted gallery projects can be edited.';
   }
   async function syncAuth(session) {
