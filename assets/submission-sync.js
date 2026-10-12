@@ -27,6 +27,12 @@
   function canEditExistingRecord(record) {
     return !!record && record.status === 'ready';
   }
+  async function isRecognisedParticipant() {
+    if (!client) return false;
+    var result = await client.rpc('is_current_user_eligible');
+    if (result.error) throw result.error;
+    return result.data === true;
+  }
   function updateSubmissionControls(record) {
     var button = $('project-ready');
     var guidance = $('submission-finalize-guidance');
@@ -301,16 +307,20 @@
       showStatus('Sign in with your registration email to edit your existing project.', true);
       return false;
     }
+    if (!(await isRecognisedParticipant())) {
+      showStatus('This email is not on the participant list, so it cannot edit a project.', true);
+      return false;
+    }
     var lookup = await findSubmissionForUser(user, email);
     if (lookup.ambiguous) {
-      setEntryLock('We could not identify one project.', 'This email appears on more than one team entry. Ask an organiser to correct the team list.');
-      showStatus('This email appears on more than one team entry. Ask an organiser to correct the team list.', true);
+      setEntryLock('We could not identify one project.', 'This email is linked to more than one submitted project. Ask an organiser to check the project team emails.');
+      showStatus('This email is linked to more than one submitted project. Ask an organiser to check the project team emails.', true);
       return false;
     }
     var existing = lookup.record;
     if (!existing) {
-      setEntryLock('No submitted project is linked to this email.', 'You are signed in and can still vote. To edit project media, use an email listed on an already submitted project.');
-      showStatus('Signed in as ' + email + '. No submitted project is linked to this email. You can still vote in the gallery.');
+      setEntryLock('No submitted project is linked to this email.', 'Your email is recognised, but it is not listed on a submitted gallery project. Sign in with the email saved on your project or ask an organiser to correct its team email.');
+      showStatus('Signed in as ' + email + '. This recognised email is not linked to a submitted project.');
       return false;
     }
     if (existing.status !== 'ready') {
@@ -500,10 +510,10 @@
     if (!user) {
       lastUserId = null;
       currentSubmissionRecord = null;
-      setEntryLock('Sign in to update an existing project.', client
-        ? 'Any verified email can sign in to vote. Participant-list emails get three votes, and other verified emails get one. To edit project media, sign in with an email listed on a submitted project.'
+      setEntryLock('Sign in to vote or edit your project.', client
+        ? 'Sign in with a verified email. A recognised participant email can edit only the submitted project linked to that email. Participant-list emails get three votes after 6:00 PM SGT; other verified emails get one.'
         : 'Supabase is not configured on this site yet.');
-      showStatus(client ? 'Sign in to vote or edit a submitted project linked to your email.' : 'Supabase is not configured on this site yet.', !client);
+      showStatus(client ? 'Sign in with the email linked to your submitted project to edit it. Everyone can sign in to vote.' : 'Supabase is not configured on this site yet.', !client);
       return;
     }
     try {
@@ -515,22 +525,27 @@
       }
       if (lastUserId !== user.id) {
         lastUserId = user.id;
+        var recognised = await isRecognisedParticipant();
+        if (!recognised) {
+          currentSubmissionRecord = null;
+          setEntryLock('You’re signed in to vote.', 'This email is not on the participant list, so it gets one vote after voting opens at 6:00 PM SGT. Project edits are limited to recognised participant emails linked to their own submitted project.');
+          showStatus('Signed in as ' + signedInEmail + '. You can cast one vote after 6:00 PM SGT.');
+          return;
+        }
         var lookup = await findSubmissionForUser(user, signedInEmail);
         if (lookup.ambiguous) {
           currentSubmissionRecord = null;
-          setEntryLock('We could not identify one project.', 'This email appears on more than one team entry. Ask an organiser to correct the team list.');
-          showStatus('This email appears on more than one team entry. Ask an organiser to correct the team list.', true);
+          setEntryLock('We could not identify one project.', 'This email is linked to more than one submitted project. Ask an organiser to check the project team emails.');
+          showStatus('This email is linked to more than one submitted project. Ask an organiser to check the project team emails.', true);
           return;
         }
         if (lookup.record) {
           fillRemote(lookup.record);
-          showStatus(lookup.record.status === 'ready'
-            ? 'Signed in as ' + signedInEmail + '. You can update the submitted gallery project during the edit window.'
-            : 'Signed in as ' + signedInEmail + '. This draft is not published in the gallery and is locked.');
+          showStatus('Signed in as ' + signedInEmail + '. You can edit the submitted project linked to this email during the edit window.');
         } else {
           currentSubmissionRecord = null;
-          setEntryLock('No submitted project is linked to this email.', 'You are signed in and can still vote. To edit project media, use an email listed on an already submitted project.');
-          showStatus('Signed in as ' + signedInEmail + '. No submitted project is linked to this email. You can still vote in the gallery.');
+          setEntryLock('No submitted project is linked to this email.', 'Your email is recognised, but it is not listed on a submitted gallery project. Sign in with the email saved on your project or ask an organiser to correct its team email. You can still vote after 6:00 PM SGT.');
+          showStatus('Signed in as ' + signedInEmail + '. This participant email is recognised, but no submitted project is linked to it.');
         }
       } else if (currentSubmissionRecord) {
         setEntryUnlocked();
