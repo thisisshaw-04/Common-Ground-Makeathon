@@ -119,6 +119,16 @@
     var isCombinedAnswer = row.one_liner && row.project_overview === 'Inspiration: ' + row.one_liner;
     return isCombinedAnswer && text.indexOf('Technology: ') === 0 ? text.slice('Technology: '.length) : text;
   }
+  function projectCredit(row) {
+    var attribution = String(row.ai_attribution || '');
+    var match = attribution.match(/^[ \t]*Additional project credit:[ \t]*(.+?)[ \t]*\.?[ \t]*$/im);
+    return match ? match[1].trim() : '';
+  }
+  function projectAttribution(row) {
+    return String(row.ai_attribution || '')
+      .replace(/^[ \t]*Additional project credit:[ \t]*.+?[ \t]*\.?[ \t]*$/im, '')
+      .trim();
+  }
   function link(label, value) {
     var href = safeHref(value);
     return href ? '<a href="' + href + '" target="_blank" rel="noopener noreferrer">' + escape(label) + ' ↗</a>' : '';
@@ -150,6 +160,8 @@
       var build = projectBuild(row);
       var tracks = Array.isArray(row.tracks) ? row.tracks : [];
       var members = Array.isArray(row.team_members) ? row.team_members.filter(Boolean) : [];
+      var credit = projectCredit(row);
+      var attribution = projectAttribution(row);
       var links = [
         link('Live demo', row.demo_url),
         link('Demo video', row.video_url),
@@ -162,7 +174,8 @@
         detail('Design × Tech reflection', row.design_reflection) +
         detail('Culture × Tech reflection', row.culture_reflection) +
         detail('Team & collaboration', row.team_collaboration) +
-        detail('AI & tool attribution', row.ai_attribution) +
+        detail('Project credit', credit) +
+        detail('AI & tool attribution', attribution) +
         detail('Supporting materials', row.supporting_materials);
       var modalContent = '<div class="project-modal-project">' +
         '<div class="project-modal-title-row"><h2>' + escape(name) + '</h2>' +
@@ -181,6 +194,7 @@
         previewMarkup(row, name, oneLiner) +
         '<div class="project-gallery-copy">' +
         '<span class="gallery-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</span>' +
+        (credit ? '<span class="gallery-credit">CREDIT / ' + escape(credit) + '</span>' : '') +
         '<h3>' + escape(name) + '</h3>' +
         awardMarkup(row) +
         (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
