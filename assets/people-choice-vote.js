@@ -11,6 +11,7 @@
   var signInCode = document.getElementById('people-choice-code');
   var signInStatus = document.getElementById('people-choice-auth-status');
   var changeEmail = document.getElementById('people-choice-change-email');
+  var signOutButton = document.getElementById('people-choice-signout');
   var pendingEmail = '';
   var cards = document.getElementById('project-gallery-cards');
   var eligible = false;
@@ -30,7 +31,8 @@
   var VOTING_END_AT = Date.parse('2026-10-14T23:59:59+08:00');
 
   function setMessage(text, isError) {
-    message.textContent = text || '';
+    var nextText = text || '';
+    if (message.textContent !== nextText) message.textContent = nextText;
     message.classList.toggle('error', !!isError);
   }
   function renderVoteButtons() {
@@ -195,28 +197,27 @@
   });
   document.addEventListener('cg-gallery-loaded', renderVoteButtons);
   document.addEventListener('cg-event-status', function (event) {
+    var wasVotingOpen = !!eventStatus.voting_open;
     eventStatus = event.detail || {};
-    if (session && session.user) {
-      voteStatusResolved = false;
-      renderState();
-      refreshStatus();
-    } else {
-      renderState();
-    }
+    renderState();
+    if (session && session.user && wasVotingOpen !== !!eventStatus.voting_open) refreshStatus();
   });
   function renderSignInState() {
     var user = session && session.user;
     if (signInForm) signInForm.hidden = !!user || !!pendingEmail;
     if (signInCodeForm) signInCodeForm.hidden = !!user || !pendingEmail;
     if (changeEmail) changeEmail.hidden = !!user || !pendingEmail;
+    if (signOutButton) signOutButton.hidden = !user;
     if (signInStatus && user) {
-      signInStatus.textContent = !voteStatusResolved
+      var nextStatus = !voteStatusResolved
         ? 'Signed in as ' + String(user.email || 'your email') + '. Checking your vote limit…'
         : eligible
           ? 'Signed in as ' + String(user.email || 'your email') + '. ' +
             (isParticipant && isOrganizer ? 'Participant and organiser accounts get up to 3 votes.' :
               isOrganizer ? 'Organisers get up to 3 votes.' : 'Participant-list emails get up to 3 votes.')
-          : 'Signed in as ' + String(user.email || 'your email') + '. This email gets 1 vote after voting opens.';
+          : 'Signed in as ' + String(user.email || 'your email') + '. ' +
+            (eventStatus.voting_open ? 'This email gets 1 vote.' : 'This email gets 1 vote when voting opens.');
+      if (signInStatus.textContent !== nextStatus) signInStatus.textContent = nextStatus;
     }
   }
   if (signInForm) signInForm.addEventListener('submit', async function (event) {
@@ -295,6 +296,35 @@
     if (signInCode) signInCode.value = '';
     renderSignInState();
     if (signInEmail) signInEmail.focus();
+  });
+  if (signOutButton) signOutButton.addEventListener('click', async function () {
+    if (!client || !session || !session.user) return;
+    signOutButton.disabled = true;
+    if (signInStatus) {
+      signInStatus.textContent = 'Signing out…';
+      signInStatus.classList.remove('error');
+    }
+    try {
+      var result = await client.auth.signOut();
+      if (result.error) throw result.error;
+      pendingEmail = '';
+      session = null;
+      votesCast = 0;
+      votedIds = [];
+      eligible = false;
+      isParticipant = false;
+      isOrganizer = false;
+      voteStatusResolved = false;
+      renderState();
+      if (signInStatus) signInStatus.textContent = 'You’re signed out.';
+    } catch (_error) {
+      if (signInStatus) {
+        signInStatus.textContent = 'Could not sign out. Please try again.';
+        signInStatus.classList.add('error');
+      }
+    } finally {
+      signOutButton.disabled = false;
+    }
   });
   document.addEventListener('cg-submission-auth', function (event) {
     session = event.detail && event.detail.session || null;
