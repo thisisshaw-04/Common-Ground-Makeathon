@@ -104,6 +104,13 @@
 .gallery-voting{border:1px solid var(--ink);background:#fff;padding:20px;margin:20px 0}
 .gallery-voting h3{margin:8px 0;font-size:22px}
 .gallery-voting p{margin:8px 0}
+.people-choice-auth{max-width:680px;margin-top:14px}
+.people-choice-auth .field{margin:12px 0}
+.people-choice-auth .field span{display:block;font:11px var(--mono);letter-spacing:.05em;color:var(--muted);margin-bottom:7px}
+.people-choice-auth .field input{width:100%;padding:11px 13px;border:1px solid var(--line-hard);background:#fff;color:var(--ink);font:14px 'Google Sans',sans-serif}
+.people-choice-auth form[hidden],.people-choice-auth [hidden]{display:none!important}
+.people-choice-auth .helper.error{color:#9b1c1c}
+.people-choice-auth button:disabled{opacity:.6;cursor:wait}
 .gallery-vote-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 20px 20px}
 .gallery-vote-actions [data-vote-project]{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;min-height:0;padding:12px 20px;font-size:13px;line-height:1.2}
 .gallery-vote-actions .btn[disabled]{opacity:.55;cursor:not-allowed}
@@ -404,7 +411,18 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
     <section class="gallery-voting" id="people-choice-area" aria-labelledby="people-choice-title" hidden>
       <span class="eyebrow">PEOPLE’S CHOICE</span><h3 id="people-choice-title">People’s Choice voting</h3>
       <p class="helper" id="people-choice-message" role="status">Sign in with any verified email to vote.</p>
-      <a class="btn btn-sm" id="people-choice-signin" href="#nav-access" data-panel-select="access" hidden>Sign in to vote</a>
+      <div class="people-choice-auth">
+        <form id="people-choice-signin-form">
+          <label class="field"><span>EMAIL TO VERIFY</span><input id="people-choice-email" type="email" autocomplete="email" required></label>
+          <button class="btn btn-primary" type="submit">Email me a sign-in code</button>
+        </form>
+        <form id="people-choice-code-form" hidden>
+          <label class="field"><span>8-DIGIT SIGN-IN CODE</span><input id="people-choice-code" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{8}" maxlength="8" required></label>
+          <button class="btn btn-primary" type="submit">Verify and continue voting</button>
+        </form>
+        <button class="btn btn-sm" id="people-choice-change-email" type="button" hidden>Use a different email</button>
+        <p class="helper" id="people-choice-auth-status" role="status" aria-live="polite"></p>
+      </div>
     </section>
     <button class="btn btn-sm gallery-refresh" id="gallery-refresh" type="button" hidden>Refresh projects</button>
     <div id="project-gallery-cards" class="project-gallery-grid"></div>
@@ -429,7 +447,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/portal.js?v=20261012-evening-vote-midnight-edit"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261012-all-award-labels"></script>
-<script src="./assets/people-choice-vote.js?v=20261012-voting-six-pm"></script>
+<script src="./assets/people-choice-vote.js?v=20261012-inline-voting-signin"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
 <script src="./assets/submission-sync.js?v=20261012-preview-upload-midnight-edit"></script>
 </body>

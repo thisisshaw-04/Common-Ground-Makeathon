@@ -5,7 +5,13 @@
   var client = window.CGSubmission && window.CGSubmission.client;
   var area = document.getElementById('people-choice-area');
   var message = document.getElementById('people-choice-message');
-  var signIn = document.getElementById('people-choice-signin');
+  var signInForm = document.getElementById('people-choice-signin-form');
+  var signInCodeForm = document.getElementById('people-choice-code-form');
+  var signInEmail = document.getElementById('people-choice-email');
+  var signInCode = document.getElementById('people-choice-code');
+  var signInStatus = document.getElementById('people-choice-auth-status');
+  var changeEmail = document.getElementById('people-choice-change-email');
+  var pendingEmail = '';
   var cards = document.getElementById('project-gallery-cards');
   var eligible = window.CGBuilderEligibility === true;
   var session = window.CGSubmission && window.CGSubmission.getSession();
@@ -42,7 +48,7 @@
   }
   function renderState() {
     area.hidden = !eventStatus.gallery_open;
-    signIn.hidden = !!(session && session.user);
+    renderSignInState();
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
       setMessage('Sign in with any verified email to vote.');
@@ -128,11 +134,95 @@
     eventStatus = event.detail || {};
     renderState();
   });
-  signIn.addEventListener('click', function () {
-    try { localStorage.setItem('cg-return-to-choice-after-signin', String(Date.now())); } catch (_err) { /* Navigation can still be manual. */ }
+  function renderSignInState() {
+    var user = session && session.user;
+    if (signInForm) signInForm.hidden = !!user || !!pendingEmail;
+    if (signInCodeForm) signInCodeForm.hidden = !!user || !pendingEmail;
+    if (changeEmail) changeEmail.hidden = !!user || !pendingEmail;
+    if (signInStatus && user) {
+      signInStatus.textContent = 'Signed in as ' + String(user.email || 'your email') + '. You can vote here.';
+    }
+  }
+  if (signInForm) signInForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var email = String(signInEmail && signInEmail.value || '').trim().toLowerCase();
+    if (!email || !signInEmail || !signInEmail.checkValidity()) {
+      if (signInEmail) signInEmail.reportValidity();
+      return;
+    }
+    var button = signInForm.querySelector('button[type="submit"]');
+    if (button) button.disabled = true;
+    if (signInStatus) {
+      signInStatus.textContent = 'Sending a sign-in email…';
+      signInStatus.classList.remove('error');
+    }
+    try {
+      if (!window.CGSubmission || !window.CGSubmission.signIn) throw new Error('Sign-in is not configured.');
+      try { localStorage.setItem('cg-return-to-choice-after-signin', String(Date.now())); } catch (_err) { /* The email code still works without storage. */ }
+      await window.CGSubmission.signIn(email);
+      pendingEmail = email;
+      if (signInStatus) {
+        signInStatus.textContent = 'Check your inbox and spam folder. Enter the newest eight-digit code here, or open the sign-in link; it returns to this voting page.';
+        signInStatus.classList.remove('error');
+      }
+      if (signInCode) signInCode.value = '';
+      renderSignInState();
+      if (signInCode) signInCode.focus();
+    } catch (error) {
+      if (signInStatus) signInStatus.textContent = window.CGSubmission && window.CGSubmission.signInErrorMessage
+        ? window.CGSubmission.signInErrorMessage(error)
+        : 'Could not send a sign-in email. Please try again.';
+      if (signInStatus) signInStatus.classList.add('error');
+    } finally {
+      if (button) button.disabled = false;
+    }
+  });
+  if (signInCodeForm) signInCodeForm.addEventListener('submit', async function (event) {
+    event.preventDefault();
+    var code = String(signInCode && signInCode.value || '').replace(/\D/g, '');
+    if (!pendingEmail || !/^\d{8}$/.test(code)) {
+      if (signInStatus) {
+        signInStatus.textContent = 'Enter the eight-digit code from your newest email.';
+        signInStatus.classList.add('error');
+      }
+      if (signInCode) signInCode.focus();
+      return;
+    }
+    var button = signInCodeForm.querySelector('button[type="submit"]');
+    if (button) button.disabled = true;
+    if (signInStatus) {
+      signInStatus.textContent = 'Verifying your code…';
+      signInStatus.classList.remove('error');
+    }
+    try {
+      await window.CGSubmission.verifyEmailCode(pendingEmail, code);
+      if (signInStatus) signInStatus.textContent = 'Code verified. Loading your votes…';
+    } catch (_error) {
+      if (signInCode) signInCode.value = '';
+      if (signInStatus) {
+        signInStatus.textContent = 'That code is invalid, expired, or already used. Request a fresh code and enter the newest one.';
+        signInStatus.classList.add('error');
+      }
+    } finally {
+      if (button) button.disabled = false;
+    }
+  });
+  if (signInCode) signInCode.addEventListener('input', function () {
+    this.value = this.value.replace(/\D/g, '').slice(0, 8);
+  });
+  if (changeEmail) changeEmail.addEventListener('click', function () {
+    pendingEmail = '';
+    if (signInStatus) {
+      signInStatus.textContent = '';
+      signInStatus.classList.remove('error');
+    }
+    if (signInCode) signInCode.value = '';
+    renderSignInState();
+    if (signInEmail) signInEmail.focus();
   });
   document.addEventListener('cg-submission-auth', function (event) {
     session = event.detail && event.detail.session || null;
+    renderSignInState();
     refreshStatus();
     if (session && session.user) {
       var returnToChoice = false;
@@ -156,6 +246,7 @@
   if (window.CGSubmission) {
     window.CGSubmission.ready.then(function (nextSession) {
       session = nextSession;
+      renderSignInState();
       refreshStatus();
     }).catch(function () { renderState(); });
   } else {
