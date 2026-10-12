@@ -220,7 +220,7 @@
           : 'The project media edit window closes at 12:00 AM SGT Tuesday, 13 October. People’s Choice voting is open through 11:59 PM Wednesday, 14 October.';
       } else if (signedIn && !hasExistingSubmission) {
         if (lockHeading) lockHeading.textContent = 'No submitted project is linked to this email.';
-        if (lockCopy) lockCopy.textContent = 'You are signed in and can still vote. Only an email listed on an already submitted gallery project can edit its preview image and demo links.';
+        if (lockCopy) lockCopy.textContent = 'Only recognised participant emails linked to a submitted project can edit that project’s image and demo links. Participant-list emails get three votes after 6:00 PM SGT; other verified emails get one.';
       }
     }
   }
