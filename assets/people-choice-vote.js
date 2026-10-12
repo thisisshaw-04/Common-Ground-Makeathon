@@ -173,7 +173,13 @@
   document.addEventListener('cg-gallery-loaded', renderVoteButtons);
   document.addEventListener('cg-event-status', function (event) {
     eventStatus = event.detail || {};
-    renderState();
+    if (session && session.user) {
+      voteStatusResolved = false;
+      renderState();
+      refreshStatus();
+    } else {
+      renderState();
+    }
   });
   function renderSignInState() {
     var user = session && session.user;
