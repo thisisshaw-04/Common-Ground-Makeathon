@@ -215,8 +215,7 @@
           ? 'Signed in as ' + String(user.email || 'your email') + '. ' +
             (isParticipant && isOrganizer ? 'Participant and organiser accounts get up to 3 votes.' :
               isOrganizer ? 'Organisers get up to 3 votes.' : 'Participant-list emails get up to 3 votes.')
-          : 'Signed in as ' + String(user.email || 'your email') + '. ' +
-            (eventStatus.voting_open ? 'This email gets 1 vote.' : 'This email gets 1 vote when voting opens.');
+          : 'Signed in as ' + String(user.email || 'your email') + '. This email gets 1 vote.';
       if (signInStatus.textContent !== nextStatus) signInStatus.textContent = nextStatus;
     }
   }
