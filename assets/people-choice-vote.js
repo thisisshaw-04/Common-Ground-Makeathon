@@ -22,7 +22,10 @@
   var votedIds = [];
   var votesCast = 0;
   var statusRequest = 0;
+  var editingLabel = document.getElementById('gallery-editing-label');
   var phaseLabel = document.getElementById('gallery-phase-label');
+  var EDITING_START_AT = Date.parse('2026-10-12T00:00:00+08:00');
+  var EDITING_END_AT = Date.parse('2026-10-13T00:00:00+08:00');
   var VOTING_START_AT = Date.parse('2026-10-12T18:00:00+08:00');
   var VOTING_END_AT = Date.parse('2026-10-14T23:59:59+08:00');
 
@@ -69,14 +72,18 @@
     });
   }
   function updatePhaseLabel() {
-    if (!phaseLabel) return;
     var now = Date.parse(eventStatus.current_at || '');
     if (!Number.isFinite(now)) now = Date.now();
+    var editingOpen = now >= EDITING_START_AT && now < EDITING_END_AT && eventStatus.submissions_closed !== true;
+    if (editingLabel) editingLabel.textContent = editingOpen
+      ? 'EDITING OPEN'
+      : now < EDITING_START_AT ? 'EDITING SOON' : 'EDITING CLOSED';
+    if (!phaseLabel) return;
     phaseLabel.textContent = eventStatus.voting_open
       ? 'VOTING OPEN'
       : now >= VOTING_END_AT ? 'VOTING CLOSED'
         : now >= VOTING_START_AT ? 'VOTING PAUSED'
-          : 'EDITING OPEN';
+          : 'VOTING SOON';
   }
   function renderState() {
     updatePhaseLabel();
