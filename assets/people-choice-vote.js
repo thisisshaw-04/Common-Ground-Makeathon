@@ -13,7 +13,8 @@
   var changeEmail = document.getElementById('people-choice-change-email');
   var pendingEmail = '';
   var cards = document.getElementById('project-gallery-cards');
-  var eligible = window.CGBuilderEligibility === true;
+  var eligible = false;
+  var voteStatusResolved = false;
   var session = window.CGSubmission && window.CGSubmission.getSession();
   var eventStatus = window.CGEventStatus || {};
   var votedIds = [];
@@ -30,7 +31,7 @@
   function renderVoteButtons() {
     if (!cards) return;
     cards.querySelectorAll('[data-vote-actions]').forEach(function (node) { node.remove(); });
-    if (!eventStatus.voting_open || !session || !session.user) return;
+    if (!eventStatus.voting_open || !session || !session.user || !voteStatusResolved) return;
     var voted = new Set(votedIds);
     var limit = eligible ? 3 : 1;
     var remaining = Math.max(0, limit - votesCast);
@@ -66,6 +67,8 @@
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
       setMessage('Sign in to vote after 6:00 PM SGT. Participant-list emails get 3 votes; other verified emails get 1.');
+    } else if (!voteStatusResolved) {
+      setMessage('Checking your sign-in and vote limit…');
     } else if (!eventStatus.voting_open) {
       var now = Date.parse(eventStatus.current_at || '');
       var votingStart = VOTING_START_AT;
@@ -93,9 +96,11 @@
       votesCast = 0;
       votedIds = [];
       eligible = false;
+      voteStatusResolved = false;
       renderState();
       return;
     }
+    voteStatusResolved = false;
     try {
       var eligibility = await client.rpc('is_current_user_eligible');
       if (sequence !== statusRequest) return;
@@ -109,9 +114,12 @@
       votesCast = Number(row.votes_cast || 0);
       votedIds = Array.isArray(row.voted_submission_ids) ? row.voted_submission_ids : [];
       eventStatus.voting_open = !!row.voting_open && !!(window.CGEventStatus && window.CGEventStatus.voting_open);
+      voteStatusResolved = true;
       renderState();
     } catch (_error) {
       if (sequence !== statusRequest) return;
+      eligible = false;
+      voteStatusResolved = false;
       setMessage('Could not load your vote status. Refresh and try again.', true);
       renderVoteButtons();
     }
@@ -159,9 +167,11 @@
     if (signInCodeForm) signInCodeForm.hidden = !!user || !pendingEmail;
     if (changeEmail) changeEmail.hidden = !!user || !pendingEmail;
     if (signInStatus && user) {
-      signInStatus.textContent = eligible
-        ? 'Signed in as ' + String(user.email || 'your email') + '. This participant email can edit its own linked project and gets up to 3 votes after voting opens.'
-        : 'Signed in as ' + String(user.email || 'your email') + '. This email gets 1 vote after voting opens.';
+      signInStatus.textContent = !voteStatusResolved
+        ? 'Signed in as ' + String(user.email || 'your email') + '. Checking your vote limit…'
+        : eligible
+          ? 'Signed in as ' + String(user.email || 'your email') + '. Participant-list emails get up to 3 votes; project edits are limited to their own linked submission.'
+          : 'Signed in as ' + String(user.email || 'your email') + '. This email gets 1 vote after voting opens.';
     }
   }
   if (signInForm) signInForm.addEventListener('submit', async function (event) {
