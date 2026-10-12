@@ -129,6 +129,8 @@
 .gallery-vote-actions .btn[disabled]{opacity:.55;cursor:not-allowed}
 .gallery-vote-actions .vote-state{font:10px var(--mono);color:var(--muted)}
 .gallery-refresh{margin:0 0 18px}
+.gallery-phase-pills{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.gallery-phase-pill{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border:2px solid var(--ink);border-radius:999px;background:transparent;font:12px var(--mono);letter-spacing:.04em;white-space:nowrap}
 @media(max-width:700px){.portal-tabs{grid-template-columns:1fr;position:static}.portal-tab{min-height:46px}.event-countdown{text-align:left}.timeline-labels span{font-size:8px}.event-timeline{padding-left:0;padding-right:0}}
 @media(prefers-reduced-motion:reduce){.timeline-fill,.timeline-cursor{transition:none}}
 #gate-code-form[hidden],#gate-change-email[hidden]{display:none!important}
@@ -416,7 +418,10 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
   <section class="section project-gallery" id="project-gallery" hidden aria-labelledby="project-gallery-title">
     <div class="section-head">
       <h2 id="project-gallery-title">Project gallery</h2>
-      <span id="gallery-phase-label" class="eyebrow" aria-live="polite">EDITING OPEN</span>
+      <div class="gallery-phase-pills" role="group" aria-label="Project gallery status">
+        <span id="gallery-editing-label" class="gallery-phase-pill" aria-live="polite">EDITING OPEN</span>
+        <span id="gallery-phase-label" class="gallery-phase-pill" aria-live="polite">VOTING OPEN</span>
+      </div>
     </div>
     <p id="project-gallery-message" class="helper" role="status">Editing is open now through 12:00 AM Tuesday, 13 October SGT. Submitted projects already visible in the gallery can update their preview image, live demo, and demo video links. Drafts and new projects are locked. Organisers and participant-list emails can vote now with 3 votes each. Other verified emails can vote from 6:00 PM SGT with 1 vote. Voting closes at 11:59 PM Wednesday, 14 October.</p>
     <section class="gallery-voting" id="people-choice-area" aria-labelledby="people-choice-title">
@@ -460,7 +465,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/portal.js?v=20261012-single-team-contact-email"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261012-project-share-links"></script>
-<script src="./assets/people-choice-vote.js?v=20261012-stable-vote-row"></script>
+<script src="./assets/people-choice-vote.js?v=20261012-vote-edit-status-pills"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
 <script src="./assets/submission-sync.js?v=20261012-hide-unlinked-edit-box"></script>
 </body>
