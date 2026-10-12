@@ -305,13 +305,13 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
   <div class="submission-locked" id="submission-locked">
     <span class="eyebrow">PROJECT SUBMISSION</span>
     <h2>Sign in to edit an existing project.</h2>
-    <p>Existing teams can update only their preview image, live demo, and demo video from 12:00 PM to 6:00 PM SGT today. New project entries are closed. After 6:00 PM, only voting remains open through Wednesday night.</p>
+    <p>Teams with submitted projects already visible in the gallery can update only their preview image, live demo, and demo video from 12:00 PM to 6:00 PM SGT Monday. Other drafts and new project entries are locked. The existing Uno Dos Tres draft is the only draft that may be updated or submitted. After 6:00 PM, only voting remains open through Wednesday night.</p>
     <a class="btn btn-primary" href="#nav-access" data-panel-select="access">Go to sign in</a>
   </div>
 <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
       <span class="eyebrow">SAVED TEAM</span>
       <h2 id="team-title">Your team is on the entry.</h2>
-      <p>Team details stay locked during this update window. You can update the project preview image and demo links below.</p>
+      <p>Only submitted projects already visible in the gallery and the existing Uno Dos Tres draft can update their preview image, live demo, and demo video links. Other drafts and new projects are locked.</p>
       <p id="team-contact" class="helper"></p>
       <div class="submission-auth" id="submission-auth">
         <form id="submission-auth-form" hidden>
@@ -336,8 +336,9 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
       <span class="eyebrow">PROJECT DETAILS</span>
       <h2 id="submission-title">Show us what you made.</h2>
-      <p>12:00–6:00 PM SGT today: existing teams can change only the preview image, live demo, and demo video links. New projects and other project details cannot be submitted or edited. Only the existing Uno Dos Tres draft may be submitted during this window.</p>
+      <p>12:00–6:00 PM SGT Monday: teams with submitted projects already visible in the gallery can update only the preview image, live demo, and demo video links. Other drafts and new projects are locked. The existing Uno Dos Tres draft is the only draft that may be updated or submitted.</p>
       <p id="submission-team" class="helper"></p>
+      <p id="project-edit-lock" class="helper" role="status" hidden></p>
       <form id="submission-form" novalidate>
         <div class="submission-masonry">
           <div class="submission-masonry-column">
@@ -396,7 +397,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
       <h2 id="project-gallery-title">Project gallery</h2>
       <span class="eyebrow">PUBLIC AFTER 3:15 PM SGT</span>
     </div>
-    <p id="project-gallery-message" class="helper" role="status">From 12:00 PM to 6:00 PM SGT Monday, 12 October, existing teams can update their preview image, live demo, and demo video links. After 6:00 PM, project editing closes. Voting is open to anyone with a verified email through 11:59 PM Wednesday, 14 October.</p>
+    <p id="project-gallery-message" class="helper" role="status">From 12:00 PM to 6:00 PM SGT Monday, 12 October, submitted projects already visible in the gallery can update their preview image, live demo, and demo video links. Other drafts and new projects are locked; the existing Uno Dos Tres draft is the only draft exception. After 6:00 PM, project editing closes. Voting is open to anyone with a verified email through 11:59 PM Wednesday, 14 October.</p>
     <section class="gallery-voting" id="people-choice-area" aria-labelledby="people-choice-title" hidden>
       <span class="eyebrow">PEOPLE’S CHOICE</span><h3 id="people-choice-title">People’s Choice voting</h3>
       <p class="helper" id="people-choice-message" role="status">Sign in with any verified email to vote.</p>
@@ -427,6 +428,6 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/project-gallery.js?v=20261012-finalist-award-badges"></script>
 <script src="./assets/people-choice-vote.js?v=20261012-cross-tab-voter-return"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261012-media-only-edit-window"></script>
+<script src="./assets/submission-sync.js?v=20261012-submitted-gallery-edit-only"></script>
 </body>
 </html>
