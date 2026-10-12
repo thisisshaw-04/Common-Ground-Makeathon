@@ -210,7 +210,7 @@
     if ($('team-form')) $('team-form').hidden = true;
     if ($('submission-section')) $('submission-section').hidden = !canEdit;
     if ($('submission-locked')) {
-      $('submission-locked').hidden = canEdit;
+      $('submission-locked').hidden = canEdit || !eligible || !hasExistingSubmission;
       var lockHeading = $('submission-locked').querySelector('h2');
       var lockCopy = $('submission-locked').querySelector('p');
       if (closed) {
