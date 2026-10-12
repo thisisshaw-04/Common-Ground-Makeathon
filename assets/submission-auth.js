@@ -15,8 +15,13 @@
   var lastSignInRequest = Object.create(null);
   var signInCooldownMs = 60000;
 
-  function signInRedirectUrl() {
+  function signInRedirectUrl(returnToPanel) {
     var currentUrl = new URL(window.location.href);
+    if (returnToPanel === 'choice') {
+      currentUrl.search = '';
+      currentUrl.hash = 'choice';
+      return currentUrl.href;
+    }
     if (/\/submissions\.html$/i.test(currentUrl.pathname)) {
       currentUrl.search = '';
       currentUrl.hash = '';
@@ -62,8 +67,9 @@
     getSession: function () { return session; },
     getUser: function () { return session && session.user || null; },
     signInErrorMessage: signInErrorMessage,
-    signIn: async function (email) {
+    signIn: async function (email, options) {
       if (!client) throw new Error('Submission sign-in is not configured yet.');
+      options = options || {};
       email = String(email || '').trim().toLowerCase();
       if (pendingSignIns[email]) return pendingSignIns[email];
       var lastRequest = lastSignInRequest[email] || 0;
@@ -76,7 +82,7 @@
       lastSignInRequest[email] = Date.now();
       var request = client.auth.signInWithOtp({
         email: email,
-        options: { emailRedirectTo: signInRedirectUrl() }
+        options: { emailRedirectTo: signInRedirectUrl(options.returnToPanel) }
       }).then(function (result) {
         if (result.error) throw result.error;
         return result;
