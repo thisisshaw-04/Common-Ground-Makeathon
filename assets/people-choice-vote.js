@@ -68,7 +68,7 @@
     renderSignInState();
     if (!eventStatus.gallery_open) return;
     if (!session || !session.user) {
-      setMessage('Sign in to vote after 6:00 PM SGT. Participant-list emails and organisers get 3 votes; other verified emails get 1.');
+      setMessage('Sign in to vote. Organisers and participant-list emails get 3 votes; other verified emails get 1.');
     } else if (!voteStatusResolved) {
       setMessage('Checking your sign-in and vote limit…');
     } else if (!eventStatus.voting_open) {
