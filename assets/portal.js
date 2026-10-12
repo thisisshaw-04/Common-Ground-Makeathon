@@ -92,7 +92,8 @@
   /* ---------------- live schedule and server cutoff ---------------- */
   var EVENT_START_AT = Date.parse('2026-10-11T09:00:00+08:00');
   var GALLERY_OPEN_AT = Date.parse('2026-10-11T15:15:00+08:00');
-  var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-11T16:08:02.945+08:00');
+  var SUBMISSION_OPEN_AT = Date.parse('2026-10-12T12:00:00+08:00');
+  var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-12T18:00:00+08:00');
   var EVENT_END_AT = Date.parse('2026-10-11T17:00:00+08:00');
   var VOTING_START_AT = Date.parse('2026-10-12T12:00:00+08:00');
   var VOTING_END_AT = Date.parse('2026-10-14T23:59:59+08:00');
@@ -100,7 +101,7 @@
   window.CGHasExistingSubmission = false;
   var eventStatus = {
     current_at: new Date().toISOString(),
-    submissions_closed: Date.now() >= SUBMISSION_CUTOFF_AT,
+    submissions_closed: Date.now() < SUBMISSION_OPEN_AT || Date.now() >= SUBMISSION_CUTOFF_AT,
     gallery_open: Date.now() >= GALLERY_OPEN_AT,
     voting_open: Date.now() >= VOTING_START_AT && Date.now() < VOTING_END_AT,
     authoritative: false
@@ -191,9 +192,19 @@
     var canAccess = eligible && codeAccess && !closed;
     var canEdit = canAccess && hasExistingSubmission;
     if ($('team-section')) $('team-section').hidden = !canAccess;
-    if ($('team-form')) $('team-form').hidden = !canEdit;
+    if ($('team-form')) $('team-form').hidden = true;
     if ($('submission-section')) $('submission-section').hidden = !canEdit;
-    if ($('submission-locked')) $('submission-locked').hidden = canEdit;
+    if ($('submission-locked')) {
+      $('submission-locked').hidden = canEdit;
+      if (closed) {
+        var lockHeading = $('submission-locked').querySelector('h2');
+        var lockCopy = $('submission-locked').querySelector('p');
+        if (lockHeading) lockHeading.textContent = Date.now() < SUBMISSION_OPEN_AT ? 'Project updates open at noon.' : 'Project edits are closed.';
+        if (lockCopy) lockCopy.textContent = Date.now() < SUBMISSION_OPEN_AT
+          ? 'From 12:00 PM to 6:00 PM SGT today, existing project teams can update only their preview image, live demo, and demo video links. After 6:00 PM, the site is open for voting through 11:59 PM Wednesday.'
+          : 'The project media edit window ended at 6:00 PM SGT today. Only People’s Choice voting remains open through 11:59 PM Wednesday, 14 October.';
+      }
+    }
   }
   document.addEventListener('cg-existing-submission-change', updateSubmissionAvailability);
   function publishEventStatus(next) {
@@ -205,13 +216,13 @@
   }
   function localEventFallback() {
     var now = Date.now();
-    var closed = now >= SUBMISSION_CUTOFF_AT;
+    var closed = now < SUBMISSION_OPEN_AT || now >= SUBMISSION_CUTOFF_AT;
     var galleryOpen = now >= GALLERY_OPEN_AT;
     return {
       current_at: new Date(now).toISOString(),
       submissions_closed: closed,
       gallery_open: galleryOpen,
-      voting_open: galleryOpen && now < EVENT_END_AT,
+      voting_open: now >= VOTING_START_AT && now < VOTING_END_AT,
       authoritative: false
     };
   }
