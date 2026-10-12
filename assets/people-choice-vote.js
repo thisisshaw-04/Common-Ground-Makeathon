@@ -128,9 +128,25 @@
     eventStatus = event.detail || {};
     renderState();
   });
+  signIn.addEventListener('click', function () {
+    try { sessionStorage.setItem('cg-return-to-choice-after-signin', '1'); } catch (_err) { /* Navigation can still be manual. */ }
+  });
   document.addEventListener('cg-submission-auth', function (event) {
     session = event.detail && event.detail.session || null;
     refreshStatus();
+    if (session && session.user) {
+      var returnToChoice = false;
+      try {
+        returnToChoice = sessionStorage.getItem('cg-return-to-choice-after-signin') === '1';
+        if (returnToChoice) sessionStorage.removeItem('cg-return-to-choice-after-signin');
+      } catch (_err) { /* Keep voting available even if storage is blocked. */ }
+      if (returnToChoice) {
+        window.setTimeout(function () {
+          var choiceTab = document.getElementById('nav-choice');
+          if (choiceTab) choiceTab.click();
+        }, 0);
+      }
+    }
   });
   document.addEventListener('cg-builder-eligibility', function (event) {
     eligible = !!(event.detail && event.detail.eligible);
