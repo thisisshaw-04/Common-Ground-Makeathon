@@ -199,8 +199,8 @@
       if (closed) {
         var lockHeading = $('submission-locked').querySelector('h2');
         var lockCopy = $('submission-locked').querySelector('p');
-        if (lockHeading) lockHeading.textContent = Date.now() < SUBMISSION_OPEN_AT ? 'Project updates open at noon.' : 'Project edits are closed.';
-        if (lockCopy) lockCopy.textContent = Date.now() < SUBMISSION_OPEN_AT
+        if (lockHeading) lockHeading.textContent = eventNow() < SUBMISSION_OPEN_AT ? 'Project updates open at noon.' : 'Project edits are closed.';
+        if (lockCopy) lockCopy.textContent = eventNow() < SUBMISSION_OPEN_AT
           ? 'From 12:00 PM to 6:00 PM SGT today, existing project teams can update only their preview image, live demo, and demo video links. After 6:00 PM, the site is open for voting through 11:59 PM Wednesday.'
           : 'The project media edit window ended at 6:00 PM SGT today. Only People’s Choice voting remains open through 11:59 PM Wednesday, 14 October.';
       }
