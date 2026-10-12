@@ -201,7 +201,7 @@
       peopleChoiceMessage('Voting has ended · ' + readyCount + ' projects · ' + voteCount + ' votes cast.');
     }
     $('people-choice-pause').hidden = !votingOpen;
-    $('people-choice-resume').hidden = votingOpen || !paused || now < cutoff || now >= ends;
+    $('people-choice-resume').hidden = votingOpen || !paused || now >= ends;
     $('people-choice-results-button').hidden = votingOpen;
   }
 
