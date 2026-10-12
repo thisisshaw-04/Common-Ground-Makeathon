@@ -188,8 +188,10 @@
     var eligible = window.CGBuilderEligibility === true;
     var codeAccess = !!(current && current.status === 'confirmed' && CGData.codesOpen(data.event));
     var hasExistingSubmission = window.CGHasExistingSubmission === true;
-    var canEdit = eligible && codeAccess && !closed && hasExistingSubmission;
-    if ($('team-section')) $('team-section').hidden = !canEdit;
+    var canAccess = eligible && codeAccess && !closed;
+    var canEdit = canAccess && hasExistingSubmission;
+    if ($('team-section')) $('team-section').hidden = !canAccess;
+    if ($('team-form')) $('team-form').hidden = !canEdit;
     if ($('submission-section')) $('submission-section').hidden = !canEdit;
     if ($('submission-locked')) $('submission-locked').hidden = canEdit;
   }
