@@ -124,6 +124,8 @@
 .people-choice-code-buttons .btn{flex:0 1 auto;width:auto;white-space:nowrap}
 .gallery-vote-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0}
 .gallery-vote-actions [data-vote-project]{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;width:auto;min-height:0;padding:12px 20px;font-size:13px;line-height:1.2}
+.gallery-vote-actions [data-vote-project].btn-unvote{background:#000;color:#fff;border-color:#000}
+.gallery-vote-actions [data-vote-project].btn-unvote:hover:not(:disabled){background:#202020;border-color:#202020}
 .gallery-vote-actions .btn[disabled]{opacity:.55;cursor:not-allowed}
 .gallery-vote-actions .vote-state{font:10px var(--mono);color:var(--muted)}
 .gallery-refresh{margin:0 0 18px}
@@ -458,7 +460,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/portal.js?v=20261012-single-team-contact-email"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261012-project-share-links"></script>
-<script src="./assets/people-choice-vote.js?v=20261012-vote-test-early"></script>
+<script src="./assets/people-choice-vote.js?v=20261012-stable-vote-row"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
 <script src="./assets/submission-sync.js?v=20261012-hide-unlinked-edit-box"></script>
 </body>
