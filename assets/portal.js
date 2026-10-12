@@ -106,10 +106,10 @@
   /* ---------------- live schedule and server cutoff ---------------- */
   var EVENT_START_AT = Date.parse('2026-10-11T09:00:00+08:00');
   var GALLERY_OPEN_AT = Date.parse('2026-10-11T15:15:00+08:00');
-  var SUBMISSION_OPEN_AT = Date.parse('2026-10-12T18:00:00+08:00');
+  var SUBMISSION_OPEN_AT = Date.parse('2026-10-12T00:00:00+08:00');
   var SUBMISSION_CUTOFF_AT = Date.parse('2026-10-13T00:00:00+08:00');
   var EVENT_END_AT = Date.parse('2026-10-11T17:00:00+08:00');
-  var VOTING_START_AT = Date.parse('2026-10-12T18:00:00+08:00');
+  var VOTING_START_AT = Date.parse('2026-10-13T00:00:00+08:00');
   var VOTING_END_AT = Date.parse('2026-10-14T23:59:59+08:00');
   var serverClockOffset = 0;
   window.CGHasExistingSubmission = false;
@@ -213,10 +213,10 @@
       if (closed) {
         var lockHeading = $('submission-locked').querySelector('h2');
         var lockCopy = $('submission-locked').querySelector('p');
-        if (lockHeading) lockHeading.textContent = eventNow() < SUBMISSION_OPEN_AT ? 'Project updates open at 6:00 PM SGT.' : 'Project edits are closed.';
+        if (lockHeading) lockHeading.textContent = eventNow() < SUBMISSION_OPEN_AT ? 'Project updates opened at 12:00 AM SGT Monday, 12 October.' : 'Project edits are closed.';
         if (lockCopy) lockCopy.textContent = eventNow() < SUBMISSION_OPEN_AT
-          ? 'From 6:00 PM today until 12:00 AM SGT Tuesday, 13 October, existing project teams can update only their preview image, live demo, and demo video links. After midnight, project edits close and voting remains open through 11:59 PM Wednesday.'
-          : 'The project media edit window closes at 12:00 AM SGT Tuesday, 13 October. Only People’s Choice voting remains open through 11:59 PM Wednesday, 14 October.';
+          ? 'From 12:00 AM SGT Monday, 12 October until 12:00 AM SGT Tuesday, 13 October, existing project teams can update only their preview image, live demo, and demo video links. After midnight, project edits close and voting opens through 11:59 PM Wednesday, 14 October.'
+          : 'The project media edit window closes at 12:00 AM SGT Tuesday, 13 October. People’s Choice voting opens then and remains open through 11:59 PM Wednesday, 14 October.';
       }
     }
   }
