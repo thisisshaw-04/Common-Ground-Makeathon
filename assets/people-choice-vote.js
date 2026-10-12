@@ -49,7 +49,9 @@
       actions.innerHTML = '<button class="btn btn-primary" type="button" data-vote-project="' +
         String(id).replace(/[&<>"']/g, '') + '"' + (disabled ? ' disabled' : '') + '>' +
         buttonText + '</button>';
-      card.appendChild(actions);
+      var actionRow = card.querySelector('.project-gallery-share-row');
+      if (actionRow) actionRow.appendChild(actions);
+      else card.appendChild(actions);
     });
   }
   function updatePhaseLabel() {
