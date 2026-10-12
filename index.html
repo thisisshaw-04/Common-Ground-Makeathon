@@ -203,7 +203,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
     <div class="gate-inner">
       <span class="eyebrow">YOUR ACCESS</span>
       <h2 id="gate-title">Sign in to vote.</h2>
-      <p>Any verified email can vote. Emails on the participant list get up to three votes; other verified emails get one. If your email is listed on an already submitted project, you can update its preview image, live demo, and demo video during the edit window. Partner offers are for registered participants.</p>
+      <p>Any verified email can vote. Participants get 3 votes; everyone else gets 1. If your email is listed on an already submitted project, you can update its preview image, live demo, and demo video during the edit window. Partner offers are for registered participants.</p>
       <form class="gate-form" id="gate-form" novalidate>
         <label for="email">Email address</label>
         <input type="email" id="email" name="email" placeholder="you@example.com"
@@ -327,7 +327,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
   <div class="submission-locked" id="submission-locked" hidden>
     <span class="eyebrow">PROJECT SUBMISSION</span>
     <h2>Sign in to edit an existing project.</h2>
-    <p>Sign in with a verified email. Recognised participant emails can edit only the image and demo links on a submitted project linked to that email until 12:00 AM SGT Tuesday, 13 October. Drafts and new entries are closed. Voting opens at 6:00 PM SGT on Monday, 12 October; participant-list emails get 3 votes and other verified emails get 1 through 11:59 PM Wednesday, 14 October.</p>
+    <p>Sign in with a verified email. Recognised participant emails can edit only the image and demo links on a submitted project linked to that email until 11:59 PM tonight, Monday, 12 October SGT. Drafts and new entries are closed. Voting closes at 11:59 PM SGT Wednesday, 14 October. Participants get 3 votes; everyone else gets 1.</p>
     <a class="btn btn-primary" href="#people-choice-area" data-panel-select="choice" data-scroll-target="people-choice-area">Sign in here to vote</a>
   </div>
 <section id="team-section" class="team-section" hidden aria-labelledby="team-title">
@@ -357,7 +357,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <section id="submission-section" class="team-section" hidden aria-labelledby="submission-title">
       <span class="eyebrow">PROJECT DETAILS</span>
       <h2 id="submission-title">Show us what you made.</h2>
-      <p>Editing is open now through 12:00 AM Tuesday, 13 October SGT. Only projects already submitted and visible in the gallery can update the preview image, live demo, and demo video links. Drafts and new projects are locked.</p>
+      <p>Editing is open now through 11:59 PM tonight, Monday, 12 October SGT. Only projects already submitted and visible in the gallery can update the preview image, live demo, and demo video links. Drafts and new projects are locked.</p>
       <p id="submission-team" class="helper"></p>
       <p id="project-edit-lock" class="helper" role="status" hidden></p>
       <form id="submission-form" novalidate>
@@ -393,10 +393,10 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
           <div class="submission-masonry-column">
             <fieldset class="field">
               <legend>PROJECT LINKS & DEMO</legend>
-              <p class="helper submission-media-note">During the edit window, update only these three links. Friends can vote with any verified email; the edit window closes at 12:00 AM SGT Tuesday, 13 October.</p>
+              <p class="helper submission-media-note">During the edit window, update only these three links. Friends can vote with any verified email; the edit window closes at 11:59 PM tonight, Monday, 12 October SGT.</p>
               <input id="project-preview-image" type="hidden">
               <label class="field media-editable"><span>UPLOAD PROJECT PREVIEW IMAGE <small class="field-status is-optional">OPTIONAL</small></span><input id="project-preview-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/avif" aria-describedby="project-image-edit-deadline project-image-upload-status"></label>
-              <p class="helper" id="project-image-edit-deadline">Submitted gallery projects can update preview images and demo links until 12:00 AM SGT Tuesday, 13 October.</p>
+              <p class="helper" id="project-image-edit-deadline">Submitted gallery projects can update preview images and demo links until 11:59 PM tonight, Monday, 12 October SGT.</p>
               <p class="helper" id="project-image-upload-status" role="status" aria-live="polite">Leave this empty to keep the current preview image. JPG, PNG, WebP, GIF, and AVIF files up to 5 MB are supported.</p>
               <label class="field media-editable"><span>LIVE DEMO / DEPLOYED PROJECT <small class="field-status is-optional">OPTIONAL</small></span><input id="project-demo" type="url" placeholder="https://…" maxlength="2000"></label>
               <label class="field media-editable"><span>DEMO VIDEO <small class="field-status is-required">MANDATORY</small></span><input id="project-video" type="url" placeholder="https://…" maxlength="2000" required></label>
@@ -423,10 +423,10 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
         <span id="gallery-phase-label" class="gallery-phase-pill" aria-live="polite">VOTING OPEN</span>
       </div>
     </div>
-    <p id="project-gallery-message" class="helper" role="status">Editing is open now through 12:00 AM Tuesday, 13 October SGT. Submitted projects already visible in the gallery can update their preview image, live demo, and demo video links. Drafts and new projects are locked. Organisers and participant-list emails can vote now with 3 votes each. Other verified emails can vote from 6:00 PM SGT with 1 vote. Voting closes at 11:59 PM Wednesday, 14 October.</p>
+    <p id="project-gallery-message" class="helper" role="status">Editing is open for projects already submitted and visible in the gallery until 11:59 PM tonight, Monday, 12 October SGT. Drafts and new projects are locked. Voting is open: participants get 3 votes; everyone else gets 1. Voting closes at 11:59 PM Wednesday, 14 October SGT.</p>
     <section class="gallery-voting" id="people-choice-area" aria-labelledby="people-choice-title">
       <span class="eyebrow">PEOPLE’S CHOICE</span><h3 id="people-choice-title">People’s Choice voting</h3>
-      <p class="helper" id="people-choice-message" role="status">Sign in to vote. Organisers and participant-list emails get 3 votes; other verified emails get 1.</p>
+      <p class="helper" id="people-choice-message" role="status">Sign in to vote. Participants get 3 votes; everyone else gets 1.</p>
       <div class="people-choice-auth">
         <form id="people-choice-signin-form">
           <label class="field"><span>SIGN-IN EMAIL</span><input id="people-choice-email" type="email" autocomplete="email" required></label>
@@ -462,12 +462,12 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="./assets/backend-config.js?v=20261011"></script>
 <script src="./assets/submission-auth.js?v=20261012-gallery-inline-signin"></script>
-<script src="./assets/data.js?v=20261012-gallery-edit-only"></script>
-<script src="./assets/portal.js?v=20261012-single-team-contact-email"></script>
+<script src="./assets/data.js?v=20261012-vote-copy-tonight-deadline"></script>
+<script src="./assets/portal.js?v=20261012-vote-copy-tonight-deadline"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
 <script src="./assets/project-gallery.js?v=20261012-project-share-links"></script>
-<script src="./assets/people-choice-vote.js?v=20261012-no-voting-timing-copy"></script>
+<script src="./assets/people-choice-vote.js?v=20261012-vote-copy-tonight-deadline"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
-<script src="./assets/submission-sync.js?v=20261012-hide-unlinked-edit-box"></script>
+<script src="./assets/submission-sync.js?v=20261012-vote-copy-tonight-deadline"></script>
 </body>
 </html>
