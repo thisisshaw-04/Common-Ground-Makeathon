@@ -1,4 +1,4 @@
-/* Sync the existing local builder drafts to Supabase after email verification. */
+/* Let approved attendees edit existing project rows; do not create new submissions. */
 (function () {
   'use strict';
   var EVENT_ID = 'common-ground-2026-10-11';
