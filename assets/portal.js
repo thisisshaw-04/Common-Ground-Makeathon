@@ -216,11 +216,11 @@
       if (closed) {
         if (lockHeading) lockHeading.textContent = eventNow() < SUBMISSION_OPEN_AT ? 'Project updates have not opened yet.' : 'Project edits are closed.';
         if (lockCopy) lockCopy.textContent = eventNow() < SUBMISSION_OPEN_AT
-          ? 'Existing submitted projects can update their preview image, live demo, and demo video during the edit window. Anyone can sign in to vote: participant-list emails get three votes; other verified emails get one.'
-          : 'The project media edit window closes at 12:00 AM SGT Tuesday, 13 October. People’s Choice voting is open through 11:59 PM Wednesday, 14 October.';
+          ? 'Existing submitted projects can update their preview image, live demo, and demo video during the edit window. Anyone can sign in to vote: participants get 3 votes; everyone else gets 1.'
+          : 'The project media edit window closed at 11:59 PM SGT Monday, 12 October. People’s Choice voting is open through 11:59 PM Wednesday, 14 October.';
       } else if (signedIn && !hasExistingSubmission) {
         if (lockHeading) lockHeading.textContent = 'No submitted project is linked to this email.';
-        if (lockCopy) lockCopy.textContent = 'Only recognised participant emails linked to a submitted project can edit that project’s image and demo links. Participant-list emails get three votes after 6:00 PM SGT; other verified emails get one.';
+        if (lockCopy) lockCopy.textContent = 'Only recognised participant emails linked to a submitted project can edit that project’s image and demo links. Participants get 3 votes; everyone else gets 1.';
       }
     }
   }
@@ -334,7 +334,7 @@
         return;
       }
       clearError();
-      setGateStatus('Signed in and verified. Participant-list email: up to three votes. You can update a submitted project’s image and demo links if this email is listed on its team.');
+      setGateStatus('Signed in and verified. You get up to 3 votes. You can update a submitted project’s image and demo links if this email is listed on its team.');
       var returnPanel = location.hash.match(/^#(access|schedule|faq|choice)$/i);
       if (!returnPanel) activatePanel('access', true);
       renderResult({
