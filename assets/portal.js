@@ -97,6 +97,7 @@
   var VOTING_START_AT = Date.parse('2026-10-12T12:00:00+08:00');
   var VOTING_END_AT = Date.parse('2026-10-14T23:59:59+08:00');
   var serverClockOffset = 0;
+  window.CGHasExistingSubmission = false;
   var eventStatus = {
     current_at: new Date().toISOString(),
     submissions_closed: Date.now() >= SUBMISSION_CUTOFF_AT,
@@ -186,11 +187,13 @@
     var closed = !!eventStatus.submissions_closed;
     var eligible = window.CGBuilderEligibility === true;
     var codeAccess = !!(current && current.status === 'confirmed' && CGData.codesOpen(data.event));
-    var canSubmit = eligible && codeAccess && !closed;
-    if ($('team-section')) $('team-section').hidden = !canSubmit;
-    if ($('submission-section')) $('submission-section').hidden = !canSubmit;
-    if ($('submission-locked')) $('submission-locked').hidden = closed || canSubmit;
+    var hasExistingSubmission = window.CGHasExistingSubmission === true;
+    var canEdit = eligible && codeAccess && !closed && hasExistingSubmission;
+    if ($('team-section')) $('team-section').hidden = !canEdit;
+    if ($('submission-section')) $('submission-section').hidden = !canEdit;
+    if ($('submission-locked')) $('submission-locked').hidden = canEdit;
   }
+  document.addEventListener('cg-existing-submission-change', updateSubmissionAvailability);
   function publishEventStatus(next) {
     eventStatus = next;
     window.CGEventStatus = eventStatus;
