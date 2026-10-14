@@ -157,11 +157,17 @@
       document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:[]}}));
       return;
     }
-    // Show projects with an available preview image first, preserving each group's order.
+    // Show award winners first, then finalists, then all other projects.
+    // Keep preview-ready projects first within each group, preserving their order otherwise.
     rows = rows.map(function (row, index) {
-      return {row: row, index: index, hasImage: !!previewImage(row)};
+      var projectName = String(row.project_name || '').trim().toLowerCase();
+      var group = AWARD_BY_SUBMISSION[String(row.submission_id || '')] ? 0
+        : (FINALIST_BY_PROJECT[projectName] ? 1 : 2);
+      return {row: row, index: index, group: group, hasImage: !!previewImage(row)};
     }).sort(function (a, b) {
-      return (Number(b.hasImage) - Number(a.hasImage)) || (a.index - b.index);
+      return (a.group - b.group)
+        || (Number(b.hasImage) - Number(a.hasImage))
+        || (a.index - b.index);
     }).map(function (item) {
       return item.row;
     });
