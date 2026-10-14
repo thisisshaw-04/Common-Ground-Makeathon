@@ -42,6 +42,7 @@
 .project-gallery-card .gallery-credit{font:10px var(--mono);color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
 .project-gallery-tracks,.project-gallery-links{display:flex;gap:8px;flex-wrap:wrap}
 .project-gallery-tracks span{font:10px var(--mono);padding:5px 8px;border:1px solid var(--ink);border-radius:999px;background:var(--acid)}
+.project-gallery-tracks span.project-finalist-track{border-color:transparent;border-radius:5px;color:#fff;background:linear-gradient(#111,#111) padding-box,linear-gradient(115deg,#fff0a8,#7defff,#d5a2ff,#ff9bc9,#fff0a8) border-box;box-shadow:0 0 16px rgba(125,239,255,.18)}
 .project-award-badge{display:grid;gap:3px;justify-items:start;width:fit-content;max-width:100%;padding:8px 11px;border:1px solid transparent;border-radius:5px;color:#fff;background:linear-gradient(#111,#111) padding-box,linear-gradient(115deg,#fff0a8,#7defff,#d5a2ff,#ff9bc9,#fff0a8) border-box;box-shadow:0 0 16px rgba(125,239,255,.18);font:10px var(--mono);letter-spacing:.04em}
 .project-award-kicker{font-size:8px;letter-spacing:.09em;opacity:.75}
 .project-award-badge strong{font:inherit;font-weight:600;text-transform:uppercase;overflow-wrap:anywhere}
@@ -109,6 +110,12 @@
 .gallery-voting{border:1px solid var(--ink);background:#fff;padding:20px;margin:20px 0}
 .gallery-voting h3{margin:8px 0;font-size:22px}
 .gallery-voting p{margin:8px 0}
+#people-choice-area{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,560px);gap:8px 32px;align-items:start}
+#people-choice-area>.eyebrow{grid-column:1;grid-row:1}
+#people-choice-title{grid-column:1;grid-row:2}
+#people-choice-message{grid-column:1;grid-row:3}
+#people-choice-area>.people-choice-auth{grid-column:2;grid-row:1/span 3;width:100%;max-width:none;margin-top:0}
+@media(max-width:760px){#people-choice-area{grid-template-columns:1fr;gap:8px}#people-choice-area>.eyebrow,#people-choice-title,#people-choice-message,#people-choice-area>.people-choice-auth{grid-column:1;grid-row:auto}#people-choice-area>.people-choice-auth{margin-top:6px}}
 .people-choice-auth{max-width:560px;margin-top:14px;padding:14px;border:1px solid var(--line-hard);border-radius:12px;background:#f1f1f1}
 .people-choice-auth form#people-choice-signin-form{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:end;gap:10px}
 .people-choice-auth form#people-choice-code-form{display:grid;gap:10px}
@@ -465,7 +472,7 @@ body.builder-page #panel-overview .hero{width:auto;margin-inline:calc(50% - 50vw
 <script src="./assets/data.js?v=20261012-vote-copy-tonight-deadline"></script>
 <script src="./assets/portal.js?v=20261012-vote-copy-tonight-deadline"></script>
 <script src="./assets/project-modal.js?v=20261011-project-modal"></script>
-<script src="./assets/project-gallery.js?v=20261012-project-share-links"></script>
+<script src="./assets/project-gallery.js?v=20261014-finalist-track-auth-layout"></script>
 <script src="./assets/people-choice-vote.js?v=20261012-vote-copy-tonight-deadline"></script>
 <script src="./assets/tool-code-claim.js?v=20261011-auth-return"></script>
 <script src="./assets/submission-sync.js?v=20261012-vote-copy-tonight-deadline"></script>
