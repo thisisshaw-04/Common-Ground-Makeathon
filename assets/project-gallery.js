@@ -106,7 +106,7 @@
   }
   function trackMarkup(row, tracks) {
     var tags = [];
-    if (projectIsFinalist(row)) tags.push('<span>Finalist</span>');
+    if (projectIsFinalist(row)) tags.push('<span class="project-finalist-track">Finalist</span>');
     tracks.forEach(function (track) {
       tags.push('<span>' + escape(track) + '</span>');
     });
