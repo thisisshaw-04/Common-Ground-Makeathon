@@ -2,12 +2,15 @@
 (function () {
   'use strict';
   var EVENT_ID = 'common-ground-2026-10-11';
-  var client = window.CGSubmission && window.CGSubmission.client;
+  var config = window.CG_SUPABASE_CONFIG || {};
+  var client = window.supabase && window.supabase.createClient && config.url && config.publishableKey
+    ? window.supabase.createClient(config.url, config.publishableKey)
+    : null;
   var section = document.getElementById('project-gallery');
   var message = document.getElementById('project-gallery-message');
   var cards = document.getElementById('project-gallery-cards');
   var refreshButton = document.getElementById('gallery-refresh');
-  var status = window.CGEventStatus || {};
+  var status = window.CGEventStatus || {gallery_open:true};
   var request = 0;
   var loaded = false;
 
@@ -160,7 +163,7 @@
   }
   function render(rows) {
     if (!rows.length) {
-      message.textContent = 'No ready submissions yet. Teams can still submit or update until 3:30 PM SGT.';
+      message.textContent = 'No submitted projects are available in the gallery right now.';
       cards.innerHTML = '';
       document.dispatchEvent(new CustomEvent('cg-gallery-loaded', {detail:{rows:[]}}));
       return;
@@ -179,7 +182,7 @@
     }).map(function (item) {
       return item.row;
     });
-    message.textContent = '';
+    message.textContent = 'Voting is closed. Browse the submitted projects below.';
     cards.innerHTML = rows.map(function (row) {
       var name = row.project_name || 'Untitled project';
       var team = row.team_name || 'Team';
@@ -327,5 +330,5 @@
     load();
   });
   document.addEventListener('cg-event-status', function (event) { update(event.detail); });
-  update(window.CGEventStatus);
+  update(window.CGEventStatus || {gallery_open:true});
 })();
