@@ -93,16 +93,24 @@
     'you & ai': true
   };
 
+  function projectIsFinalist(row) {
+    var projectName = String(row.project_name || '').trim().toLowerCase();
+    return !!FINALIST_BY_PROJECT[projectName];
+  }
   function awardMarkup(row) {
     var award = AWARD_BY_SUBMISSION[String(row.submission_id || '')];
-    if (award) {
-      return '<div class="project-award-badge" aria-label="' + escape(award) + '">' +
-        '<strong>' + escape(award) + '</strong>' +
-        '</div>';
-    }
-    var projectName = String(row.project_name || '').trim().toLowerCase();
-    if (!FINALIST_BY_PROJECT[projectName]) return '';
-    return '<div class="project-award-badge" aria-label="Finalist"><strong>Finalist</strong></div>';
+    if (!award) return '';
+    return '<div class="project-award-badge" aria-label="' + escape(award) + '">' +
+      '<strong>' + escape(award) + '</strong>' +
+      '</div>';
+  }
+  function trackMarkup(row, tracks) {
+    var tags = [];
+    if (projectIsFinalist(row)) tags.push('<span>Finalist</span>');
+    tracks.forEach(function (track) {
+      tags.push('<span>' + escape(track) + '</span>');
+    });
+    return tags.length ? '<div class="project-gallery-tracks">' + tags.join('') + '</div>' : '';
   }
   function detail(label, value) {
     if (!value) return '';
@@ -202,9 +210,7 @@
         (links ? '<div class="project-gallery-links">' + links + '</div>' : '') + '</div>' +
         '<p class="project-modal-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</p>' +
         awardMarkup(row) +
-        (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
-          return '<span>' + escape(track) + '</span>';
-        }).join('') + '</div>' : '') +
+        trackMarkup(row, tracks) +
         (oneLiner && oneLiner !== overview ? '<p class="project-modal-one-liner">' + escape(oneLiner) + '</p>' : '') +
         '<div class="project-modal-details">' + (expanded || '<p class="helper">No additional details were shared.</p>') + '</div>' +
         '</div>';
@@ -216,9 +222,7 @@
         '<span class="gallery-team">' + escape(team) + (row.is_my_team ? ' · Your team' : '') + '</span>' +
         '<h3>' + escape(name) + '</h3>' +
         awardMarkup(row) +
-        (tracks.length ? '<div class="project-gallery-tracks">' + tracks.map(function (track) {
-          return '<span>' + escape(track) + '</span>';
-        }).join('') + '</div>' : '') +
+        trackMarkup(row, tracks) +
         (oneLiner ? '<p class="project-gallery-one-liner">' + escape(oneLiner) + '</p>' : '') +
         '<span class="project-gallery-toggle"><span>View project details</span><span aria-hidden="true">↗</span></span>' +
         '</div></button>' +
