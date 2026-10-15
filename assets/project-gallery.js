@@ -87,7 +87,9 @@
     '571179e5-7f4c-4c66-93c1-ede16510df69': 'Culture × Tech Award',
     '05ffd087-231c-4672-ba73-32e0424d89cd': 'Design × Tech Award',
     '42d8f39b-0c16-4fd5-8493-c37afeb808fc': 'Best Use of Tech Award',
-    'f690e28f-9605-4047-952d-c3ce5c49a619': 'Best Common Ground Award'
+    'f690e28f-9605-4047-952d-c3ce5c49a619': 'Best Common Ground Award',
+    '6ce562cc-650e-4a7e-b05a-1a9496c3464d': 'People’s Choice — Design × Tech',
+    'fc4f0465-1838-4791-8e2d-68b2d670307c': 'People’s Choice — Culture × Tech'
   };
   var FINALIST_BY_PROJECT = {
     'common heritage': true,
@@ -109,7 +111,7 @@
   }
   function trackMarkup(row, tracks) {
     var tags = [];
-    if (projectIsFinalist(row)) tags.push('<span class="project-finalist-track">Finalist</span>');
+    if (projectIsFinalist(row)) tags.push('<span class="project-award-badge project-finalist-track">Finalist</span>');
     tracks.forEach(function (track) {
       tags.push('<span>' + escape(track) + '</span>');
     });
