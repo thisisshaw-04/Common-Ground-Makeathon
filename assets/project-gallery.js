@@ -112,7 +112,7 @@
   }
   function trackMarkup(row, tracks) {
     var tags = [];
-    if (projectIsFinalist(row)) tags.push('<span class="project-award-badge project-finalist-track">Finalist</span>');
+    if (projectIsFinalist(row)) tags.push('<span class="project-award-badge project-finalist-track" style="background:#111!important;color:#fff!important;border:1px solid #111!important;border-radius:5px!important">Finalist</span>');
     tracks.forEach(function (track) {
       tags.push('<span>' + escape(track) + '</span>');
     });
